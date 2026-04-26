@@ -1,6 +1,4 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
 :root {
   --foreground-rgb: 255, 255, 255;
@@ -28,8 +26,6 @@ input[type="time"]::-webkit-calendar-picker-indicator {
   cursor: pointer;
 }
 
-@layer base {
-  h1, h2, h3, h4, h5, h6 {
-    @apply tracking-tight;
-  }
+h1, h2, h3, h4, h5, h6 {
+  letter-spacing: -0.025em;
 }
