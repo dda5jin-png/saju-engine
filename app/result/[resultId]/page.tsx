@@ -67,8 +67,8 @@ export default function ResultPage() {
           <div className="inline-block px-4 py-1 rounded-full bg-indigo-500/20 text-indigo-400 text-sm font-bold border border-indigo-500/30">
             분석 완료
           </div>
-          <h1 className="text-4xl font-black">{analysis.type_name}의 구조</h1>
-          <p className="text-gray-400 text-lg leading-relaxed">{analysis.summary}</p>
+          <h1 className="text-4xl md:text-5xl font-black tracking-tight bg-gradient-to-b from-white to-white/70 bg-clip-text text-transparent">{analysis.type_name}의 구조</h1>
+          <p className="text-gray-300 text-lg md:text-xl font-medium leading-relaxed max-w-lg mx-auto">{analysis.summary}</p>
         </header>
 
         {/* 카드 리스트 */}
@@ -142,25 +142,30 @@ export default function ResultPage() {
           }} 
         />
 
-        <footer className="pt-20 text-center space-y-8">
-          <div className="flex flex-col items-center gap-4">
+        <footer className="pt-20 text-center space-y-12">
+          <div className="flex flex-col items-center gap-6">
             <ShareButton 
                url={`${typeof window !== 'undefined' ? window.location.origin : ''}/result/${resultId}`}
                title={`내 사주 구조는 [${analysis.type_name}] 입니다!`}
                description={analysis.summary}
             />
-            <p className="text-gray-500 text-xs flex items-center gap-2">
-              <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
-              현재 1,482명이 자신의 구조를 분석 중입니다
+            <p className="text-gray-500 text-xs flex items-center gap-2 font-medium tracking-tight">
+              <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
+              현재 2,841명이 자신의 구조를 실시간 분석 중입니다
             </p>
           </div>
           
-          <div className="pt-10 border-t border-white/5">
+          <div className="pt-10 border-t border-white/10">
             <button 
               onClick={() => window.location.href = '/'}
-              className="text-gray-400 hover:text-white transition-colors underline underline-offset-8 text-sm font-medium"
+              className="group relative inline-flex items-center justify-center px-8 py-4 font-bold text-white transition-all duration-200 bg-white/5 border border-white/10 rounded-2xl hover:bg-white/10 hover:border-white/20 active:scale-95"
             >
-              새로운 데이터로 분석하기
+              <span className="relative flex items-center gap-2">
+                <svg className="w-4 h-4 transition-transform group-hover:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+                새로운 데이터로 다시 분석하기
+              </span>
             </button>
           </div>
         </footer>

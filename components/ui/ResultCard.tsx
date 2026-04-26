@@ -54,21 +54,21 @@ export default function ResultCard({ card, index, isLocked = false }: Props) {
         </div>
         
         <div className="space-y-4">
-          <h3 className="text-lg font-medium text-white/50 tracking-tight">{card.title}</h3>
-          <p className="text-3xl md:text-4xl font-extrabold text-white leading-[1.15] break-keep">
+          <h3 className="text-lg font-bold text-indigo-300/90 tracking-tight">{card.title}</h3>
+          <p className="text-3xl md:text-4xl font-extrabold text-white leading-[1.15] break-keep drop-shadow-sm">
             {isLocked ? "••••••••••••••••••••" : card.content}
           </p>
         </div>
       </div>
 
-      <div className="relative mt-8 pt-6 border-t border-white/5 flex justify-between items-center text-white/40">
+      <div className="relative mt-8 pt-6 border-t border-white/10 flex justify-between items-center text-white/60">
         <div className="flex -space-x-2">
           {[1, 2, 3].map(i => (
-            <div key={i} className="w-6 h-6 rounded-full border-2 border-slate-900 bg-slate-700" />
+            <div key={i} className="w-6 h-6 rounded-full border-2 border-slate-900 bg-slate-700 shadow-inner" />
           ))}
-          <span className="ml-4 text-xs self-center">3,492명이 공감함</span>
+          <span className="ml-4 text-[11px] font-medium self-center text-gray-400">3,492명이 공감함</span>
         </div>
-        <div className="text-xs font-medium uppercase tracking-widest group-hover:text-white transition-colors cursor-pointer">
+        <div className="text-[11px] font-bold uppercase tracking-widest text-indigo-400 group-hover:text-white transition-colors cursor-pointer">
           Tap to Share
         </div>
       </div>
