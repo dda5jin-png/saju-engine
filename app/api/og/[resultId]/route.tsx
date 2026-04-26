@@ -6,10 +6,10 @@ export const runtime = 'edge';
 
 export async function GET(
   request: Request,
-  { params }: { params: { resultId: string } }
+  { params }: { params: Promise<{ resultId: string }> }
 ) {
   try {
-    const resultId = params.resultId;
+    const { resultId } = await params;
     const docRef = doc(db, "results", resultId);
     const docSnap = await getDoc(docRef);
 
