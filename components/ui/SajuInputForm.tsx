@@ -4,11 +4,11 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { SajuInput } from '@/types/saju';
 import AnalysisLoading from './AnalysisLoading';
-import { AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 
 export default function SajuInputForm() {
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
+  const [status, setStatus] = useState<'idle' | 'loading' | 'error'>('idle');
   const [form, setForm] = useState<SajuInput>({
     birthDate: '',
     birthTime: '',
@@ -17,85 +17,122 @@ export default function SajuInputForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
+    setStatus('loading');
 
     try {
-      // 1. API 호출과 동시에 최소 대기 시간 확보
-      const [res] = await Promise.all([
-        fetch('/api/analyze', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(form)
-        }),
-        new Promise(resolve => setTimeout(resolve, 3000)) // 의도적 지연 3초
-      ]);
+      const res = await fetch('/api/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form)
+      });
       
-      const { id } = await res.json();
-      router.push(`/result/${id}`);
+      const data = await res.json();
+      
+      if (!res.ok || !data.id) {
+        throw new Error(data.error || '분석 실패');
+      }
+
+      // 의도적 지연 후 이동 (사용자에게 분석 중임을 인지시킴)
+      setTimeout(() => {
+        router.push(`/result/${data.id}`);
+      }, 3000);
+      
     } catch (error) {
       console.error('Analysis failed', error);
-      setLoading(false);
+      setStatus('error');
+      alert('분석 중 오류가 발생했습니다. 다시 시도해주세요.');
     }
   };
 
   return (
-    <>
+    <div className="w-full max-w-md mx-auto">
       <AnimatePresence>
-        {loading && <AnalysisLoading />}
+        {status === 'loading' && <AnalysisLoading />}
       </AnimatePresence>
       
-      <form onSubmit={handleSubmit} className="w-full max-w-md space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-1000">
-      <div className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-400 mb-2">생년월일</label>
-          <input
-            required
-            type="date"
-            value={form.birthDate}
-            onChange={(e) => setForm({ ...form, birthDate: e.target.value })}
-            className="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
-          />
-        </div>
+      <motion.form 
+        onSubmit={handleSubmit} 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="glass p-8 rounded-[2.5rem] space-y-8 border-white/10 shadow-2xl relative overflow-hidden"
+      >
+        {/* 장식용 빛 효과 */}
+        <div className="absolute -top-24 -right-24 w-48 h-48 bg-indigo-500/20 blur-[60px] rounded-full" />
+        <div className="absolute -bottom-24 -left-24 w-48 h-48 bg-purple-500/20 blur-[60px] rounded-full" />
 
-        <div>
-          <label className="block text-sm font-medium text-gray-400 mb-2">태어난 시간 (선택)</label>
-          <input
-            type="time"
-            value={form.birthTime}
-            onChange={(e) => setForm({ ...form, birthTime: e.target.value })}
-            className="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
-          />
-        </div>
+        <div className="space-y-6 relative z-10">
+          <div>
+            <label className="block text-xs font-bold text-indigo-300 uppercase tracking-widest mb-3 ml-1">
+              생년월일
+            </label>
+            <input
+              required
+              type="date"
+              value={form.birthDate}
+              onChange={(e) => setForm({ ...form, birthDate: e.target.value })}
+              className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white focus:ring-2 focus:ring-indigo-500 focus:bg-white/10 outline-none transition-all text-lg"
+            />
+          </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-400 mb-2">성별</label>
-          <div className="grid grid-cols-2 gap-4">
-            {(['male', 'female'] as const).map((g) => (
-              <button
-                key={g}
-                type="button"
-                onClick={() => setForm({ ...form, gender: g })}
-                className={`py-3 rounded-xl border transition-all ${
-                  form.gender === g 
-                    ? 'bg-indigo-600 border-indigo-500 text-white shadow-lg shadow-indigo-500/20' 
-                    : 'bg-slate-900 border-slate-700 text-gray-400'
-                }`}
-              >
-                {g === 'male' ? '남성' : '여성'}
-              </button>
-            ))}
+          <div>
+            <label className="block text-xs font-bold text-indigo-300 uppercase tracking-widest mb-3 ml-1">
+              태어난 시간 (선택)
+            </label>
+            <input
+              type="time"
+              value={form.birthTime}
+              onChange={(e) => setForm({ ...form, birthTime: e.target.value })}
+              className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white focus:ring-2 focus:ring-indigo-500 focus:bg-white/10 outline-none transition-all text-lg"
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-bold text-indigo-300 uppercase tracking-widest mb-3 ml-1">
+              나의 성별
+            </label>
+            <div className="grid grid-cols-2 gap-3">
+              {(['male', 'female'] as const).map((g) => (
+                <button
+                  key={g}
+                  type="button"
+                  onClick={() => setForm({ ...form, gender: g })}
+                  className={`py-4 rounded-2xl border font-bold transition-all ${
+                    form.gender === g 
+                      ? 'bg-indigo-600 border-indigo-400 text-white shadow-lg shadow-indigo-500/30 scale-[1.02]' 
+                      : 'bg-white/5 border-white/10 text-gray-400 hover:bg-white/10'
+                  }`}
+                >
+                  {g === 'male' ? '남성' : '여성'}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
-      </div>
 
-      <button
-        type="submit"
-        disabled={loading || !form.birthDate}
-        className="w-full bg-white text-black font-bold py-4 rounded-xl hover:bg-gray-100 disabled:opacity-50 transition-all active:scale-[0.98]"
-      >
-        {loading ? '구조를 분석 중입니다...' : '내 사주 분석하기'}
-      </button>
-    </form>
-    </>
+        <button
+          type="submit"
+          disabled={status === 'loading' || !form.birthDate}
+          className="w-full relative group"
+        >
+          <div className="absolute -inset-1 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl blur opacity-30 group-hover:opacity-100 transition duration-1000 group-hover:duration-200" />
+          <div className="relative w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-black py-5 rounded-2xl shadow-xl flex items-center justify-center gap-3 transition-all active:scale-[0.97]">
+            {status === 'loading' ? (
+              <span className="animate-pulse">구조 해석 가동 중...</span>
+            ) : (
+              <>
+                <span className="text-lg">내 사주 구조 분석하기</span>
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                </svg>
+              </>
+            )}
+          </div>
+        </button>
+
+        <p className="text-center text-[10px] text-gray-500 font-medium tracking-tight relative z-10 leading-relaxed">
+          제공된 데이터는 구조 분석을 위해서만<br /> 사용되며 별도로 외부에 노출되지 않습니다.
+        </p>
+      </motion.form>
+    </div>
   );
 }
