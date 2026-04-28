@@ -53,6 +53,24 @@ export interface ViralCharacterMode {
   share_lines: string[];
 }
 
+export type DecisionCategory = 'love' | 'money' | 'career' | 'general';
+
+export interface DecisionChoice {
+  label: string;
+  expected_flow: string;
+  pros: string;
+  cons: string;
+}
+
+export interface DecisionCoachResult {
+  situation: string;
+  choices: DecisionChoice[];
+  recommended_action: string;
+  risk_warning: string;
+  one_line_guide: string;
+  closing_message: string;
+}
+
 export interface SajuAnalysis {
   summary: string;
   type_name: string;

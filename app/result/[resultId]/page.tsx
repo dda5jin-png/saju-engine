@@ -9,6 +9,7 @@ import CharacterGuide from '@/components/ui/CharacterGuide';
 import ElementBalancePanel from '@/components/ui/ElementBalancePanel';
 import DetailedReadingPanel from '@/components/ui/DetailedReadingPanel';
 import ViralCharacterPanel from '@/components/ui/ViralCharacterPanel';
+import DecisionCoachPanel from '@/components/ui/DecisionCoachPanel';
 
 async function getDocWithTimeout(docRef: ReturnType<typeof doc>) {
   return Promise.race([
@@ -94,6 +95,8 @@ export default function ResultPage() {
           resultUrl={resultUrl}
           resultId={resultId as string}
         />
+
+        <DecisionCoachPanel resultId={resultId as string} />
       </div>
 
       <footer data-share-exclude className="max-w-2xl mx-auto pt-20 text-center space-y-12">
