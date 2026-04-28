@@ -37,7 +37,7 @@ export default function ResultCard({ card, index, isLocked = false }: Props) {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ delay: index * 0.1, duration: 0.6 }}
-      className={`relative w-full ${style.bg} backdrop-blur-xl rounded-[2.5rem] p-10 border ${style.border} shadow-2xl overflow-hidden group min-h-[300px] flex flex-col justify-between`}
+      className={`relative w-full ${style.bg} backdrop-blur-xl rounded-[2rem] md:rounded-[2.5rem] p-7 md:p-10 border ${style.border} shadow-2xl overflow-hidden group min-h-[300px] flex flex-col justify-between`}
     >
       {/* 프리미엄 장식 요소 */}
       <div className={`absolute -right-10 -top-10 w-40 h-40 ${style.glow} rounded-full blur-[60px] transition-all duration-700`} />
@@ -55,7 +55,7 @@ export default function ResultCard({ card, index, isLocked = false }: Props) {
         
         <div className="space-y-4">
           <h3 className="text-lg font-bold text-indigo-300/90 tracking-tight">{card.title}</h3>
-          <p className="text-3xl md:text-4xl font-extrabold text-white leading-[1.15] break-keep drop-shadow-sm">
+          <p className="text-2xl md:text-3xl font-extrabold text-white leading-[1.22] break-keep drop-shadow-sm">
             {isLocked ? "••••••••••••••••••••" : card.content}
           </p>
         </div>
@@ -68,8 +68,8 @@ export default function ResultCard({ card, index, isLocked = false }: Props) {
           ))}
           <span className="ml-4 text-[11px] font-medium self-center text-gray-400">3,492명이 공감함</span>
         </div>
-        <div className="text-[11px] font-bold uppercase tracking-widest text-indigo-400 group-hover:text-white transition-colors cursor-pointer">
-          Tap to Share
+        <div className="text-[11px] font-bold uppercase tracking-widest text-indigo-400 group-hover:text-white transition-colors">
+          FULL SHARE
         </div>
       </div>
 

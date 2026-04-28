@@ -32,6 +32,17 @@ export interface DayMasterProfile {
   strategy: string;
 }
 
+export interface DetailedReading {
+  basis: string[];
+  temperament: string;
+  work_style: string;
+  relationship: string;
+  money: string;
+  timing: string;
+  balance_practice: string;
+  reliability_note: string;
+}
+
 export interface SajuAnalysis {
   summary: string;
   type_name: string;
@@ -47,6 +58,7 @@ export interface SajuAnalysis {
   confidence_note: string;
   element_profile: ElementProfile;
   day_master_profile: DayMasterProfile;
+  detailed_reading: DetailedReading;
   viral_sentences: {
     self_realization: string;
     painful_truth: string;

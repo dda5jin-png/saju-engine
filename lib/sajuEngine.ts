@@ -1,6 +1,7 @@
 import { Solar } from 'lunar-javascript';
 import {
   DayMasterProfile,
+  DetailedReading,
   ElementDistribution,
   ElementProfile,
   ElementType,
@@ -33,6 +34,34 @@ const ELEMENT_LABELS: Record<ElementType, string> = {
   earth: '토',
   metal: '금',
   water: '수',
+};
+
+const ELEMENT_MEANINGS: Record<ElementType, { trait: string; excess: string; practice: string }> = {
+  wood: {
+    trait: '성장, 기획, 확장, 시작의 힘',
+    excess: '일을 크게 벌리지만 마무리 에너지가 분산되기 쉽습니다.',
+    practice: '목표를 작게 쪼개고 마감 기준을 먼저 정하세요.',
+  },
+  fire: {
+    trait: '표현, 열정, 몰입, 드러나는 에너지',
+    excess: '감정 온도가 높아질 때 말과 선택이 빨라질 수 있습니다.',
+    practice: '중요한 대화와 결제는 한 번 식힌 뒤 진행하세요.',
+  },
+  earth: {
+    trait: '안정, 축적, 현실감, 중재의 힘',
+    excess: '익숙한 방식에 머물러 변화 타이밍을 늦출 수 있습니다.',
+    practice: '유지할 것과 바꿀 것을 나누어 적어보세요.',
+  },
+  metal: {
+    trait: '정리, 판단, 경계, 결단의 힘',
+    excess: '기준이 강해져 관계에서 차갑게 보일 수 있습니다.',
+    practice: '결론 앞에 이유와 감정을 한 문장 덧붙이세요.',
+  },
+  water: {
+    trait: '사고, 탐색, 정보, 흐름을 읽는 힘',
+    excess: '생각이 깊어질수록 실행이 늦어질 수 있습니다.',
+    practice: '정보 수집 시간을 제한하고 작은 실행부터 시작하세요.',
+  },
 };
 
 // 일간(Day Master)별 핵심 성격 키워드
@@ -171,6 +200,77 @@ function buildElementProfile(distribution: ElementDistribution, timeKnown: boole
   };
 }
 
+function sentenceList(items: string[]) {
+  return items.filter(Boolean).join(' ');
+}
+
+function buildDetailedReading(
+  input: SajuInput,
+  pillars: { year: string; month: string; day: string; hour: string },
+  dayMaster: string,
+  dayMasterProfile: DayMasterProfile,
+  elementProfile: ElementProfile,
+  distribution: ElementDistribution,
+  timeKnown: boolean,
+  matchedRules: typeof sajuRules,
+): DetailedReading {
+  const ranked = getRankedElements(distribution);
+  const dominant = elementProfile.dominant[0] ?? ranked[0]?.type ?? 'earth';
+  const support = elementProfile.missing[0] ?? elementProfile.weak[0] ?? ranked[ranked.length - 1]?.type ?? 'water';
+  const dominantMeaning = ELEMENT_MEANINGS[dominant];
+  const supportMeaning = ELEMENT_MEANINGS[support];
+  const ruleStrengths = matchedRules.map((rule) => rule.interpretation.strength).slice(0, 3);
+  const ruleWeaknesses = matchedRules.map((rule) => rule.interpretation.weakness).slice(0, 2);
+  const genderContext = input.gender === 'female' ? '여성 사주' : '남성 사주';
+
+  return {
+    basis: [
+      `연주 ${pillars.year}`,
+      `월주 ${pillars.month}`,
+      `일주 ${pillars.day}`,
+      timeKnown ? `시주 ${pillars.hour}` : '시주 미상',
+      `일간 ${dayMaster}`,
+      `오행 총 ${elementProfile.total_count}글자`,
+    ],
+    temperament: sentenceList([
+      `${genderContext}로 입력된 이 명식은 일간 ${dayMaster}을 중심축으로 봅니다.`,
+      dayMasterProfile.core,
+      `가장 강한 ${ELEMENT_LABELS[dominant]} 기운은 ${dominantMeaning.trait}을 뜻해, 기본 반응이 빠르고 자기 기준을 세우려는 쪽으로 나타납니다.`,
+      ruleStrengths.length > 0 ? `특히 ${ruleStrengths.join(', ')}이 장점으로 드러납니다.` : '',
+    ]),
+    work_style: sentenceList([
+      `일에서는 ${dayMasterProfile.strength}이 강점입니다.`,
+      `${ELEMENT_LABELS[dominant]} 기운이 앞설 때는 ${dominantMeaning.excess}`,
+      ruleWeaknesses.length > 0 ? `주의할 점은 ${ruleWeaknesses.join(', ')}입니다.` : dayMasterProfile.risk,
+      dayMasterProfile.strategy,
+    ]),
+    relationship: sentenceList([
+      `관계에서는 ${supportMeaning.trait}이 보완 포인트입니다.`,
+      matchedRules[0]?.interpretation.relationship_style ?? '가까운 관계일수록 기준과 감정 표현의 균형이 중요합니다.',
+      `부족한 ${ELEMENT_LABELS[support]} 기운은 상대의 속도와 내 속도를 맞추는 연습으로 보완할 수 있습니다.`,
+    ]),
+    money: sentenceList([
+      matchedRules[0]?.interpretation.money_style ?? '돈의 흐름은 안정성과 실행 속도의 균형을 함께 봐야 합니다.',
+      `${ELEMENT_LABELS[dominant]} 기운이 강한 시기에는 장점이 빠른 판단으로 나타나지만, 기록 없이 움직이면 반복 지출이나 무리한 선택으로 이어질 수 있습니다.`,
+      '큰 결정보다 예산, 손절 기준, 보유 기간을 먼저 숫자로 정하는 방식이 잘 맞습니다.',
+    ]),
+    timing: sentenceList([
+      timeKnown
+        ? '태어난 시간이 있어 시주까지 포함했기 때문에 말년, 실행 습관, 외부로 드러나는 행동 패턴을 조금 더 구체적으로 볼 수 있습니다.'
+        : '태어난 시간이 없어 시주는 해석하지 않았습니다. 그래서 말년운이나 세밀한 실행 패턴은 단정하지 않고 큰 구조 중심으로 봅니다.',
+      '현재 결과는 대운·세운까지 계산한 예측이 아니라, 태어난 사주의 기본 구조를 설명하는 정적 해석입니다.',
+      '다음 고도화 단계에서는 절기 기준 대운 시작 시점과 연도별 세운을 분리해 타이밍 해석을 붙이는 것이 좋습니다.',
+    ]),
+    balance_practice: sentenceList([
+      elementProfile.recommendation,
+      `${ELEMENT_LABELS[support]} 보완 실천: ${supportMeaning.practice}`,
+      '사주는 확정된 운명표라기보다 반복되는 선택 습관을 읽는 참고 도구로 쓰는 편이 가장 안전합니다.',
+    ]),
+    reliability_note:
+      '음양력 변환은 천문 역법 기준 계산 라이브러리를 사용하고, 해석은 일간 중심·오행 분포·강약 보완이라는 명리학의 전통적 구조를 앱 안에서 규칙화한 것입니다. 개인의 실제 삶, 환경, 선택을 대체하는 판단으로 사용하지 마세요.',
+  };
+}
+
 export function analyzeSaju(input: SajuInput): SajuAnalysis {
   const { year, month, day } = parseBirthDate(input.birthDate);
   const birthTime = input.birthTime;
@@ -237,6 +337,16 @@ export function analyzeSaju(input: SajuInput): SajuAnalysis {
       : '태어난 시간이 없어 시주는 추정하지 않았고, 연주·월주·일주 6글자 기준으로 분석했습니다.',
     element_profile: elementProfile,
     day_master_profile: dayMasterProfile,
+    detailed_reading: buildDetailedReading(
+      input,
+      pillars,
+      dayMaster,
+      dayMasterProfile,
+      elementProfile,
+      distribution,
+      timeKnown,
+      matchedRules,
+    ),
     // 바이럴 문구 추가
     viral_sentences: {
       self_realization: primaryRule ? primaryRule.content.share_sentence : "나는 나를 알아가는 과정에 있다.",

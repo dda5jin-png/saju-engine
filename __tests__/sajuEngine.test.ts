@@ -49,6 +49,8 @@ describe('analyzeSaju', () => {
     ).toBe(6);
     expect(analysis.element_profile.total_count).toBe(6);
     expect(analysis.element_profile.summary).toContain('시간 미상');
+    expect(analysis.detailed_reading.basis).toContain('시주 미상');
+    expect(analysis.detailed_reading.timing).toContain('시주는 해석하지 않았습니다');
   });
 
   it('includes the hour pillar in element distribution when birth time is provided', () => {
@@ -68,5 +70,7 @@ describe('analyzeSaju', () => {
     expect(analysis.element_profile.balance_score).toBeGreaterThanOrEqual(0);
     expect(analysis.element_profile.balance_score).toBeLessThanOrEqual(100);
     expect(analysis.day_master_profile.core).toContain('발산형');
+    expect(analysis.detailed_reading.basis).toContain('시주 甲午');
+    expect(analysis.detailed_reading.reliability_note).toContain('일간 중심');
   });
 });
