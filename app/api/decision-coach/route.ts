@@ -1,11 +1,14 @@
 import { NextResponse } from "next/server";
-import { getAdminDb } from "@/lib/firebaseAdmin";
+import { getAdminDb, getAdminFieldValue } from "@/lib/firebaseAdmin";
 import { buildDecisionCoachResult, inferDecisionCategory } from "@/lib/decisionCoach";
 import { verifyBearerToken } from "@/lib/serverAuth";
-import { getUserSubscription } from "@/lib/subscription";
+import {
+  canUseFreeDecision,
+  getPaidDecisionCredits,
+  getTodayKey,
+  isPremiumUser,
+} from "@/lib/subscription";
 import { DecisionCategory, SajuAnalysis } from "@/types/saju";
-
-const FREE_DECISION_LIMIT = 1;
 
 type RequestBody = {
   resultId?: string;
@@ -34,15 +37,31 @@ export async function POST(req: Request) {
     }
 
     const db = getAdminDb();
+    const fieldValue = getAdminFieldValue();
     const userRef = db.collection("users").doc(decoded.uid);
-    const subscription = await getUserSubscription(decoded.uid);
+    const userSnap = await userRef.get();
 
-    if (!subscription.premiumActive && subscription.decisionCoachUsed >= FREE_DECISION_LIMIT) {
+    if (!userSnap.exists) {
+      return NextResponse.json(
+        { success: false, message: "회원 정보가 없습니다. 다시 로그인해주세요." },
+        { status: 404 },
+      );
+    }
+
+    const user = userSnap.data() ?? {};
+    const premium = isPremiumUser(user);
+    const credits = getPaidDecisionCredits(user);
+    const freeAllowed = canUseFreeDecision(user);
+    const today = getTodayKey();
+
+    if (!premium && !freeAllowed) {
       return NextResponse.json(
         {
           success: false,
           paywall: true,
-          message: "이 분석은 더 깊게 들어갈수록 정확해진다",
+          message: "오늘 무료 분석 1회를 모두 사용했습니다.",
+          deepMessage: "이 분석은 더 깊게 들어갈수록 정확해진다",
+          cta: "프리미엄 분석 열기",
           upsells: ["추가 분석 보기", "다른 선택지도 비교하기", "연애 / 돈 / 커리어 전용 분석 열기"],
         },
         { status: 402 },
@@ -61,39 +80,53 @@ export async function POST(req: Request) {
     const analysis = resultSnap.data() as SajuAnalysis;
     const inferredCategory = inferDecisionCategory(question, category);
     const decision = buildDecisionCoachResult(analysis, question.trim(), inferredCategory);
+    const usedPaidCredit = premium && credits > 0;
 
     await db.runTransaction(async (tx) => {
-      const userSnap = await tx.get(userRef);
-      const currentUsed = Number(userSnap.data()?.decisionCoachUsed ?? 0);
+      const updateData: Record<string, unknown> = {
+        totalDecisionCount: fieldValue.increment(1),
+        updatedAt: new Date(),
+      };
 
-      tx.set(
-        userRef,
-        {
-          uid: decoded.uid,
-          email: decoded.email || null,
-          decisionCoachUsed: subscription.premiumActive ? currentUsed : currentUsed + 1,
-          updatedAt: new Date(),
-        },
-        { merge: true },
-      );
+      if (usedPaidCredit) {
+        updateData.paidDecisionCredits = fieldValue.increment(-1);
+      } else if (user.freeDecisionDate !== today) {
+        updateData.freeDecisionDate = today;
+        updateData.freeDecisionCountToday = 1;
+      } else {
+        updateData.freeDecisionCountToday = fieldValue.increment(1);
+      }
+
+      tx.set(userRef, updateData, { merge: true });
+
+      tx.set(db.collection("usageLogs").doc(), {
+        uid: decoded.uid,
+        mode: inferredCategory === "general" ? "decision" : inferredCategory,
+        isPremiumAtUse: usedPaidCredit,
+        question: question.trim(),
+        resultId,
+        createdAt: new Date(),
+      });
 
       tx.set(userRef.collection("decisionCoachLogs").doc(), {
         resultId,
         question: question.trim(),
         category: inferredCategory,
-        premiumActive: subscription.premiumActive,
+        isPremiumAtUse: usedPaidCredit,
         createdAt: new Date(),
       });
     });
+
+    const freeUsedAfter =
+      user.freeDecisionDate === today ? Number(user.freeDecisionCountToday ?? 0) + (usedPaidCredit ? 0 : 1) : 1;
 
     return NextResponse.json({
       success: true,
       category: inferredCategory,
       decision,
-      remainingFreeUses: subscription.premiumActive
-        ? null
-        : Math.max(0, FREE_DECISION_LIMIT - subscription.decisionCoachUsed - 1),
-      premiumActive: subscription.premiumActive,
+      premiumActive: usedPaidCredit,
+      paidDecisionCredits: usedPaidCredit ? Math.max(0, credits - 1) : credits,
+      remainingFreeUses: usedPaidCredit ? null : Math.max(0, 1 - freeUsedAfter),
     });
   } catch (error) {
     console.error("Decision coach error:", error);

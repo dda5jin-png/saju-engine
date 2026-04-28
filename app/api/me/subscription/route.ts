@@ -11,6 +11,7 @@ export async function GET(req: Request) {
         premiumActive: false,
         plan: "free",
         premiumExpiresAt: null,
+        paidDecisionCredits: 0,
       });
     }
 
@@ -24,6 +25,7 @@ export async function GET(req: Request) {
       premiumActive: false,
       plan: "free",
       premiumExpiresAt: null,
+      paidDecisionCredits: 0,
     });
   }
 }

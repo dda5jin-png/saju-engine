@@ -21,6 +21,13 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: Props) {
     try {
       const user = await signInWithGoogle();
       if (user) {
+        const idToken = await user.getIdToken();
+        await fetch('/api/auth/sync-user', {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${idToken}`,
+          },
+        });
         onSuccess(user);
         onClose();
       }

@@ -50,3 +50,7 @@ export function getAdminDb() {
 export function getAdminTimestamp() {
   return admin.firestore.Timestamp;
 }
+
+export function getAdminFieldValue() {
+  return admin.firestore.FieldValue;
+}

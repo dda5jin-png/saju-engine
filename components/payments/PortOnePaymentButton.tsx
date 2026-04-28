@@ -152,7 +152,7 @@ export default function PortOnePaymentButton({ productId, variant = "primary", o
       }
     >
       {loading ? <Loader2 size={20} className="animate-spin" /> : <ArrowRight size={20} />}
-      {loading ? "결제 준비 중..." : `프리미엄 분석 열기 ${product.amount.toLocaleString()}원`}
+      {loading ? "결제 준비 중..." : `${product.name} ${product.amount.toLocaleString()}원`}
     </button>
   );
 }

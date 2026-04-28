@@ -27,12 +27,21 @@ export async function POST(req: Request) {
     const merchantUid = `saju_${decoded.uid}_${product.id}_${Date.now()}`;
 
     await getAdminDb().collection("paymentOrders").doc(merchantUid).set({
+      merchantUid,
       uid: decoded.uid,
       productId: product.id,
       productName: product.name,
       amount: product.amount,
       status: "READY",
+      impUid: null,
+      pgProvider: null,
+      payMethod: null,
+      receiptUrl: null,
       createdAt: new Date(),
+      paidAt: null,
+      cancelledAt: null,
+      verifiedAt: null,
+      updatedAt: new Date(),
     });
 
     return NextResponse.json({
