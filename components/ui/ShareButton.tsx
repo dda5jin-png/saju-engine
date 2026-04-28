@@ -109,7 +109,7 @@ export default function ShareButton({
         className="flex-1 flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-500 disabled:bg-indigo-900 disabled:text-white/60 text-white font-bold py-4 px-6 rounded-2xl transition-all shadow-lg active:scale-95"
       >
         {capturing ? <Loader2 size={20} className="animate-spin" /> : <Share2 size={20} />}
-        <span>{capturing ? '이미지 만드는 중' : '전체 결과 공유하기'}</span>
+        <span>{capturing ? '공유 이미지 생성 중' : '분석 링크 공유하기'}</span>
       </button>
 
       <button

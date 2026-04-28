@@ -10,6 +10,7 @@ body {
   color: rgb(var(--foreground-rgb));
   background: radial-gradient(circle at top center, #111827 0%, #000000 100%);
   min-height: 100vh;
+  letter-spacing: 0;
 }
 
 .glass {
@@ -27,5 +28,10 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 }
 
 h1, h2, h3, h4, h5, h6 {
-  letter-spacing: -0.025em;
+  letter-spacing: 0;
+}
+
+.result-report-font {
+  font-family: "SF Pro Rounded", "Apple SD Gothic Neo", "Noto Sans KR", "Pretendard", ui-rounded, system-ui, sans-serif;
+  letter-spacing: 0;
 }

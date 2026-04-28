@@ -35,12 +35,13 @@ const sectionItems = [
 
 export default function DetailedReadingPanel({ analysis }: Props) {
   const reading = analysis.detailed_reading ?? fallbackReading(analysis);
+  const reliabilityNote = '역법 계산과 일간·오행 규칙을 바탕으로 한 참고 리포트입니다.';
 
   return (
     <section className="rounded-[2rem] border border-white/10 bg-white/[0.035] p-6 md:p-8 space-y-8">
       <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
         <div className="space-y-3">
-          <span className="inline-flex w-fit items-center gap-2 rounded-full border border-cyan-400/30 bg-cyan-400/10 px-4 py-1.5 text-[11px] font-black tracking-[0.18em] text-cyan-200">
+          <span className="inline-flex w-fit items-center gap-2 rounded-full border border-cyan-400/30 bg-cyan-400/10 px-4 py-1.5 text-[11px] font-bold text-cyan-200">
             DEEP READING
           </span>
           <div className="space-y-2">
@@ -77,13 +78,13 @@ export default function DetailedReadingPanel({ analysis }: Props) {
         ))}
       </div>
 
-      <div className="rounded-2xl border border-amber-300/20 bg-amber-300/10 p-5">
-        <div className="flex items-center gap-2 text-sm font-black text-amber-100">
+      <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-5">
+        <div className="flex items-center gap-2 text-sm font-extrabold text-white/85">
           <ShieldCheck size={17} />
-          해석 신뢰도 안내
+          해석 기준
         </div>
-        <p className="mt-3 text-sm leading-6 text-amber-50/75 break-keep">
-          {reading.reliability_note}
+        <p className="mt-3 text-sm leading-6 text-white/58 break-keep">
+          {reliabilityNote}
         </p>
       </div>
     </section>
