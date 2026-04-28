@@ -5,12 +5,10 @@ import { useParams } from 'next/navigation';
 import { getDb } from '@/lib/firebase';
 import { doc, getDoc } from 'firebase/firestore';
 import { SajuAnalysis } from '@/types/saju';
-import { generateResultCards } from '@/lib/cardGenerator';
-import ShareButton from '@/components/ui/ShareButton';
 import CharacterGuide from '@/components/ui/CharacterGuide';
 import ElementBalancePanel from '@/components/ui/ElementBalancePanel';
 import DetailedReadingPanel from '@/components/ui/DetailedReadingPanel';
-import IntegratedInsightPanel from '@/components/ui/IntegratedInsightPanel';
+import ViralCharacterPanel from '@/components/ui/ViralCharacterPanel';
 
 async function getDocWithTimeout(docRef: ReturnType<typeof doc>) {
   return Promise.race([
@@ -68,12 +66,11 @@ export default function ResultPage() {
     </div>
   );
 
-  const cards = generateResultCards(analysis);
-  const shareCaptureId = 'result-share-capture';
+  const resultUrl = `${typeof window !== 'undefined' ? window.location.origin : ''}/result/${resultId}`;
 
   return (
     <main className="min-h-screen bg-black text-white p-5 pb-24 md:pt-16">
-      <div id={shareCaptureId} className="result-report-font max-w-2xl mx-auto space-y-8 bg-black pb-8">
+      <div className="result-report-font max-w-2xl mx-auto space-y-8 bg-black pb-8">
         {/* 상단 요약 */}
         <header className="text-center space-y-4 px-1">
           <div className="inline-block px-4 py-1 rounded-full bg-white/[0.04] text-white/62 text-xs font-bold border border-white/10">
@@ -92,24 +89,14 @@ export default function ResultPage() {
 
         <DetailedReadingPanel analysis={analysis} />
 
-        <IntegratedInsightPanel cards={cards} />
+        <ViralCharacterPanel
+          analysis={analysis}
+          resultUrl={resultUrl}
+          resultId={resultId as string}
+        />
       </div>
 
       <footer data-share-exclude className="max-w-2xl mx-auto pt-20 text-center space-y-12">
-        <div className="flex flex-col items-center gap-6">
-          <ShareButton
-            url={`${typeof window !== 'undefined' ? window.location.origin : ''}/result/${resultId}`}
-            title={`사주 구조 분석 리포트: ${analysis.type_name}`}
-            description="일간, 오행 분포, 시주 입력 여부를 기준으로 정리한 개인 사주 구조 리포트입니다."
-            captureTargetId={shareCaptureId}
-            fileName={`saju-${resultId}.png`}
-          />
-          <p className="text-gray-500 text-xs flex items-center gap-2 font-medium tracking-tight">
-            <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
-            현재 2,841명이 자신의 구조를 실시간 분석 중입니다
-          </p>
-        </div>
-        
         <div className="pt-10 border-t border-white/10">
           <button
             onClick={() => window.location.href = '/'}

@@ -7,6 +7,7 @@ import {
   ElementType,
   SajuAnalysis,
   SajuInput,
+  ViralCharacterMode,
 } from '../types/saju';
 import { sajuRules } from './knowledge/sajuRules';
 
@@ -340,6 +341,120 @@ function buildDetailedReading(
   };
 }
 
+function buildViralCharacterMode(
+  dayMaster: string,
+  dayMasterProfile: DayMasterProfile,
+  elementProfile: ElementProfile,
+  distribution: ElementDistribution,
+  matchedRules: typeof sajuRules,
+): ViralCharacterMode {
+  const ranked = getRankedElements(distribution);
+  const dominant = elementProfile.dominant[0] ?? ranked[0]?.type ?? 'earth';
+  const support = elementProfile.missing[0] ?? elementProfile.weak[0] ?? ranked[ranked.length - 1]?.type ?? 'water';
+  const dominantLabel = ELEMENT_LABELS[dominant];
+  const supportLabel = ELEMENT_LABELS[support];
+  const primaryRule = matchedRules[0];
+
+  const archetypes: Record<string, { type: string; definition: string; decision: string; similar: string; quotes: string[]; lines: string[] }> = {
+    '甲': {
+      type: '판을 키우는 개척자형',
+      definition: '넌 작은 판에서 오래 버티는 사람보다, 판 자체를 키우는 쪽에 가깝다. 방향이 보이면 먼저 깃발을 꽂고 사람을 모은다.',
+      decision: '완벽한 준비보다 큰 방향을 먼저 본다. 대신 시작한 뒤 정리할 사람이 없으면 스스로가 제일 피곤해진다.',
+      similar: 'RPG로 치면 선봉에 서는 리더 클래스. 무작정 돌격하는 전사가 아니라, 길을 열고 팀을 앞으로 당기는 타입이다.',
+      quotes: ['얘는 일단 판부터 크게 봄.', '작게 하자고 해도 결국 크게 만듦.', '문제는 마감 디테일에서 체력 빠질 때 있음.'],
+      lines: ['작게 시작해도 결국 판을 키우는 사람', '방향 잡히면 제일 먼저 움직이는 타입', '기회가 보이면 판부터 키우는 사람'],
+    },
+    '乙': {
+      type: '틈을 찾는 생존 전략가형',
+      definition: '넌 힘으로 밀어붙이는 타입이 아니다. 막힌 길에서도 틈을 찾고, 안 되는 상황을 되게 만드는 쪽에 가깝다.',
+      decision: '정면 돌파보다 우회로를 선호한다. 유연하지만, 너무 맞춰주면 자기 기준이 흐려질 수 있다.',
+      similar: '게임 직업으로 치면 정찰과 교섭을 같이 하는 서포트 전략가. 싸움을 피하는 게 아니라 이길 각을 고르는 사람이다.',
+      quotes: ['얘는 진짜 어떻게든 방법을 찾음.', '근데 자기 마음은 잘 숨김.', '착해 보이는데 은근히 생존력 강함.'],
+      lines: ['부드럽지만 쉽게 꺾이지 않는 사람', '정면보다 빈틈을 먼저 보는 타입', '맞춰주지만 자기 길은 끝내 찾는 사람'],
+    },
+    '丙': {
+      type: '분위기를 장악하는 발광체형',
+      definition: '넌 존재감이 약한 사람이 아니다. 말하지 않아도 공기의 온도를 바꾸고, 들어오면 장면이 밝아지는 타입이다.',
+      decision: '판단이 빠르고 표현도 빠르다. 장점은 추진력이고, 약점은 감정 온도가 높을 때 결론까지 빨라진다는 점이다.',
+      similar: '무대 위 주연 캐릭터에 가깝다. 앞에서 빛나지만, 그 빛이 강할수록 주변은 눈부심을 느낄 수 있다.',
+      quotes: ['얘 들어오면 분위기 달라짐.', '말이 빠른데 이상하게 설득됨.', '근데 화나면 결론도 너무 빨리 냄.'],
+      lines: ['존재감으로 판을 밝히는 사람', '느끼면 바로 움직이는 발산형', '분위기를 바꾸고 속도를 올리는 타입'],
+    },
+    '丁': {
+      type: '조용히 오래 타는 집중형',
+      definition: '넌 시끄럽게 증명하는 사람은 아니다. 조용히 보고, 오래 품고, 결정적인 순간에 정확히 불을 켜는 타입이다.',
+      decision: '한 번 마음에 들어온 문제는 쉽게 놓지 않는다. 다만 혼자 오래 품으면 생각이 감정보다 뜨거워질 수 있다.',
+      similar: '후방에서 판세를 읽는 마법사형 캐릭터. 화려한 폭발보다 필요한 순간의 한 방이 강하다.',
+      quotes: ['얘는 말은 적은데 다 보고 있음.', '혼자 생각하다가 갑자기 정답을 냄.', '근데 속에 쌓이면 티가 확 남.'],
+      lines: ['조용하지만 오래 타오르는 사람', '말보다 관찰로 판을 읽는 타입', '작게 보여도 결정적일 때 강한 사람'],
+    },
+    '戊': {
+      type: '중심을 세우는 기준점형',
+      definition: '넌 쉽게 흔들리는 사람이 아니다. 상황이 복잡해질수록 중심을 잡고, 사람들이 기대는 기준점이 된다.',
+      decision: '빠른 변화보다 안정된 판단을 선호한다. 단단함이 장점이지만, 가끔은 고집으로 보일 수 있다.',
+      similar: '파티의 탱커나 요새 같은 캐릭터. 먼저 흔들리지 않아서 전체가 버틸 수 있게 만든다.',
+      quotes: ['얘 있으면 이상하게 판이 안정됨.', '결정은 느린데 한번 정하면 잘 안 바뀜.', '가끔 너무 안 움직여서 답답함.'],
+      lines: ['흔들릴수록 더 단단해지는 사람', '판이 흔들릴 때 중심 잡는 타입', '느리지만 쉽게 무너지지 않는 사람'],
+    },
+    '己': {
+      type: '현실을 결과로 바꾸는 운영자형',
+      definition: '넌 말보다 실제로 굴러가게 만드는 사람이다. 흩어진 일을 받아내고, 사람과 일을 현실적인 결과로 묶는다.',
+      decision: '가능한 것부터 정리하고 쌓아간다. 다만 너무 많이 받아주면 남의 문제까지 내 몫이 된다.',
+      similar: 'RPG로 치면 운영형 서포터. 전면에 드러나진 않아도 없으면 전체 시스템이 삐걱인다.',
+      quotes: ['얘 없으면 일 정리가 안 됨.', '은근히 다 챙기고 있음.', '근데 너무 떠안다가 혼자 지침.'],
+      lines: ['흩어진 일을 현실로 묶는 사람', '조용히 판을 굴리는 운영자 타입', '챙기다 지치기 쉬운 실무형 인간'],
+    },
+    '庚': {
+      type: '필요한 것만 남기는 결단형',
+      definition: '넌 애매한 상태를 오래 견디는 사람이 아니다. 복잡한 상황에서 남길 것과 자를 것을 빠르게 구분한다.',
+      decision: '감정보다 기준을 먼저 세운다. 그래서 명확하지만, 때로는 차갑게 보일 수 있다.',
+      similar: '전략 게임의 지휘관형. 감정으로 움직이지 않고, 손실을 계산한 뒤 가장 빠른 결론을 낸다.',
+      quotes: ['얘는 말 돌리는 거 별로 안 좋아함.', '복잡한 걸 한 방에 정리함.', '근데 가끔 너무 칼같아서 무서움.'],
+      lines: ['애매하면 자르고 가는 사람', '복잡할수록 기준이 선명해지는 타입', '필요한 것만 남기는 결단형 인간'],
+    },
+    '辛': {
+      type: '완성도를 포기 못 하는 정밀형',
+      definition: '넌 대충 넘어가는 걸 잘 못한다. 작은 어긋남을 먼저 보고, 결과물의 마지막 질감을 끝까지 다듬는다.',
+      decision: '시작보다 완성 기준이 먼저 떠오른다. 장점은 품질이고, 약점은 스스로에게 너무 빡빡하다는 점이다.',
+      similar: '보석 세공사 같은 캐릭터. 남들이 못 보는 흠을 보고, 그 작은 차이로 완성도를 만든다.',
+      quotes: ['얘 눈에는 남들이 못 보는 게 보임.', '대충 하자는 말을 제일 싫어함.', '근데 본인이 제일 피곤하게 삶.'],
+      lines: ['대충을 못 견디는 완성형 인간', '작은 차이로 결과를 바꾸는 타입', '완벽 기준이 높은 정밀한 사람'],
+    },
+    '壬': {
+      type: '큰 흐름을 읽는 전략가형',
+      definition: '넌 눈앞의 사건보다 그 뒤의 흐름을 본다. 정보가 모이면 머릿속에서 판이 커지고, 전체 구조를 먼저 읽는다.',
+      decision: '바로 뛰기보다 흐름을 확인한다. 생각이 깊은 만큼 실행 단위가 흐려질 때가 있다.',
+      similar: '맵 전체를 보는 전략 시뮬레이션 플레이어. 한 칸 싸움보다 다음 세 턴을 계산하는 타입이다.',
+      quotes: ['얘는 생각이 진짜 멀리 감.', '말은 늦는데 방향은 꽤 정확함.', '근데 가끔 실행보다 시뮬레이션이 김.'],
+      lines: ['눈앞보다 흐름을 먼저 읽는 사람', '세 턴 뒤를 계산하는 전략가', '생각이 깊어서 출발이 늦는 타입'],
+    },
+    '癸': {
+      type: '작은 신호를 읽는 감지형',
+      definition: '넌 큰 소리보다 작은 낌새를 먼저 듣는다. 남들이 넘긴 신호를 잡고, 조용히 해법을 찾는 타입이다.',
+      decision: '확신이 생기기 전까지 정보를 더 모은다. 섬세함이 장점이지만, 걱정이 많아지면 결정이 늦어진다.',
+      similar: '은밀한 분석가나 힐러형 캐릭터. 전면에 서기보다 흐름을 감지하고 빈틈을 메우는 쪽에 강하다.',
+      quotes: ['얘는 분위기 변한 걸 제일 빨리 느낌.', '말 안 해도 눈치챔.', '근데 생각이 많아져서 혼자 불안해질 때 있음.'],
+      lines: ['작은 신호를 제일 먼저 읽는 사람', '확신 전까지 절대 쉽게 안 움직이는 타입', '조용히 판을 읽고 해법을 찾는 사람'],
+    },
+  };
+
+  const archetype = archetypes[dayMaster] ?? archetypes['癸'];
+  const ruleHook = primaryRule?.interpretation.decision_style;
+  const oneLiner = archetype.lines[0];
+
+  return {
+    character_type: `${dominantLabel} 강한 ${archetype.type}`,
+    character_definition: `${archetype.definition}\n\n강한 ${dominantLabel} 기운 때문에 반응은 분명하고, 부족한 ${supportLabel} 기운 때문에 보완해야 할 빈틈도 선명하다.`,
+    decision_style: ruleHook
+      ? `${archetype.decision}\n\n이 명식의 판단 습관은 "${ruleHook}"에 가깝다.`
+      : archetype.decision,
+    similar_character: archetype.similar,
+    outsider_quotes: archetype.quotes,
+    one_liner: oneLiner,
+    share_lines: archetype.lines,
+  };
+}
+
 export function analyzeSaju(input: SajuInput): SajuAnalysis {
   const { year, month, day } = parseBirthDate(input.birthDate);
   const birthTime = input.birthTime;
@@ -414,6 +529,13 @@ export function analyzeSaju(input: SajuInput): SajuAnalysis {
       elementProfile,
       distribution,
       timeKnown,
+      matchedRules,
+    ),
+    viral_character: buildViralCharacterMode(
+      dayMaster,
+      dayMasterProfile,
+      elementProfile,
+      distribution,
       matchedRules,
     ),
     // 바이럴 문구 추가

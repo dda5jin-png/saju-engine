@@ -72,5 +72,7 @@ describe('analyzeSaju', () => {
     expect(analysis.day_master_profile.core).toContain('발산형');
     expect(analysis.detailed_reading.basis).toContain('시주 甲午');
     expect(analysis.detailed_reading.reliability_note).toContain('일간 중심');
+    expect(analysis.viral_character?.share_lines).toHaveLength(3);
+    expect(analysis.viral_character?.one_liner.length).toBeGreaterThanOrEqual(15);
   });
 });

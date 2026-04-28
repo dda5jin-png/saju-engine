@@ -43,6 +43,16 @@ export interface DetailedReading {
   reliability_note: string;
 }
 
+export interface ViralCharacterMode {
+  character_type: string;
+  character_definition: string;
+  decision_style: string;
+  similar_character: string;
+  outsider_quotes: string[];
+  one_liner: string;
+  share_lines: string[];
+}
+
 export interface SajuAnalysis {
   summary: string;
   type_name: string;
@@ -59,6 +69,7 @@ export interface SajuAnalysis {
   element_profile: ElementProfile;
   day_master_profile: DayMasterProfile;
   detailed_reading: DetailedReading;
+  viral_character?: ViralCharacterMode;
   viral_sentences: {
     self_realization: string;
     painful_truth: string;

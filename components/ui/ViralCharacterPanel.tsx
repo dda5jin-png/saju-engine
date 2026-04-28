@@ -1,0 +1,229 @@
+'use client';
+
+import { useMemo, useState } from 'react';
+import { toPng } from 'html-to-image';
+import { Download, Link as LinkIcon, Loader2, MessageCircle } from 'lucide-react';
+import { SajuAnalysis, ViralCharacterMode } from '@/types/saju';
+
+interface Props {
+  analysis: SajuAnalysis;
+  resultUrl: string;
+  resultId: string;
+}
+
+const fallbackViral = (analysis: SajuAnalysis): ViralCharacterMode => ({
+  character_type: `${analysis.type_name} 캐릭터`,
+  character_definition:
+    '넌 아무 생각 없이 움직이는 타입은 아니다.\n\n상황을 보고, 조건을 맞추고, 확신이 생겼을 때 움직인다.',
+  decision_style:
+    '빠른 선택보다 틀리지 않는 선택을 선호한다.\n\n그래서 느려 보일 수 있지만, 한번 확신이 들면 오래 밀고 간다.',
+  similar_character:
+    '전략가형 캐릭터에 가깝다. 앞에서 무작정 싸우기보다 판을 읽고 구조를 짠 다음 들어가는 사람이다.',
+  outsider_quotes: [
+    '얘는 아무 생각 없이 움직이는 애는 절대 아님.',
+    '근데 너무 계산하다가 기회 놓칠 때 있음.',
+    '그래도 한번 확신 들면 진짜 무섭게 밀어붙임.',
+  ],
+  one_liner: '확신 없으면 절대 안 움직이는 타입',
+  share_lines: [
+    '확신 없으면 절대 안 움직이는 타입',
+    '기회보다 확률을 먼저 계산하는 사람',
+    '준비 끝나면 크게 움직이는 스타일',
+  ],
+});
+
+export default function ViralCharacterPanel({ analysis, resultUrl, resultId }: Props) {
+  const viral = useMemo(() => analysis.viral_character ?? fallbackViral(analysis), [analysis]);
+  const [selectedLine, setSelectedLine] = useState(viral.one_liner || viral.share_lines[0]);
+  const [notice, setNotice] = useState('');
+  const [saving, setSaving] = useState(false);
+  const shareCardId = `share-card-${resultId}`;
+
+  const showNotice = (message: string) => {
+    setNotice(message);
+    setTimeout(() => setNotice(''), 2600);
+  };
+
+  const copyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(resultUrl);
+      showNotice('링크가 복사되었습니다');
+    } catch (error) {
+      console.error('Failed to copy result link:', error);
+      showNotice('링크 복사에 실패했습니다');
+    }
+  };
+
+  const makeCardFile = async () => {
+    const node = document.getElementById(shareCardId);
+    if (!node) return null;
+
+    const dataUrl = await toPng(node, {
+      cacheBust: true,
+      pixelRatio: Math.min(window.devicePixelRatio || 2, 2),
+      backgroundColor: '#05070d',
+    });
+    const blob = await (await fetch(dataUrl)).blob();
+    return new File([blob], `saju-character-${resultId}.png`, { type: 'image/png' });
+  };
+
+  const saveImage = async () => {
+    setSaving(true);
+    try {
+      const file = await makeCardFile();
+      if (!file) return;
+
+      const imageUrl = URL.createObjectURL(file);
+      const link = document.createElement('a');
+      link.href = imageUrl;
+      link.download = file.name;
+      link.click();
+      URL.revokeObjectURL(imageUrl);
+      showNotice('캐릭터 카드 이미지가 저장되었습니다');
+    } catch (error) {
+      console.error('Failed to save share card:', error);
+      showNotice('이미지 저장에 실패했습니다');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const shareToKakao = async () => {
+    const shareText = `${selectedLine}\n${viral.character_type}\n${resultUrl}`;
+
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          title: `SAJU INSIGHT - ${viral.character_type}`,
+          text: shareText,
+          url: resultUrl,
+        });
+        return;
+      }
+
+      await navigator.clipboard.writeText(shareText);
+      showNotice('공유 문구가 복사되었습니다. 카카오톡에 붙여넣어 주세요');
+    } catch (error) {
+      if ((error as DOMException).name !== 'AbortError') {
+        console.error('Failed to share:', error);
+        showNotice('공유를 준비하지 못했습니다');
+      }
+    }
+  };
+
+  return (
+    <section className="space-y-6" data-share-exclude>
+      <div className="rounded-[2rem] border border-white/10 bg-[#080b12] p-6 md:p-8">
+        <div className="space-y-3 border-b border-white/10 pb-6">
+          <span className="inline-flex rounded-full border border-fuchsia-300/25 bg-fuchsia-300/10 px-3 py-1 text-[11px] font-bold text-fuchsia-100">
+            VIRAL CHARACTER MODE
+          </span>
+          <div className="space-y-2">
+            <h2 className="text-2xl font-extrabold text-white">내 캐릭터 카드 만들기</h2>
+            <p className="text-sm leading-6 text-white/55">
+              위 해석을 반복하지 않고, 공유하기 좋은 캐릭터 콘텐츠로 재해석했습니다.
+            </p>
+          </div>
+        </div>
+
+        <div className="divide-y divide-white/10">
+          <ViralBlock title="캐릭터 정의" content={viral.character_definition} />
+          <ViralBlock title="의사결정 방식" content={viral.decision_style} />
+          <ViralBlock title="닮은 캐릭터" content={viral.similar_character} />
+          <article className="py-5">
+            <h3 className="text-sm font-extrabold text-white/88">주변 사람이 보는 너</h3>
+            <div className="mt-3 space-y-2">
+              {viral.outsider_quotes.map((quote) => (
+                <p key={quote} className="rounded-2xl border border-white/10 bg-white/[0.035] px-4 py-3 text-[15px] leading-6 text-white/72">
+                  &ldquo;{quote}&rdquo;
+                </p>
+              ))}
+            </div>
+          </article>
+          <article className="py-5">
+            <h3 className="text-sm font-extrabold text-white/88">공유용 한줄 문장</h3>
+            <div className="mt-3 grid gap-2">
+              {viral.share_lines.map((line, index) => (
+                <button
+                  key={line}
+                  onClick={() => setSelectedLine(line)}
+                  className={`rounded-2xl border px-4 py-3 text-left text-[15px] font-bold leading-6 transition ${
+                    selectedLine === line
+                      ? 'border-emerald-300/60 bg-emerald-300/12 text-emerald-50'
+                      : 'border-white/10 bg-white/[0.03] text-white/65 hover:bg-white/[0.06]'
+                  }`}
+                >
+                  {index + 1}) {line}
+                </button>
+              ))}
+            </div>
+          </article>
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        <div
+          id={shareCardId}
+          className="aspect-square rounded-[2rem] border border-white/12 bg-[radial-gradient(circle_at_30%_20%,rgba(79,70,229,0.28),transparent_34%),linear-gradient(145deg,#05070d,#080d1f_54%,#020308)] p-7 shadow-2xl flex flex-col justify-between overflow-hidden"
+        >
+          <div className="flex items-center justify-between text-[11px] font-black tracking-[0.18em] text-white/45">
+            <span>SAJU INSIGHT</span>
+            <span>{String(new Date().getFullYear())}</span>
+          </div>
+          <div className="space-y-5 text-center">
+            <p className="mx-auto max-w-[14rem] text-3xl font-black leading-tight text-white md:max-w-[18rem] md:text-4xl break-keep">
+              {selectedLine}
+            </p>
+            <div className="mx-auto h-px w-16 bg-white/18" />
+          </div>
+          <div className="text-center">
+            <p className="text-sm font-extrabold text-white/72">{viral.character_type}</p>
+            <p className="mt-2 text-[11px] font-semibold text-white/35">saju-engine.vercel.app</p>
+          </div>
+        </div>
+
+        {notice && (
+          <div role="status" aria-live="polite" className="rounded-2xl border border-emerald-400/30 bg-emerald-400/12 px-5 py-4 text-center text-sm font-extrabold text-emerald-100">
+            {notice}
+          </div>
+        )}
+
+        <div className="grid grid-cols-3 gap-2">
+          <button
+            onClick={saveImage}
+            disabled={saving}
+            className="flex min-h-14 flex-col items-center justify-center gap-1 rounded-2xl bg-white text-black text-xs font-extrabold transition active:scale-95 disabled:bg-white/50"
+          >
+            {saving ? <Loader2 size={18} className="animate-spin" /> : <Download size={18} />}
+            이미지 저장
+          </button>
+          <button
+            onClick={copyLink}
+            className="flex min-h-14 flex-col items-center justify-center gap-1 rounded-2xl border border-white/10 bg-white/[0.06] text-xs font-extrabold text-white transition active:scale-95"
+          >
+            <LinkIcon size={18} />
+            링크 복사
+          </button>
+          <button
+            onClick={shareToKakao}
+            className="flex min-h-14 flex-col items-center justify-center gap-1 rounded-2xl bg-[#fee500] text-xs font-extrabold text-black transition active:scale-95"
+          >
+            <MessageCircle size={18} />
+            카카오톡 공유
+          </button>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function ViralBlock({ title, content }: { title: string; content: string }) {
+  return (
+    <article className="py-5">
+      <h3 className="text-sm font-extrabold text-white/88">{title}</h3>
+      <p className="mt-3 whitespace-pre-line text-[15px] leading-7 text-white/70 break-keep">
+        {content}
+      </p>
+    </article>
+  );
+}
