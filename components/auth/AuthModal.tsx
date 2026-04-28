@@ -4,11 +4,13 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { signInWithGoogle } from '@/lib/auth';
 import { LogIn, X } from 'lucide-react';
 import { useState } from 'react';
+import { User } from 'firebase/auth';
+import Image from 'next/image';
 
 interface Props {
   isOpen: boolean;
   onClose: () => void;
-  onSuccess: (user: any) => void;
+  onSuccess: (user: User) => void;
 }
 
 export default function AuthModal({ isOpen, onClose, onSuccess }: Props) {
@@ -75,7 +77,13 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: Props) {
                 disabled={loading}
                 className="w-full flex items-center justify-center gap-3 bg-white hover:bg-gray-100 text-black font-bold py-4 rounded-2xl transition-all shadow-lg active:scale-95 disabled:opacity-50"
               >
-                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" className="w-5 h-5" alt="Google" />
+                <Image
+                  src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+                  width={20}
+                  height={20}
+                  alt=""
+                  aria-hidden="true"
+                />
                 <span>Google로 계속하기</span>
               </button>
 

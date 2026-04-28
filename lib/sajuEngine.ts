@@ -1,5 +1,12 @@
-import { Solar, Lunar } from 'lunar-javascript';
-import { SajuAnalysis, SajuInput, ElementDistribution, ElementType } from '../types/saju';
+import { Solar } from 'lunar-javascript';
+import {
+  DayMasterProfile,
+  ElementDistribution,
+  ElementProfile,
+  ElementType,
+  SajuAnalysis,
+  SajuInput,
+} from '../types/saju';
 import { sajuRules } from './knowledge/sajuRules';
 
 const STEM_ELEMENTS: Record<string, ElementType> = {
@@ -18,6 +25,16 @@ const BRANCH_ELEMENTS: Record<string, ElementType> = {
   '亥': 'water', '子': 'water'
 };
 
+const UNKNOWN_HOUR = '미상';
+
+const ELEMENT_LABELS: Record<ElementType, string> = {
+  wood: '목',
+  fire: '화',
+  earth: '토',
+  metal: '금',
+  water: '수',
+};
+
 // 일간(Day Master)별 핵심 성격 키워드
 const DAY_MASTER_INFO: Record<string, { typeName: string; summary: string }> = {
   '甲': { typeName: '거대한 거목(甲)', summary: '앞장서서 나아가고 뿌리 깊은 자존감을 가진 리더 타입입니다.' },
@@ -32,13 +49,137 @@ const DAY_MASTER_INFO: Record<string, { typeName: string; summary: string }> = {
   '癸': { typeName: '맑은 냇물(癸)', summary: '두뇌 회전이 빠르고 창의적이며 주변에 스며드는 지략가입니다.' }
 };
 
+const DAY_MASTER_PROFILES: Record<string, DayMasterProfile> = {
+  '甲': {
+    core: '크게 방향을 잡고 앞으로 뻗어가는 개척형 일간',
+    strength: '판을 키우고 사람을 끌어모으는 추진력',
+    risk: '속도가 빨라 디테일과 마감이 뒤로 밀릴 수 있음',
+    strategy: '큰 목표를 작게 쪼개고, 매주 정리하는 루틴을 붙이면 강점이 오래 갑니다.',
+  },
+  '乙': {
+    core: '환경을 읽고 유연하게 살아남는 적응형 일간',
+    strength: '관계와 흐름을 세밀하게 조율하는 감각',
+    risk: '맞춰주다 보면 자기 기준이 흐려질 수 있음',
+    strategy: '양보할 수 없는 기준 3가지를 먼저 정해두면 유연함이 무기가 됩니다.',
+  },
+  '丙': {
+    core: '존재감과 표현력이 강한 발산형 일간',
+    strength: '분위기를 띄우고 빠르게 몰입시키는 에너지',
+    risk: '감정 온도가 높아질수록 판단이 성급해질 수 있음',
+    strategy: '중요한 결정은 하루를 넘겨 확인하면 직관의 정확도가 올라갑니다.',
+  },
+  '丁': {
+    core: '작지만 오래 타오르는 집중형 일간',
+    strength: '사람의 마음과 맥락을 읽는 섬세한 통찰',
+    risk: '혼자 오래 품다가 소진되거나 예민해질 수 있음',
+    strategy: '생각을 글로 꺼내고, 도움 요청 시점을 미리 정해두는 것이 좋습니다.',
+  },
+  '戊': {
+    core: '중심을 잡고 버티는 안정형 일간',
+    strength: '흔들리는 상황에서도 기준을 유지하는 신뢰감',
+    risk: '변화가 필요한 순간에도 고집으로 버틸 수 있음',
+    strategy: '고정된 원칙 옆에 예외 조건을 함께 써두면 안정감이 성과로 이어집니다.',
+  },
+  '己': {
+    core: '현실을 가꾸고 결과로 만드는 생산형 일간',
+    strength: '세부를 챙기고 사람을 품는 실무 감각',
+    risk: '너무 많이 받아주다 자기 에너지가 분산될 수 있음',
+    strategy: '내 몫과 남의 몫을 구분하는 체크리스트가 필요합니다.',
+  },
+  '庚': {
+    core: '필요한 것을 자르고 결정하는 결단형 일간',
+    strength: '복잡한 상황을 단순하게 만드는 판단력',
+    risk: '기준이 강해 관계에서 차갑게 느껴질 수 있음',
+    strategy: '결론 전에 이유를 한 문장 더 설명하면 영향력이 부드럽게 커집니다.',
+  },
+  '辛': {
+    core: '완성도와 품질을 끌어올리는 정밀형 일간',
+    strength: '작은 차이를 발견하고 결과물을 다듬는 능력',
+    risk: '완벽 기준이 높아 시작이 늦거나 피로가 쌓일 수 있음',
+    strategy: '초안과 완성본을 분리해서 평가하면 날카로움이 생산성으로 바뀝니다.',
+  },
+  '壬': {
+    core: '큰 흐름을 읽고 전략을 설계하는 확장형 일간',
+    strength: '복잡한 정보를 연결해 방향을 보는 통찰',
+    risk: '생각이 커질수록 실행 단위가 흐려질 수 있음',
+    strategy: '큰 그림을 세운 뒤 오늘 할 한 가지 행동으로 바로 내려와야 합니다.',
+  },
+  '癸': {
+    core: '작은 신호를 포착하고 해법을 찾는 지략형 일간',
+    strength: '섬세한 관찰과 빠른 학습 능력',
+    risk: '불안이 많아지면 결정을 미루기 쉬움',
+    strategy: '정보 수집 시간을 제한하면 판단 속도와 자신감이 함께 올라갑니다.',
+  },
+};
+
+function hasBirthTime(input: SajuInput) {
+  return Boolean(input.birthTime && /^\d{2}:\d{2}$/.test(input.birthTime));
+}
+
+function parseBirthDate(birthDate: string) {
+  const [year, month, day] = birthDate.split('-').map(Number);
+  return { year, month, day };
+}
+
+function addPillarElements(pillar: string, distribution: ElementDistribution) {
+  if (pillar.length < 2) return;
+
+  const stemType = STEM_ELEMENTS[pillar[0]];
+  const branchType = BRANCH_ELEMENTS[pillar[1]];
+
+  if (stemType) distribution[stemType]++;
+  if (branchType) distribution[branchType]++;
+}
+
+function getRankedElements(distribution: ElementDistribution) {
+  return (Object.keys(distribution) as ElementType[])
+    .map((type) => ({ type, count: distribution[type] }))
+    .sort((a, b) => b.count - a.count);
+}
+
+function formatElements(types: ElementType[]) {
+  return types.map((type) => ELEMENT_LABELS[type]).join(', ');
+}
+
+function buildElementProfile(distribution: ElementDistribution, timeKnown: boolean): ElementProfile {
+  const ranked = getRankedElements(distribution);
+  const totalCount = ranked.reduce((sum, item) => sum + item.count, 0);
+  const max = ranked[0]?.count ?? 0;
+  const min = ranked[ranked.length - 1]?.count ?? 0;
+  const dominant = ranked.filter((item) => item.count === max && item.count > 0).map((item) => item.type);
+  const weak = ranked.filter((item) => item.count === min).map((item) => item.type);
+  const missing = ranked.filter((item) => item.count === 0).map((item) => item.type);
+  const ideal = totalCount / 5;
+  const imbalance = ranked.reduce((sum, item) => sum + Math.abs(item.count - ideal), 0);
+  const maxImbalance = totalCount * 1.6;
+  const balanceScore = Math.max(0, Math.min(100, Math.round(100 - (imbalance / maxImbalance) * 100)));
+  const dominantText = dominant.length > 0 ? formatElements(dominant) : '특정 오행';
+  const weakText = missing.length > 0 ? formatElements(missing) : formatElements(weak);
+  const timePrefix = timeKnown ? '8글자 기준' : '시간 미상으로 6글자 기준';
+
+  return {
+    dominant,
+    weak,
+    missing,
+    balance_score: balanceScore,
+    total_count: totalCount,
+    summary: `${timePrefix}에서 ${dominantText} 기운이 가장 강하고, ${weakText} 기운이 보강 포인트입니다.`,
+    recommendation:
+      missing.length > 0
+        ? `비어 있는 ${formatElements(missing)} 기운을 생활 루틴과 의사결정 방식에서 의식적으로 채우는 것이 좋습니다.`
+        : `${dominantText} 기운이 과하게 앞서지 않도록, 약한 ${formatElements(weak)} 기운을 보완하는 선택이 균형을 만듭니다.`,
+  };
+}
+
 export function analyzeSaju(input: SajuInput): SajuAnalysis {
-  const date = new Date(input.birthDate);
-  let solar = Solar.fromYmd(date.getFullYear(), date.getMonth() + 1, date.getDate());
+  const { year, month, day } = parseBirthDate(input.birthDate);
+  const birthTime = input.birthTime;
+  const timeKnown = hasBirthTime(input);
+  let solar = Solar.fromYmd(year, month, day);
   
-  if (input.birthTime) {
-    const [hours, minutes] = input.birthTime.split(':').map(Number);
-    solar = Solar.fromYmdHms(date.getFullYear(), date.getMonth() + 1, date.getDate(), hours, minutes, 0);
+  if (timeKnown && birthTime) {
+    const [hours, minutes] = birthTime.split(':').map(Number);
+    solar = Solar.fromYmdHms(year, month, day, hours, minutes, 0);
   }
 
   const lunar = solar.getLunar();
@@ -48,25 +189,26 @@ export function analyzeSaju(input: SajuInput): SajuAnalysis {
     year: eightChar.getYear(),
     month: eightChar.getMonth(),
     day: eightChar.getDay(),
-    hour: eightChar.getHour()
+    hour: timeKnown ? eightChar.getTime() : UNKNOWN_HOUR
   };
 
   // 오행 분포 계산
   const distribution: ElementDistribution = { wood: 0, fire: 0, earth: 0, metal: 0, water: 0 };
-  
-  const addElement = (char: string, isBranch: boolean) => {
-    const type = isBranch ? BRANCH_ELEMENTS[char] : STEM_ELEMENTS[char];
-    if (type) distribution[type]++;
-  };
 
-  // 8글자 오행 집계
-  [pillars.year, pillars.month, pillars.day, pillars.hour].forEach(p => {
-    addElement(p[0], false);
-    addElement(p[1], true);
+  // 시간 미상인 경우 시주를 추정하지 않고 6글자 기준으로만 집계한다.
+  [pillars.year, pillars.month, pillars.day, ...(timeKnown ? [pillars.hour] : [])].forEach(p => {
+    addPillarElements(p, distribution);
   });
 
   const dayMaster = pillars.day[0];
   const info = DAY_MASTER_INFO[dayMaster] || { typeName: '미지의 구조', summary: '알 수 없는 구조입니다.' };
+  const elementProfile = buildElementProfile(distribution, timeKnown);
+  const dayMasterProfile = DAY_MASTER_PROFILES[dayMaster] || {
+    core: info.summary,
+    strength: '자기 구조를 읽고 조정하는 힘',
+    risk: '아직 해석 데이터가 충분하지 않아 단정하기 어려움',
+    strategy: '반복되는 선택 패턴을 먼저 기록해보는 것이 좋습니다.',
+  };
 
   // 3. 룰 엔진 적용 (매칭되는 모든 룰 찾기)
   const matchedRules = sajuRules.filter(rule => rule.condition(distribution));
@@ -89,6 +231,12 @@ export function analyzeSaju(input: SajuInput): SajuAnalysis {
     element_distribution: distribution,
     pillars: pillars,
     day_master: dayMaster,
+    time_known: timeKnown,
+    confidence_note: timeKnown
+      ? '태어난 시간이 입력되어 시주까지 포함한 8글자 기준 분석입니다.'
+      : '태어난 시간이 없어 시주는 추정하지 않았고, 연주·월주·일주 6글자 기준으로 분석했습니다.',
+    element_profile: elementProfile,
+    day_master_profile: dayMasterProfile,
     // 바이럴 문구 추가
     viral_sentences: {
       self_realization: primaryRule ? primaryRule.content.share_sentence : "나는 나를 알아가는 과정에 있다.",
@@ -96,28 +244,4 @@ export function analyzeSaju(input: SajuInput): SajuAnalysis {
       social_share: `나는 '${info.typeName}'의 구조를 가진 사람입니다.`
     }
   };
-}
-
-// 상세 분석 헬퍼 함수들 (로직 보강 필요)
-function getKeywords(dm: string, dist: ElementDistribution): string[] {
-  const base = ["논리적", "분석적"];
-  if (dist.fire > 2) base.push("열정적");
-  if (dist.metal > 2) base.push("냉철함");
-  if (dist.wood > 2) base.push("추진력");
-  return base.slice(0, 4);
-}
-
-function getPainPoint(dm: string, dist: ElementDistribution): string {
-  if (dist.fire > 3) return "폭발적인 에너지가 제어되지 않아 스스로를 소진시키고 있습니다. 멈춰야 할 때 가속 페달을 밟는 것이 당신의 가장 큰 결함입니다.";
-  if (dist.metal > 3) return "지나치게 날카로운 원칙이 본인과 주변의 숨통을 조이고 있습니다. 유연함이 결여된 정답은 때로 오답보다 위험합니다.";
-  if (dist.water > 3) return "생각의 깊이가 너무 깊어 실행력이 침수되었습니다. 완벽한 계획을 세우느라 기회의 파도를 놓치고 있지는 않나요?";
-  return "확신이 생길 때까지 움직이지 않는 신중함이 때로는 성장의 속도를 늦추는 독이 됩니다.";
-}
-
-function getRelationshipStyle(dm: string, dist: ElementDistribution): string {
-  return "표면적인 다정함보다 구조적인 신뢰를 중시합니다. 바운더리 안의 사람에게는 절대적이지만, 선을 넘는 순간 차갑게 회로를 차단합니다.";
-}
-
-function getMoneyStyle(dm: string, dist: ElementDistribution): string {
-  return "단순한 저축보다 자산의 흐름과 시스템 구축에 집착합니다. 논리적으로 납득되지 않는 지출에는 인색하지만, 승부처라고 판단되면 과감하게 베팅합니다.";
 }

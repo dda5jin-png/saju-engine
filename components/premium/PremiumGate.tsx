@@ -6,8 +6,31 @@ import { Sparkles, ArrowRight, ShieldCheck, Zap } from 'lucide-react';
 
 declare global {
   interface Window {
-    IMP: any;
+    IMP?: PortOnePayment;
   }
+}
+
+interface PortOnePaymentResponse {
+  success: boolean;
+  error_msg?: string;
+}
+
+interface PortOnePaymentRequest {
+  pg: string;
+  pay_method: string;
+  merchant_uid: string;
+  name: string;
+  amount: number;
+  buyer_email: string;
+  buyer_name: string;
+}
+
+interface PortOnePayment {
+  init: (merchantCode: string) => void;
+  request_pay: (
+    request: PortOnePaymentRequest,
+    callback: (response: PortOnePaymentResponse) => void
+  ) => void;
 }
 
 export default function PremiumGate({ analysisId }: { analysisId: string }) {
@@ -23,12 +46,12 @@ export default function PremiumGate({ analysisId }: { analysisId: string }) {
     IMP.request_pay({
       pg: 'html5_inicis',
       pay_method: 'card',
-      merchant_uid: `mid_${new Date().getTime()}`,
+      merchant_uid: `analysis_${analysisId}_${Date.now()}`,
       name: '내 정밀 구조 분석 리포트 (PDF)',
       amount: 4900,
       buyer_email: 'user@example.com',
       buyer_name: '사용자',
-    }, (rsp: any) => {
+    }, (rsp) => {
       if (rsp.success) {
         alert('결제가 완료되었습니다! 정밀 리포트로 이동합니다.');
         // 실제 운영 시 여기서 백엔드 검증 후 리다이렉트

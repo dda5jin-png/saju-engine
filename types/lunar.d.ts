@@ -16,6 +16,6 @@ declare module 'lunar-javascript' {
     getYear(): string;
     getMonth(): string;
     getDay(): string;
-    getHour(): string;
+    getTime(): string;
   }
 }

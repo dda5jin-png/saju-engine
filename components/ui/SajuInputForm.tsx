@@ -5,6 +5,14 @@ import { useRouter } from 'next/navigation';
 import { SajuInput } from '@/types/saju';
 import AnalysisLoading from './AnalysisLoading';
 import { AnimatePresence, motion } from 'framer-motion';
+import { SajuAnalysis } from '@/types/saju';
+
+interface AnalyzeResponse {
+  id?: string;
+  analysis?: SajuAnalysis;
+  persisted?: boolean;
+  error?: string;
+}
 
 export default function SajuInputForm() {
   const router = useRouter();
@@ -26,10 +34,14 @@ export default function SajuInputForm() {
         body: JSON.stringify(form)
       });
       
-      const data = await res.json();
+      const data = (await res.json()) as AnalyzeResponse;
       
       if (!res.ok || !data.id) {
         throw new Error(data.error || '분석 실패');
+      }
+
+      if (data.analysis && data.persisted === false) {
+        sessionStorage.setItem(`saju:analysis:${data.id}`, JSON.stringify(data.analysis));
       }
 
       // 의도적 지연 후 이동 (사용자에게 분석 중임을 인지시킴)

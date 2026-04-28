@@ -1,6 +1,7 @@
 import { ImageResponse } from 'next/og';
-import { db } from '@/lib/firebase';
+import { getDb } from '@/lib/firebase';
 import { doc, getDoc } from 'firebase/firestore';
+import { SajuAnalysis } from '@/types/saju';
 
 export const runtime = 'edge';
 
@@ -10,14 +11,14 @@ export async function GET(
 ) {
   try {
     const { resultId } = await params;
-    const docRef = doc(db, "results", resultId);
+    const docRef = doc(getDb(), "results", resultId);
     const docSnap = await getDoc(docRef);
 
     if (!docSnap.exists()) {
       return new Response('Not Found', { status: 404 });
     }
 
-    const data = docSnap.data();
+    const data = docSnap.data() as SajuAnalysis;
 
     return new ImageResponse(
       (
@@ -70,7 +71,7 @@ export async function GET(
                 maxWidth: '80%',
               }}
             >
-              "{data.summary.split('.')[0]}"
+              &quot;{data.summary.split('.')[0]}&quot;
             </div>
             <div
               style={{
@@ -90,8 +91,8 @@ export async function GET(
         height: 630,
       }
     );
-  } catch (e: any) {
-    console.log(`${e.message}`);
+  } catch (error) {
+    console.error(error);
     return new Response(`Failed to generate the image`, {
       status: 500,
     });

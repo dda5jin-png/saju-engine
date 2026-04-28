@@ -15,6 +15,23 @@ export interface ElementDistribution {
   water: number;
 }
 
+export interface ElementProfile {
+  dominant: ElementType[];
+  weak: ElementType[];
+  missing: ElementType[];
+  balance_score: number;
+  total_count: number;
+  summary: string;
+  recommendation: string;
+}
+
+export interface DayMasterProfile {
+  core: string;
+  strength: string;
+  risk: string;
+  strategy: string;
+}
+
 export interface SajuAnalysis {
   summary: string;
   type_name: string;
@@ -26,6 +43,10 @@ export interface SajuAnalysis {
   element_distribution: ElementDistribution;
   pillars: SajuPillars;
   day_master: string;
+  time_known: boolean;
+  confidence_note: string;
+  element_profile: ElementProfile;
+  day_master_profile: DayMasterProfile;
   viral_sentences: {
     self_realization: string;
     painful_truth: string;

@@ -2,18 +2,28 @@
 
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
-import { db } from '@/lib/firebase';
+import { getDb } from '@/lib/firebase';
 import { doc, getDoc } from 'firebase/firestore';
 import { SajuAnalysis, SajuResultCard } from '@/types/saju';
 import { generateResultCards } from '@/lib/cardGenerator';
 import ResultCard from '@/components/ui/ResultCard';
 import ShareButton from '@/components/ui/ShareButton';
 import CharacterGuide from '@/components/ui/CharacterGuide';
+import ElementBalancePanel from '@/components/ui/ElementBalancePanel';
 import AuthModal from '@/components/auth/AuthModal';
 import PremiumGate from '@/components/premium/PremiumGate';
 import { motion, AnimatePresence } from 'framer-motion';
 import { subscribeToAuthChanges } from '@/lib/auth';
 import { User } from 'firebase/auth';
+
+async function getDocWithTimeout(docRef: ReturnType<typeof doc>) {
+  return Promise.race([
+    getDoc(docRef),
+    new Promise<null>((resolve) => {
+      setTimeout(() => resolve(null), 4500);
+    }),
+  ]);
+}
 
 export default function ResultPage() {
   const { resultId } = useParams();
@@ -33,12 +43,27 @@ export default function ResultPage() {
   useEffect(() => {
     async function fetchData() {
       if (!resultId) return;
-      const docRef = doc(db, "results", resultId as string);
-      const docSnap = await getDoc(docRef);
-      
-      if (docSnap.exists()) {
-        setAnalysis(docSnap.data() as SajuAnalysis);
+
+      const id = resultId as string;
+      const fallback = sessionStorage.getItem(`saju:analysis:${id}`);
+
+      if (fallback) {
+        setAnalysis(JSON.parse(fallback) as SajuAnalysis);
+        setLoading(false);
+        return;
       }
+
+      try {
+        const docRef = doc(getDb(), "results", id);
+        const docSnap = await getDocWithTimeout(docRef);
+        
+        if (docSnap?.exists()) {
+          setAnalysis(docSnap.data() as SajuAnalysis);
+        }
+      } catch (error) {
+        console.error('Failed to load analysis result:', error);
+      }
+
       setLoading(false);
     }
     fetchData();
@@ -70,6 +95,13 @@ export default function ResultPage() {
           <h1 className="text-4xl md:text-5xl font-black tracking-tight bg-gradient-to-b from-white to-white/70 bg-clip-text text-transparent">{analysis.type_name}의 구조</h1>
           <p className="text-gray-300 text-lg md:text-xl font-medium leading-relaxed max-w-lg mx-auto">{analysis.summary}</p>
         </header>
+
+        <ElementBalancePanel
+          distribution={analysis.element_distribution}
+          profile={analysis.element_profile}
+          confidenceNote={analysis.confidence_note}
+          timeKnown={Boolean(analysis.time_known)}
+        />
 
         {/* 카드 리스트 */}
         <div className="space-y-6">
