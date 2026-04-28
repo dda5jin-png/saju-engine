@@ -36,31 +36,94 @@ const ELEMENT_LABELS: Record<ElementType, string> = {
   water: '수',
 };
 
-const ELEMENT_MEANINGS: Record<ElementType, { trait: string; excess: string; practice: string }> = {
+const ELEMENT_MEANINGS: Record<ElementType, { trait: string; excess: string; practice: string; image: string; lowImage: string }> = {
   wood: {
     trait: '성장, 기획, 확장, 시작의 힘',
     excess: '일을 크게 벌리지만 마무리 에너지가 분산되기 쉽습니다.',
     practice: '목표를 작게 쪼개고 마감 기준을 먼저 정하세요.',
+    image: '봄비를 맞고 한 번에 가지를 뻗는 나무처럼, 기회를 보면 먼저 몸이 앞으로 나갑니다.',
+    lowImage: '화분의 흙은 있는데 새순이 늦게 올라오는 모습처럼, 시작의 명분과 방향을 더 분명히 세워야 힘이 붙습니다.',
   },
   fire: {
     trait: '표현, 열정, 몰입, 드러나는 에너지',
     excess: '감정 온도가 높아질 때 말과 선택이 빨라질 수 있습니다.',
     practice: '중요한 대화와 결제는 한 번 식힌 뒤 진행하세요.',
+    image: '방 안의 조명을 단숨에 켜는 사람처럼, 분위기와 속도를 바꾸는 존재감이 있습니다.',
+    lowImage: '좋은 장작이 있어도 불씨가 약한 상태라, 마음속 의욕을 밖으로 드러내는 연습이 필요합니다.',
   },
   earth: {
     trait: '안정, 축적, 현실감, 중재의 힘',
     excess: '익숙한 방식에 머물러 변화 타이밍을 늦출 수 있습니다.',
     practice: '유지할 것과 바꿀 것을 나누어 적어보세요.',
+    image: '사람들이 잠시 쉬어갈 수 있는 넓은 마당처럼, 주변을 받아내고 판을 안정시키는 힘이 큽니다.',
+    lowImage: '집을 짓기 전 기초 공사가 얇은 상태라, 약속·돈·일정의 기본 틀을 먼저 세울수록 안정됩니다.',
   },
   metal: {
     trait: '정리, 판단, 경계, 결단의 힘',
     excess: '기준이 강해져 관계에서 차갑게 보일 수 있습니다.',
     practice: '결론 앞에 이유와 감정을 한 문장 덧붙이세요.',
+    image: '흐트러진 책상을 칼같이 정리하는 손처럼, 복잡한 문제에서 핵심만 남기는 감각이 좋습니다.',
+    lowImage: '가위가 무뎌진 상태라 자를 것과 남길 것을 정하는 데 시간이 걸릴 수 있습니다.',
   },
   water: {
     trait: '사고, 탐색, 정보, 흐름을 읽는 힘',
     excess: '생각이 깊어질수록 실행이 늦어질 수 있습니다.',
     practice: '정보 수집 시간을 제한하고 작은 실행부터 시작하세요.',
+    image: '겉으로는 잔잔하지만 바닥에서는 물길이 계속 움직이는 강처럼, 보이지 않는 계산과 관찰이 많습니다.',
+    lowImage: '지도는 있는데 물길이 마른 상태라, 정보와 휴식이 채워질 때 판단의 유연함이 살아납니다.',
+  },
+};
+
+const DAY_MASTER_SCENES: Record<string, { metaphor: string; shadow: string; advice: string }> = {
+  '甲': {
+    metaphor: '큰 나무가 하늘을 향해 곧게 서듯, 방향이 정해지면 주변을 이끌며 판을 키웁니다.',
+    shadow: '가지가 너무 빨리 뻗으면 아래쪽 정리가 늦어져, 시작한 일들이 동시에 관리 이슈가 됩니다.',
+    advice: '리더 역할을 맡되 마지막 점검표를 곁에 두면 신뢰가 오래 갑니다.',
+  },
+  '乙': {
+    metaphor: '담장을 타고 올라가는 넝쿨처럼, 막힌 길에서도 틈을 찾아 결국 살아남습니다.',
+    shadow: '너무 잘 맞춰주면 내 줄기가 어디로 향하는지 흐려질 수 있습니다.',
+    advice: '관계의 온도는 유지하되 양보하지 않을 기준을 먼저 정하세요.',
+  },
+  '丙': {
+    metaphor: '해가 뜨면 방 안의 먼지까지 보이듯, 존재감이 상황을 밝히고 사람들을 움직입니다.',
+    shadow: '빛이 너무 강하면 가까운 사람이 눈부심을 느끼듯, 직설과 속도가 부담이 될 수 있습니다.',
+    advice: '표현력은 살리고 결정은 한 박자 늦추면 매력이 설득력으로 바뀝니다.',
+  },
+  '丁': {
+    metaphor: '작은 촛불이 어두운 방의 방향을 잡아주듯, 조용하지만 오래 집중하는 힘이 있습니다.',
+    shadow: '혼자 속을 태우면 불빛보다 그을음이 먼저 쌓입니다.',
+    advice: '마음에 품은 판단을 글이나 대화로 조금씩 꺼내야 에너지가 맑게 탑니다.',
+  },
+  '戊': {
+    metaphor: '산이 계절마다 자리를 지키듯, 흔들리는 상황에서 중심을 세우는 사람입니다.',
+    shadow: '산은 쉽게 움직이지 않기 때문에, 변화가 필요한 순간에는 고집처럼 보일 수 있습니다.',
+    advice: '원칙은 유지하되 예외 조건을 미리 정하면 안정감이 답답함으로 굳지 않습니다.',
+  },
+  '己': {
+    metaphor: '밭이 씨앗을 품어 작물로 바꾸듯, 사람과 일을 현실적인 결과로 키우는 힘이 있습니다.',
+    shadow: '너무 많이 품으면 좋은 흙도 금방 지치고, 남의 문제까지 내 책임처럼 떠안게 됩니다.',
+    advice: '돌볼 것과 돌려보낼 것을 나누면 포용력이 생산성으로 이어집니다.',
+  },
+  '庚': {
+    metaphor: '원석을 단단한 칼날로 벼리듯, 필요한 것만 남기고 결론을 내리는 힘이 강합니다.',
+    shadow: '칼날이 너무 먼저 나오면 상대는 해결보다 공격으로 받아들일 수 있습니다.',
+    advice: '결론을 말하기 전에 맥락을 한 문장 얹으면 단단함이 믿음으로 전달됩니다.',
+  },
+  '辛': {
+    metaphor: '보석을 마지막까지 연마하듯, 작은 흠과 어긋남을 발견해 완성도를 높입니다.',
+    shadow: '기준이 높아질수록 시작 전부터 마음이 피곤해지고, 완성 전에는 스스로를 인정하기 어렵습니다.',
+    advice: '초안은 거칠게, 완성은 섬세하게 나누면 예민함이 실력이 됩니다.',
+  },
+  '壬': {
+    metaphor: '넓은 바다가 여러 물길을 받아들이듯, 큰 흐름과 복잡한 정보를 한꺼번에 읽습니다.',
+    shadow: '생각의 바다가 넓어질수록 오늘 할 한 걸음이 흐려질 수 있습니다.',
+    advice: '큰 전략을 세운 뒤 가장 작은 실행 단위로 내려오는 습관이 필요합니다.',
+  },
+  '癸': {
+    metaphor: '새벽 이슬이 소리 없이 스며들듯, 작고 미묘한 신호를 빨리 포착합니다.',
+    shadow: '감지가 빠른 만큼 걱정도 빨리 번져, 결정 전에 경우의 수가 너무 많아질 수 있습니다.',
+    advice: '정보 수집 시간을 제한하면 섬세함이 불안이 아니라 판단력으로 남습니다.',
   },
 };
 
@@ -219,6 +282,7 @@ function buildDetailedReading(
   const support = elementProfile.missing[0] ?? elementProfile.weak[0] ?? ranked[ranked.length - 1]?.type ?? 'water';
   const dominantMeaning = ELEMENT_MEANINGS[dominant];
   const supportMeaning = ELEMENT_MEANINGS[support];
+  const dayScene = DAY_MASTER_SCENES[dayMaster];
   const ruleStrengths = matchedRules.map((rule) => rule.interpretation.strength).slice(0, 3);
   const ruleWeaknesses = matchedRules.map((rule) => rule.interpretation.weakness).slice(0, 2);
   const genderContext = input.gender === 'female' ? '여성 사주' : '남성 사주';
@@ -235,23 +299,27 @@ function buildDetailedReading(
     temperament: sentenceList([
       `${genderContext}로 입력된 이 명식은 일간 ${dayMaster}을 중심축으로 봅니다.`,
       dayMasterProfile.core,
-      `가장 강한 ${ELEMENT_LABELS[dominant]} 기운은 ${dominantMeaning.trait}을 뜻해, 기본 반응이 빠르고 자기 기준을 세우려는 쪽으로 나타납니다.`,
+      dayScene?.metaphor ?? '',
+      `가장 강한 ${ELEMENT_LABELS[dominant]} 기운은 ${dominantMeaning.trait}을 뜻합니다. ${dominantMeaning.image}`,
       ruleStrengths.length > 0 ? `특히 ${ruleStrengths.join(', ')}이 장점으로 드러납니다.` : '',
     ]),
     work_style: sentenceList([
       `일에서는 ${dayMasterProfile.strength}이 강점입니다.`,
       `${ELEMENT_LABELS[dominant]} 기운이 앞설 때는 ${dominantMeaning.excess}`,
+      dayScene?.shadow ?? '',
       ruleWeaknesses.length > 0 ? `주의할 점은 ${ruleWeaknesses.join(', ')}입니다.` : dayMasterProfile.risk,
-      dayMasterProfile.strategy,
+      `${dayMasterProfile.strategy} ${dayScene?.advice ?? ''}`,
     ]),
     relationship: sentenceList([
       `관계에서는 ${supportMeaning.trait}이 보완 포인트입니다.`,
       matchedRules[0]?.interpretation.relationship_style ?? '가까운 관계일수록 기준과 감정 표현의 균형이 중요합니다.',
-      `부족한 ${ELEMENT_LABELS[support]} 기운은 상대의 속도와 내 속도를 맞추는 연습으로 보완할 수 있습니다.`,
+      `부족한 ${ELEMENT_LABELS[support]} 기운은 ${supportMeaning.lowImage}`,
+      '상대가 원하는 답보다 내가 줄 수 있는 답의 범위를 먼저 말하면 관계가 덜 소모됩니다.',
     ]),
     money: sentenceList([
       matchedRules[0]?.interpretation.money_style ?? '돈의 흐름은 안정성과 실행 속도의 균형을 함께 봐야 합니다.',
       `${ELEMENT_LABELS[dominant]} 기운이 강한 시기에는 장점이 빠른 판단으로 나타나지만, 기록 없이 움직이면 반복 지출이나 무리한 선택으로 이어질 수 있습니다.`,
+      '돈은 감정의 온도계처럼 움직이기 쉬워서, 기분이 올라간 날일수록 지출과 투자를 하루 뒤로 미루는 장치가 필요합니다.',
       '큰 결정보다 예산, 손절 기준, 보유 기간을 먼저 숫자로 정하는 방식이 잘 맞습니다.',
     ]),
     timing: sentenceList([
@@ -264,6 +332,7 @@ function buildDetailedReading(
     balance_practice: sentenceList([
       elementProfile.recommendation,
       `${ELEMENT_LABELS[support]} 보완 실천: ${supportMeaning.practice}`,
+      `하루를 마감할 때 오늘의 선택을 ${ELEMENT_LABELS[dominant]}의 강점으로 한 일과 ${ELEMENT_LABELS[support]}로 보완할 일로 나눠 적어보세요.`,
       '사주는 확정된 운명표라기보다 반복되는 선택 습관을 읽는 참고 도구로 쓰는 편이 가장 안전합니다.',
     ]),
     reliability_note:

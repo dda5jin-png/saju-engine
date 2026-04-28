@@ -17,11 +17,19 @@ export const generateResultCards = (analysis: SajuAnalysis): SajuResultCard[] =>
     (analysis.time_known
       ? "태어난 시간이 입력되어 시주까지 포함한 분석입니다."
       : "태어난 시간이 없어 시주는 추정하지 않았습니다.");
+  const detailedReading = analysis.detailed_reading ?? {
+    temperament: `${analysis.type_name}: ${dayMasterProfile.core}`,
+    work_style: `${dayMasterProfile.strength} 단, ${dayMasterProfile.risk}`,
+    relationship: analysis.relationship_style,
+    money: analysis.money_style,
+    timing: analysis.timing_flow,
+    balance_practice: elementProfile.recommendation,
+  };
 
   return [
     {
       title: "나의 본질적 키워드",
-      content: `${analysis.type_name}: ${dayMasterProfile.core}`,
+      content: detailedReading.temperament,
       tag: "정체성"
     },
     {
@@ -31,22 +39,22 @@ export const generateResultCards = (analysis: SajuAnalysis): SajuResultCard[] =>
     },
     {
       title: "행동의 나침반",
-      content: `${dayMasterProfile.strength} 단, ${dayMasterProfile.risk}`,
+      content: detailedReading.work_style,
       tag: "행동패턴"
     },
     {
       title: "사람들 사이의 나",
-      content: `${analysis.relationship_style} ${dayMasterProfile.strategy}`,
+      content: detailedReading.relationship,
       tag: "인간관계"
     },
     {
       title: "뼈아픈 한 마디",
-      content: `${analysis.viral_sentences.painful_truth} ${elementProfile.recommendation}`,
+      content: `${analysis.viral_sentences.painful_truth} ${detailedReading.balance_practice}`,
       tag: "팩트폭격"
     },
     {
       title: "앞으로의 흐름",
-      content: `${analysis.money_style} ${analysis.timing_flow} ${confidenceNote}`,
+      content: `${detailedReading.money} ${detailedReading.timing} ${confidenceNote}`,
       tag: "미래가치"
     }
   ];
