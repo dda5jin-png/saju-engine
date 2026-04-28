@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { toPng } from 'html-to-image';
-import { Check, ImageDown, Link as LinkIcon, Loader2, Share2 } from 'lucide-react';
+import { Check, ImageDown, Link as LinkIcon, Loader2 } from 'lucide-react';
 
 interface Props {
   url?: string;
@@ -23,6 +23,7 @@ export default function ShareButton({
 }: Props) {
   const [copied, setCopied] = useState(false);
   const [capturing, setCapturing] = useState(false);
+  const [notice, setNotice] = useState('');
 
   const shareUrl = url || (typeof window !== 'undefined' ? window.location.href : '');
   const shareTitle = title || '내 사주 구조 분석 결과 확인하기';
@@ -32,9 +33,13 @@ export default function ShareButton({
     try {
       await navigator.clipboard.writeText(shareUrl);
       setCopied(true);
+      setNotice('링크가 생성되었습니다');
       setTimeout(() => setCopied(false), 2000);
+      setTimeout(() => setNotice(''), 2600);
     } catch (err) {
       console.error('Error copying to clipboard:', err);
+      setNotice('링크 생성에 실패했습니다');
+      setTimeout(() => setNotice(''), 2600);
     }
   };
 
@@ -64,7 +69,11 @@ export default function ShareButton({
     URL.revokeObjectURL(imageUrl);
   };
 
-  const handleShare = async () => {
+  const handleGenerateLink = async () => {
+    await copyToClipboard();
+  };
+
+  const handleImageShare = async () => {
     setCapturing(true);
 
     try {
@@ -87,6 +96,8 @@ export default function ShareButton({
 
       if (imageFile) {
         downloadImage(imageFile);
+        setNotice('공유 이미지가 생성되었습니다');
+        setTimeout(() => setNotice(''), 2600);
         return;
       }
 
@@ -102,34 +113,40 @@ export default function ShareButton({
   };
 
   return (
-    <div className={`flex gap-2 ${className}`}>
-      <button
-        onClick={handleShare}
-        disabled={capturing}
-        className="flex-1 flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-500 disabled:bg-indigo-900 disabled:text-white/60 text-white font-bold py-4 px-6 rounded-2xl transition-all shadow-lg active:scale-95"
-      >
-        {capturing ? <Loader2 size={20} className="animate-spin" /> : <Share2 size={20} />}
-        <span>{capturing ? '공유 이미지 생성 중' : '분석 링크 공유하기'}</span>
-      </button>
+    <div className={`relative w-full space-y-3 ${className}`}>
+      {notice && (
+        <div
+          role="status"
+          aria-live="polite"
+          className="rounded-2xl border border-emerald-400/30 bg-emerald-400/12 px-5 py-4 text-center text-sm font-extrabold text-emerald-100 shadow-[0_0_30px_rgba(16,185,129,0.16)]"
+        >
+          {notice}
+        </div>
+      )}
 
-      <button
-        onClick={copyToClipboard}
-        className="w-16 flex items-center justify-center bg-slate-800 hover:bg-slate-700 text-white rounded-2xl transition-all border border-slate-700 active:scale-95"
-        title="링크 복사"
-      >
-        {copied ? <Check size={20} className="text-emerald-400" /> : <LinkIcon size={20} />}
-      </button>
-
-      {captureTargetId && (
+      <div className="flex gap-2">
         <button
-          onClick={handleShare}
+          onClick={handleGenerateLink}
+          className="flex-1 flex items-center justify-center gap-2 bg-emerald-500 hover:bg-emerald-400 text-black font-extrabold py-4 px-6 rounded-2xl transition-all shadow-lg shadow-emerald-500/20 active:scale-95"
+        >
+          {copied ? <Check size={20} /> : <LinkIcon size={20} />}
+          <span>{copied ? '링크 생성 완료' : '공유 링크 생성하기'}</span>
+        </button>
+
+        <button
+          onClick={handleImageShare}
           disabled={capturing}
           className="w-16 flex items-center justify-center bg-slate-800 hover:bg-slate-700 disabled:bg-slate-900 text-white rounded-2xl transition-all border border-slate-700 active:scale-95"
-          title="이미지 공유"
+          title="리포트 이미지 공유"
         >
           {capturing ? <Loader2 size={20} className="animate-spin" /> : <ImageDown size={20} />}
         </button>
-      )}
+
+      </div>
+
+      <p className="text-center text-xs leading-5 text-white/45">
+        링크를 생성하면 바로 클립보드에 복사됩니다.
+      </p>
     </div>
   );
 }
