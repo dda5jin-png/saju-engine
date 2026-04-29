@@ -11,7 +11,8 @@ declare global {
       init: (merchantCode?: string) => void;
       request_pay: (
         request: {
-          pg: string;
+          pg?: string;
+          channelKey?: string;
           pay_method: string;
           merchant_uid: string;
           name: string;
@@ -90,9 +91,12 @@ export default function PortOnePaymentButton({ productId, variant = "primary", o
       }
 
       window.IMP.init(impCode);
+      const channelKey = process.env.NEXT_PUBLIC_PORTONE_CHANNEL_KEY;
+      const pgProvider = process.env.NEXT_PUBLIC_PORTONE_PG_PROVIDER || "html5_inicis";
+
       window.IMP.request_pay(
         {
-          pg: "html5_inicis",
+          ...(channelKey ? { channelKey } : { pg: pgProvider }),
           pay_method: "card",
           merchant_uid: orderData.merchantUid,
           name: product.name,
