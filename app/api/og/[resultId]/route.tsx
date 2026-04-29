@@ -5,23 +5,31 @@ import { SajuAnalysis } from '@/types/saju';
 
 export const runtime = 'edge';
 
+async function getAnalysisWithTimeout(resultId: string) {
+  try {
+    return await Promise.race([
+      (async () => {
+        const docRef = doc(getDb(), 'results', resultId);
+        const docSnap = await getDoc(docRef);
+        return docSnap.exists() ? (docSnap.data() as SajuAnalysis) : null;
+      })(),
+      new Promise<null>((resolve) => setTimeout(() => resolve(null), 1200)),
+    ]);
+  } catch {
+    return null;
+  }
+}
+
 export async function GET(
   _request: Request,
   { params }: { params: Promise<{ resultId: string }> }
 ) {
   try {
     const { resultId } = await params;
-    const docRef = doc(getDb(), "results", resultId);
-    const docSnap = await getDoc(docRef);
-
-    if (!docSnap.exists()) {
-      return new Response('Not Found', { status: 404 });
-    }
-
-    const data = docSnap.data() as SajuAnalysis;
-    const viral = data.viral_character;
-    const quote = viral?.one_liner || data.viral_sentences?.self_realization || data.summary;
-    const characterType = viral?.character_type || data.type_name;
+    const data = await getAnalysisWithTimeout(resultId);
+    const viral = data?.viral_character;
+    const quote = viral?.one_liner || data?.viral_sentences?.self_realization || '사주 구조 분석 리포트';
+    const characterType = viral?.character_type || data?.type_name || '진지한 해석과 공유 가능한 캐릭터 카드';
 
     return new ImageResponse(
       (
@@ -152,8 +160,7 @@ export async function GET(
         height: 630,
       }
     );
-  } catch (error) {
-    console.error(error);
+  } catch {
     return new ImageResponse(
       (
         <div
