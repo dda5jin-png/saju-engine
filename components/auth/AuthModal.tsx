@@ -4,10 +4,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   createPersonalEmailAccount,
   signInWithGoogle,
-  signInWithKakao,
   signInWithPersonalEmail,
 } from '@/lib/auth';
-import { Mail, MessageCircle, X } from 'lucide-react';
+import { Mail, X } from 'lucide-react';
 import { useState } from 'react';
 import { User } from 'firebase/auth';
 import Image from 'next/image';
@@ -19,7 +18,7 @@ interface Props {
 }
 
 export default function AuthModal({ isOpen, onClose, onSuccess }: Props) {
-  const [loadingProvider, setLoadingProvider] = useState<'google' | 'kakao' | 'email' | null>(null);
+  const [loadingProvider, setLoadingProvider] = useState<'google' | 'email' | null>(null);
   const [emailMode, setEmailMode] = useState<'signin' | 'signup'>('signin');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -36,20 +35,16 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: Props) {
     onClose();
   };
 
-  const handleOAuthLogin = async (provider: 'google' | 'kakao') => {
-    setLoadingProvider(provider);
+  const handleGoogleLogin = async () => {
+    setLoadingProvider('google');
     try {
-      const user = provider === 'google' ? await signInWithGoogle() : await signInWithKakao();
+      const user = await signInWithGoogle();
       if (user) {
         await completeLogin(user);
       }
     } catch (error) {
-      console.error(`${provider} login failed:`, error);
-      alert(
-        provider === 'kakao'
-          ? '카카오 로그인에 실패했습니다. Firebase OIDC 설정과 카카오 앱 설정을 확인해주세요.'
-          : '로그인에 실패했습니다. 다시 시도해주세요.'
-      );
+      console.error('Google login failed:', error);
+      alert('로그인에 실패했습니다. 다시 시도해주세요.');
     } finally {
       setLoadingProvider(null);
     }
@@ -116,7 +111,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: Props) {
 
               <div className="space-y-3">
                 <button
-                  onClick={() => handleOAuthLogin('google')}
+                  onClick={handleGoogleLogin}
                   disabled={loading}
                   className="w-full flex min-h-14 items-center justify-center gap-3 bg-white hover:bg-gray-100 text-black font-extrabold rounded-2xl transition-all shadow-lg active:scale-95 disabled:opacity-50"
                 >
@@ -128,15 +123,6 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: Props) {
                     aria-hidden="true"
                   />
                   <span>{loadingProvider === 'google' ? 'Google 연결 중...' : 'Google로 계속하기'}</span>
-                </button>
-
-                <button
-                  onClick={() => handleOAuthLogin('kakao')}
-                  disabled={loading}
-                  className="w-full flex min-h-14 items-center justify-center gap-3 bg-[#fee500] text-black font-extrabold rounded-2xl transition-all shadow-lg active:scale-95 disabled:opacity-50"
-                >
-                  <MessageCircle size={20} />
-                  <span>{loadingProvider === 'kakao' ? '카카오 연결 중...' : '카카오톡 아이디로 계속하기'}</span>
                 </button>
               </div>
 
