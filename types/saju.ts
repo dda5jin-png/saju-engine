@@ -70,13 +70,18 @@ export interface DecisionChoice {
   expected_flow: string;
   pros: string;
   cons: string;
+  when_to_choose?: string;
+  first_action?: string;
+  watch_signal?: string;
 }
 
 export interface DecisionCoachResult {
+  decision_basis?: string;
   situation: string;
   choices: DecisionChoice[];
   recommended_action: string;
   risk_warning: string;
+  avoid_action?: string;
   one_line_guide: string;
   closing_message: string;
 }

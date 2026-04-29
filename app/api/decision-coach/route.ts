@@ -6,7 +6,7 @@ import {
   canUseFreeDecision,
   getPaidDecisionCredits,
   getTodayKey,
-  isPremiumUser,
+  hasActivePeriodAccess,
 } from "@/lib/subscription";
 import { DecisionCategory, SajuAnalysis } from "@/types/saju";
 
@@ -49,12 +49,12 @@ export async function POST(req: Request) {
     }
 
     const user = userSnap.data() ?? {};
-    const premium = isPremiumUser(user);
+    const periodAccess = hasActivePeriodAccess(user);
     const credits = getPaidDecisionCredits(user);
     const freeAllowed = canUseFreeDecision(user);
     const today = getTodayKey();
 
-    if (!premium && !freeAllowed) {
+    if (!periodAccess && credits <= 0 && !freeAllowed) {
       return NextResponse.json(
         {
           success: false,
@@ -80,7 +80,8 @@ export async function POST(req: Request) {
     const analysis = resultSnap.data() as SajuAnalysis;
     const inferredCategory = inferDecisionCategory(question, category);
     const decision = buildDecisionCoachResult(analysis, question.trim(), inferredCategory);
-    const usedPaidCredit = premium && credits > 0;
+    const usedFreeCredit = !periodAccess && freeAllowed;
+    const usedPaidCredit = !periodAccess && !usedFreeCredit && credits > 0;
 
     await db.runTransaction(async (tx) => {
       const updateData: Record<string, unknown> = {
@@ -102,7 +103,8 @@ export async function POST(req: Request) {
       tx.set(db.collection("usageLogs").doc(), {
         uid: decoded.uid,
         mode: inferredCategory === "general" ? "decision" : inferredCategory,
-        isPremiumAtUse: usedPaidCredit,
+        isPremiumAtUse: periodAccess || usedPaidCredit,
+        usedPaidCredit,
         question: question.trim(),
         resultId,
         createdAt: new Date(),
@@ -112,7 +114,9 @@ export async function POST(req: Request) {
         resultId,
         question: question.trim(),
         category: inferredCategory,
-        isPremiumAtUse: usedPaidCredit,
+        isPremiumAtUse: periodAccess || usedPaidCredit,
+        usedPaidCredit,
+        decision,
         createdAt: new Date(),
       });
     });
@@ -124,9 +128,9 @@ export async function POST(req: Request) {
       success: true,
       category: inferredCategory,
       decision,
-      premiumActive: usedPaidCredit,
+      premiumActive: periodAccess || usedPaidCredit,
       paidDecisionCredits: usedPaidCredit ? Math.max(0, credits - 1) : credits,
-      remainingFreeUses: usedPaidCredit ? null : Math.max(0, 1 - freeUsedAfter),
+      remainingFreeUses: periodAccess || usedPaidCredit ? null : Math.max(0, 1 - freeUsedAfter),
     });
   } catch (error) {
     console.error("Decision coach error:", error);

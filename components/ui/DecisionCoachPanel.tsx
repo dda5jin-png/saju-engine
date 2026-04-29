@@ -23,10 +23,10 @@ interface Props {
 }
 
 const categories: { id: DecisionCategory; label: string }[] = [
-  { id: 'general', label: '일반' },
-  { id: 'love', label: '연애' },
+  { id: 'general', label: '선택' },
+  { id: 'love', label: '연애/관계' },
   { id: 'money', label: '돈/투자' },
-  { id: 'career', label: '커리어' },
+  { id: 'career', label: '일/커리어' },
 ];
 
 export default function DecisionCoachPanel({ resultId }: Props) {
@@ -135,7 +135,7 @@ export default function DecisionCoachPanel({ resultId }: Props) {
         value={question}
         onChange={(event) => setQuestion(event.target.value)}
         rows={5}
-        placeholder="예: 지금 이직을 해야 할까, 아니면 3개월 더 버티는 게 맞을까?"
+        placeholder="예: 지금 이직을 해야 할까, 아니면 3개월 더 버티는 게 맞을까? / 연락을 다시 해볼까, 거리를 둘까?"
         className="w-full resize-none rounded-3xl border border-white/10 bg-black/35 p-5 text-[15px] leading-7 text-white outline-none placeholder:text-white/28 focus:border-emerald-300/60"
       />
 
@@ -183,6 +183,12 @@ export default function DecisionCoachPanel({ resultId }: Props) {
 function DecisionResultView({ result }: { result: DecisionCoachResult }) {
   return (
     <div className="space-y-5 border-t border-white/10 pt-6">
+      {result.decision_basis && (
+        <div className="rounded-2xl border border-emerald-300/20 bg-emerald-300/10 px-4 py-3 text-xs font-extrabold leading-5 text-emerald-50">
+          {result.decision_basis}
+        </div>
+      )}
+
       <DecisionSection title="현재 상황 해석" content={result.situation} />
 
       <div className="space-y-3">
@@ -206,6 +212,24 @@ function DecisionResultView({ result }: { result: DecisionCoachResult }) {
                   <dt className="font-extrabold text-white/82">단점</dt>
                   <dd>{choice.cons}</dd>
                 </div>
+                {choice.when_to_choose && (
+                  <div>
+                    <dt className="font-extrabold text-white/82">이 선택이 맞는 조건</dt>
+                    <dd>{choice.when_to_choose}</dd>
+                  </div>
+                )}
+                {choice.first_action && (
+                  <div>
+                    <dt className="font-extrabold text-white/82">첫 행동</dt>
+                    <dd>{choice.first_action}</dd>
+                  </div>
+                )}
+                {choice.watch_signal && (
+                  <div>
+                    <dt className="font-extrabold text-white/82">주의 신호</dt>
+                    <dd>{choice.watch_signal}</dd>
+                  </div>
+                )}
               </dl>
             </article>
           ))}
@@ -214,6 +238,7 @@ function DecisionResultView({ result }: { result: DecisionCoachResult }) {
 
       <DecisionSection title="추천 행동" content={result.recommended_action} />
       <DecisionSection title="리스크 경고" content={result.risk_warning} warning />
+      {result.avoid_action && <DecisionSection title="피해야 할 행동" content={result.avoid_action} warning />}
       <div className="rounded-3xl bg-white p-5 text-center">
         <p className="text-xs font-black text-black/45">한줄 가이드</p>
         <p className="mt-2 text-xl font-black text-black">{result.one_line_guide}</p>

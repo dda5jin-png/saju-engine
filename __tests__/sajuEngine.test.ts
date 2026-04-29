@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { buildDecisionCoachResult } from '@/lib/decisionCoach';
 import { analyzeSaju } from '@/lib/sajuEngine';
 
 describe('analyzeSaju', () => {
@@ -74,5 +75,38 @@ describe('analyzeSaju', () => {
     expect(analysis.detailed_reading.reliability_note).toContain('일간 중심');
     expect(analysis.viral_character?.share_lines).toHaveLength(3);
     expect(analysis.viral_character?.one_liner.length).toBeGreaterThanOrEqual(15);
+  });
+
+  it('creates different decision coaching frames by category and question', () => {
+    const analysis = analyzeSaju({
+      birthDate: '1990-01-01',
+      birthTime: '12:00',
+      gender: 'male',
+    });
+
+    const career = buildDecisionCoachResult(
+      analysis,
+      '지금 이직을 해야 할까?',
+      'career',
+    );
+    const money = buildDecisionCoachResult(
+      analysis,
+      '코인을 지금 매수할까 아니면 기준까지 기다릴까?',
+      'money',
+    );
+    const love = buildDecisionCoachResult(
+      analysis,
+      '이 관계를 이별로 정리해야 할까?',
+      'love',
+    );
+
+    expect(career.choices.map((choice) => choice.label)).toEqual(['이동한다', '현재 판에서 조건을 바꾼다']);
+    expect(money.choices.map((choice) => choice.label)).toEqual(['코인을 지금 매수할까', '기준까지 기다릴까']);
+    expect(love.choices.map((choice) => choice.label)).toEqual(['관계를 정리한다', '거리를 두고 확인한다']);
+    expect(career.one_line_guide).not.toBe(money.one_line_guide);
+    expect(money.recommended_action).toContain('손실 한도');
+    expect(love.recommended_action).toContain('반복해서 보여주는 행동');
+    expect(career.choices[0].first_action).toContain('역할');
+    expect(career.decision_basis).toContain('강점');
   });
 });
