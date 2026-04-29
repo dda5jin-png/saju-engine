@@ -1,9 +1,11 @@
 import Link from 'next/link';
 import CharacterGuide from '@/components/ui/CharacterGuide';
+import HeaderAuthButton from '@/components/auth/HeaderAuthButton';
 
 export default function LandingPage() {
   return (
     <main className="min-h-screen bg-black text-white flex flex-col items-center justify-center p-6 text-center space-y-12">
+      <HeaderAuthButton />
       <div className="space-y-6">
         <CharacterGuide size={160} />
         
@@ -25,6 +27,10 @@ export default function LandingPage() {
         >
           내 구조 분석하기
         </Link>
+        <p className="mt-3 text-xs font-semibold leading-5 text-white/45">
+          비회원도 바로 체험할 수 있어요.<br />
+          결과 저장과 프리미엄 질문은 로그인 후 이용됩니다.
+        </p>
         <p className="mt-4 text-gray-500 text-sm">
           현재까지 12,402명의 구조가 해석되었습니다.
         </p>
