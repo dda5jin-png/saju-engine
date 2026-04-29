@@ -1,6 +1,7 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
+import { FirebaseError } from 'firebase/app';
 import {
   createPersonalEmailAccount,
   signInWithGoogle,
@@ -17,6 +18,30 @@ interface Props {
   onSuccess: (user: User) => void;
 }
 
+function getAuthErrorMessage(error: unknown, fallback: string) {
+  if (!(error instanceof FirebaseError)) return fallback;
+
+  const messages: Record<string, string> = {
+    'auth/unauthorized-domain':
+      '현재 도메인이 Firebase 승인 도메인에 등록되지 않았습니다. Firebase Authentication 설정에서 saju-engine.vercel.app을 추가해주세요.',
+    'auth/operation-not-allowed':
+      'Firebase에서 해당 로그인 제공업체가 아직 활성화되지 않았습니다. Google 로그인 또는 이메일/비밀번호 제공업체를 사용 설정해주세요.',
+    'auth/popup-closed-by-user': '로그인 창이 닫혔습니다. 다시 시도해주세요.',
+    'auth/popup-blocked': '브라우저가 로그인 팝업을 차단했습니다. 팝업 허용 후 다시 시도해주세요.',
+    'auth/account-exists-with-different-credential':
+      '이미 다른 로그인 방식으로 가입된 이메일입니다. 기존 방식으로 로그인해주세요.',
+    'auth/invalid-api-key':
+      'Firebase API Key 설정이 올바르지 않습니다. Vercel 환경변수 NEXT_PUBLIC_FIREBASE_API_KEY를 확인해주세요.',
+    'auth/invalid-email': '이메일 주소 형식이 올바르지 않습니다.',
+    'auth/user-not-found': '가입되지 않은 이메일입니다. 회원가입으로 진행해주세요.',
+    'auth/wrong-password': '비밀번호가 올바르지 않습니다.',
+    'auth/email-already-in-use': '이미 가입된 이메일입니다. 로그인으로 진행해주세요.',
+    'auth/weak-password': '비밀번호는 6자 이상으로 입력해주세요.',
+  };
+
+  return messages[error.code] || `${fallback}\n오류 코드: ${error.code}`;
+}
+
 export default function AuthModal({ isOpen, onClose, onSuccess }: Props) {
   const [loadingProvider, setLoadingProvider] = useState<'google' | 'email' | null>(null);
   const [emailMode, setEmailMode] = useState<'signin' | 'signup'>('signin');
@@ -25,12 +50,17 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: Props) {
 
   const completeLogin = async (user: User) => {
     const idToken = await user.getIdToken();
-    await fetch('/api/auth/sync-user', {
+    const res = await fetch('/api/auth/sync-user', {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${idToken}`,
       },
     });
+
+    if (!res.ok) {
+      throw new Error('회원 정보 동기화에 실패했습니다.');
+    }
+
     onSuccess(user);
     onClose();
   };
@@ -44,7 +74,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: Props) {
       }
     } catch (error) {
       console.error('Google login failed:', error);
-      alert('로그인에 실패했습니다. 다시 시도해주세요.');
+      alert(getAuthErrorMessage(error, 'Google 로그인에 실패했습니다. 다시 시도해주세요.'));
     } finally {
       setLoadingProvider(null);
     }
@@ -67,7 +97,12 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: Props) {
       await completeLogin(user);
     } catch (error) {
       console.error('Email login failed:', error);
-      alert(emailMode === 'signin' ? '이메일 로그인에 실패했습니다.' : '이메일 회원가입에 실패했습니다.');
+      alert(
+        getAuthErrorMessage(
+          error,
+          emailMode === 'signin' ? '이메일 로그인에 실패했습니다.' : '이메일 회원가입에 실패했습니다.',
+        ),
+      );
     } finally {
       setLoadingProvider(null);
     }
