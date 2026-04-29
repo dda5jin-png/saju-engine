@@ -6,6 +6,7 @@ import {
   ElementProfile,
   ElementType,
   JewelryRecommendation,
+  JewelryOption,
   SajuAnalysis,
   SajuInput,
   ViralCharacterMode,
@@ -76,41 +77,59 @@ const ELEMENT_MEANINGS: Record<ElementType, { trait: string; excess: string; pra
   },
 };
 
-const JEWELRY_RECOMMENDATIONS: Record<ElementType, Omit<JewelryRecommendation, 'support_element' | 'element_label'>> = {
+const JEWELRY_MATCHING: Record<ElementType, {
+  meaning: string;
+  gems: string[];
+  colors: string[];
+  metals: string[];
+  shapes: string[];
+  jewelry: string;
+  tone: string;
+}> = {
   wood: {
-    gemstone: '페리도트 또는 그린 투어멀린',
-    jewelry: '초록빛 포인트 펜던트',
-    tone: '맑은 그린, 새싹색, 브러시드 골드',
-    reason: '목은 성장과 방향을 상징합니다. 부족한 목을 보완할 때는 시선을 위로 끌어올리는 초록 포인트가 잘 맞습니다.',
-    styling_tip: '목선 가까이에 작은 펜던트를 두면 시작과 확장의 이미지를 가장 깔끔하게 살릴 수 있습니다.',
+    meaning: '성장, 확장, 시작',
+    gems: ['에메랄드', '페리도트', '그린 투어말린', '제이드'],
+    colors: ['그린'],
+    metals: ['화이트골드', '옐로우골드'],
+    shapes: ['길쭉한 형태'],
+    jewelry: '그린 스톤 펜던트',
+    tone: '그린, 새싹색, 브러시드 골드',
   },
   fire: {
-    gemstone: '가넷 또는 카넬리언',
-    jewelry: '로즈골드 포인트 링',
-    tone: '딥 레드, 코랄, 로즈골드',
-    reason: '화는 표현과 몰입을 상징합니다. 부족한 화를 보완할 때는 너무 큰 장식보다 따뜻한 색의 작은 포인트가 자연스럽습니다.',
-    styling_tip: '손을 쓸 때 보이는 링이나 얇은 브레이슬릿으로 활력을 더하는 쪽이 좋습니다.',
+    meaning: '추진력, 행동력, 표현',
+    gems: ['루비', '가넷', '레드 스피넬', '핑크 사파이어'],
+    colors: ['레드', '핑크'],
+    metals: ['옐로우골드', '핑크골드'],
+    shapes: ['날카롭고 역동적인 컷'],
+    jewelry: '레드 스톤 링',
+    tone: '레드, 핑크, 로즈골드',
   },
   earth: {
-    gemstone: '시트린 또는 타이거 아이',
-    jewelry: '골드 체인 브레이슬릿',
-    tone: '허니 골드, 샴페인, 웜 브라운',
-    reason: '토는 안정과 축적을 상징합니다. 부족한 토를 보완할 때는 무게감 있는 골드 톤이 중심을 잡아줍니다.',
-    styling_tip: '매일 착용할 수 있는 브레이슬릿처럼 반복되는 루틴에 붙는 아이템이 잘 맞습니다.',
+    meaning: '안정, 재물, 기반',
+    gems: ['시트린', '타이거아이', '옐로우 토파즈', '스모키 쿼츠'],
+    colors: ['브라운', '옐로우'],
+    metals: ['순금', '옐로우골드'],
+    shapes: ['둥근 형태'],
+    jewelry: '골드 브레이슬릿',
+    tone: '브라운, 옐로우, 순금',
   },
   metal: {
-    gemstone: '화이트 사파이어 또는 클리어 쿼츠',
-    jewelry: '실버 미니멀 이어링',
-    tone: '실버, 아이스 화이트, 차분한 그레이',
-    reason: '금은 기준과 정리를 상징합니다. 부족한 금을 보완할 때는 선이 깨끗하고 과하지 않은 디자인이 좋습니다.',
-    styling_tip: '귀걸이나 얇은 링처럼 형태가 분명한 아이템을 고르면 판단의 선명함을 시각적으로 살릴 수 있습니다.',
+    meaning: '결단력, 통제, 구조',
+    gems: ['다이아몬드', '화이트 사파이어', '화이트 토파즈'],
+    colors: ['화이트', '실버'],
+    metals: ['화이트골드', '플래티넘'],
+    shapes: ['각진 컷'],
+    jewelry: '화이트 메탈 링',
+    tone: '화이트, 실버, 플래티넘',
   },
   water: {
-    gemstone: '아쿠아마린 또는 블루 토파즈',
+    meaning: '흐름, 지혜, 관계',
+    gems: ['아쿠아마린', '블루 사파이어', '라피스라줄리', '블루 토파즈'],
+    colors: ['블루', '블랙'],
+    metals: ['화이트골드', '실버'],
+    shapes: ['물방울형'],
     jewelry: '블루 스톤 네크리스',
-    tone: '아이스 블루, 딥 네이비, 화이트 메탈',
-    reason: '수는 사고와 흐름을 상징합니다. 부족한 수를 보완할 때는 차분한 블루 계열이 과열된 판단을 식히는 이미지와 맞습니다.',
-    styling_tip: '가슴선 근처의 작은 블루 스톤은 깊이와 여백을 동시에 보여주는 포인트가 됩니다.',
+    tone: '블루, 블랙, 화이트 메탈',
   },
 };
 
@@ -312,14 +331,90 @@ function getSupportElement(elementProfile: ElementProfile, distribution: Element
   return elementProfile.missing[0] ?? elementProfile.weak[0] ?? ranked[ranked.length - 1]?.type ?? 'water';
 }
 
+function classifyElementStates(distribution: ElementDistribution) {
+  const total = Object.values(distribution).reduce((sum, count) => sum + count, 0);
+  const lowCut = total >= 8 ? 1 : 0;
+  const highCut = total >= 8 ? 3 : 2;
+
+  return (Object.keys(distribution) as ElementType[]).reduce(
+    (states, type) => {
+      const count = distribution[type];
+      states[type] = count <= lowCut ? '부족' : count >= highCut ? '과다' : '적정';
+      return states;
+    },
+    {} as Record<ElementType, '부족' | '적정' | '과다'>,
+  );
+}
+
+function getAvoidElement(elementProfile: ElementProfile, distribution: ElementDistribution, supportElement: ElementType): ElementType {
+  const ranked = getRankedElements(distribution);
+  return elementProfile.dominant.find((type) => type !== supportElement) ?? ranked[0]?.type ?? supportElement;
+}
+
+function buildJewelryOptions(supportElement: ElementType, avoidElement: ElementType): JewelryOption[] {
+  const match = JEWELRY_MATCHING[supportElement];
+  const avoidLabel = ELEMENT_LABELS[avoidElement];
+
+  return match.gems.slice(0, 2).map((gemstone, index) => ({
+    gemstone,
+    reason:
+      index === 0
+        ? `${ELEMENT_LABELS[supportElement]}은 ${match.meaning}의 에너지입니다. 현재 구조에서 이 기운을 보완해야 하므로, ${match.colors.join('/')} 계열의 ${gemstone}이 가장 직접적인 상징이 됩니다. 과한 ${avoidLabel} 기운을 더 키우지 않고 필요한 방향만 선명하게 보강합니다.`
+        : `${gemstone}은 같은 ${ELEMENT_LABELS[supportElement]} 계열을 더 일상적으로 쓰기 좋은 대안입니다. 첫 번째 보석보다 부담이 적고, 매일 착용해도 스타일이 과해지지 않아 루틴형 보완에 적합합니다.`,
+    metal: match.metals[index % match.metals.length],
+    shape: match.shapes[0],
+  }));
+}
+
+function buildJewelryPracticalStrategy(supportElement: ElementType) {
+  const label = ELEMENT_LABELS[supportElement];
+
+  return {
+    love: `${label} 기운을 보완하는 보석은 관계에서 부족한 태도를 의식하게 만드는 장치입니다. 감정 표현이 약하면 목걸이, 결단이 약하면 반지로 시선을 고정하세요.`,
+    money: `${label} 기운은 재물 판단에서 빠진 기준을 보강합니다. 계약·결제·투자처럼 숫자를 다루는 날에는 손에 보이는 반지나 팔찌가 가장 실용적입니다.`,
+    business: `사업이나 업무 확장 상황에서는 ${label}의 상징을 작은 포인트로 두는 편이 좋습니다. 과한 장식보다 매일 반복 착용 가능한 디자인이 신뢰감을 만듭니다.`,
+    relationship: `인간관계에서는 부족한 ${label} 기운을 말투보다 분위기로 먼저 보완하세요. 목걸이는 인상을 부드럽게, 팔찌는 행동의 리듬을 안정시킵니다.`,
+  };
+}
+
+function buildJewelryWearingGuide(supportElement: ElementType) {
+  const match = JEWELRY_MATCHING[supportElement];
+  const primaryGem = match.gems[0];
+  const secondaryGem = match.gems[1];
+  const metal = match.metals[0];
+
+  return {
+    ring: `${metal} ${primaryGem} 반지는 결정을 내려야 하는 날에 가장 적합합니다. 손에 보이는 위치라 선택 기준을 계속 상기시킵니다.`,
+    necklace: `${secondaryGem} 목걸이는 대화, 연애, 인간관계처럼 인상이 중요한 상황에 맞습니다. 시선이 얼굴과 목선으로 올라와 부드러운 보완이 됩니다.`,
+    bracelet: `${match.metals[match.metals.length - 1]} 팔찌는 돈, 일정, 업무처럼 반복 관리가 필요한 날에 좋습니다. 과시보다 루틴을 잡는 용도로 쓰세요.`,
+  };
+}
+
 function buildJewelryRecommendation(elementProfile: ElementProfile, distribution: ElementDistribution): JewelryRecommendation {
   const supportElement = getSupportElement(elementProfile, distribution);
-  const recommendation = JEWELRY_RECOMMENDATIONS[supportElement];
+  const avoidElement = getAvoidElement(elementProfile, distribution, supportElement);
+  const match = JEWELRY_MATCHING[supportElement];
+  const recommendations = buildJewelryOptions(supportElement, avoidElement);
+  const practicalStrategy = buildJewelryPracticalStrategy(supportElement);
+  const wearingGuide = buildJewelryWearingGuide(supportElement);
 
   return {
     support_element: supportElement,
     element_label: ELEMENT_LABELS[supportElement],
-    ...recommendation,
+    gemstone: recommendations.map((item) => item.gemstone).join(' 또는 '),
+    jewelry: match.jewelry,
+    tone: match.tone,
+    reason: `${ELEMENT_LABELS[supportElement]} 기운은 현재 명식에서 보강해야 할 용신 축입니다. ${match.meaning}을 상징하는 색과 형태로 가져가야 해석과 착용 전략이 겹치지 않고 기능적으로 분리됩니다.`,
+    styling_tip: `${recommendations[0].metal} 소재와 ${recommendations[0].shape}를 우선으로 고르세요. 중요한 상황에서는 작은 포인트 하나만 선명하게 쓰는 편이 가장 단정합니다.`,
+    element_states: classifyElementStates(distribution),
+    needed_element: supportElement,
+    avoid_element: avoidElement,
+    needed_element_label: ELEMENT_LABELS[supportElement],
+    avoid_element_label: ELEMENT_LABELS[avoidElement],
+    recommendations,
+    practical_strategy: practicalStrategy,
+    wearing_guide: wearingGuide,
+    scenario_summary: `중요한 결정이나 도전 상황에서는 ${recommendations[0].metal} ${recommendations[0].gemstone} 반지를 착용하는 것이 가장 효과적입니다.`,
   };
 }
 

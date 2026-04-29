@@ -51,6 +51,35 @@ export interface JewelryRecommendation {
   tone: string;
   reason: string;
   styling_tip: string;
+  element_states?: Record<ElementType, '부족' | '적정' | '과다'>;
+  needed_element?: ElementType;
+  avoid_element?: ElementType;
+  needed_element_label?: string;
+  avoid_element_label?: string;
+  recommendations?: JewelryOption[];
+  practical_strategy?: JewelryPracticalStrategy;
+  wearing_guide?: JewelryWearingGuide;
+  scenario_summary?: string;
+}
+
+export interface JewelryOption {
+  gemstone: string;
+  reason: string;
+  metal: string;
+  shape: string;
+}
+
+export interface JewelryPracticalStrategy {
+  love: string;
+  money: string;
+  business: string;
+  relationship: string;
+}
+
+export interface JewelryWearingGuide {
+  ring: string;
+  necklace: string;
+  bracelet: string;
 }
 
 export interface ViralCharacterMode {

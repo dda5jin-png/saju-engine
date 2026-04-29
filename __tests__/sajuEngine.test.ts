@@ -75,6 +75,11 @@ describe('analyzeSaju', () => {
     expect(analysis.detailed_reading.reliability_note).toContain('일간 중심');
     expect(analysis.viral_character?.share_lines).toHaveLength(3);
     expect(analysis.viral_character?.one_liner.length).toBeGreaterThanOrEqual(15);
+    expect(analysis.jewelry_recommendation?.recommendations?.length).toBeGreaterThanOrEqual(2);
+    expect(analysis.jewelry_recommendation?.element_states?.wood).toMatch(/부족|적정|과다/);
+    expect(analysis.jewelry_recommendation?.needed_element_label).toBeTruthy();
+    expect(analysis.jewelry_recommendation?.avoid_element_label).toBeTruthy();
+    expect(analysis.jewelry_recommendation?.scenario_summary).toContain('반지');
   });
 
   it('creates different decision coaching frames by category and question', () => {
