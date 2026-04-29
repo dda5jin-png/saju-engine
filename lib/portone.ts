@@ -1,49 +1,56 @@
+import { PaymentClient } from "@portone/server-sdk";
+
 export type PortOnePaymentInfo = {
-  merchant_uid: string;
+  paymentId: string;
+  transactionId: string | null;
   amount: number;
   status: string;
-  pg_provider?: string;
-  pay_method?: string;
-  receipt_url?: string;
-  card_name?: string;
-  cancelled_at?: number;
+  pgProvider?: string | null;
+  payMethod?: string | null;
+  receiptUrl?: string | null;
+  cardName?: string | null;
 };
 
-export async function getPortOneAccessToken() {
-  if (!process.env.PORTONE_API_KEY || !process.env.PORTONE_API_SECRET) {
-    throw new Error("Missing PortOne API credentials");
+function getPortOnePaymentClient() {
+  const secret = process.env.PORTONE_API_SECRET;
+  const storeId = process.env.NEXT_PUBLIC_PORTONE_STORE_ID;
+
+  if (!secret) {
+    throw new Error("Missing PORTONE_API_SECRET");
   }
 
-  const res = await fetch("https://api.iamport.kr/users/getToken", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      imp_key: process.env.PORTONE_API_KEY,
-      imp_secret: process.env.PORTONE_API_SECRET,
-    }),
-  });
-
-  const data = await res.json();
-
-  if (data.code !== 0) {
-    throw new Error(data.message || "포트원 토큰 발급 실패");
-  }
-
-  return data.response.access_token as string;
+  return PaymentClient({ secret, storeId });
 }
 
-export async function getPaymentInfo(impUid: string, accessToken: string): Promise<PortOnePaymentInfo> {
-  const res = await fetch(`https://api.iamport.kr/payments/${impUid}`, {
-    headers: {
-      Authorization: accessToken,
-    },
-  });
+function getPaymentMethodLabel(method: unknown) {
+  if (!method || typeof method !== "object") return null;
 
-  const data = await res.json();
+  const typed = method as { type?: unknown; card?: { name?: unknown }; easyPay?: { provider?: unknown } };
+  const type = typeof typed.type === "string" ? typed.type : null;
+  const cardName = typeof typed.card?.name === "string" ? typed.card.name : null;
+  const easyPay = typeof typed.easyPay?.provider === "string" ? typed.easyPay.provider : null;
 
-  if (data.code !== 0) {
-    throw new Error(data.message || "결제 정보 조회 실패");
-  }
+  return cardName || easyPay || type;
+}
 
-  return data.response as PortOnePaymentInfo;
+export async function getPaymentInfo(paymentId: string): Promise<PortOnePaymentInfo> {
+  const payment = await getPortOnePaymentClient().getPayment({ paymentId });
+  const amount = "amount" in payment && payment.amount ? payment.amount.paid || payment.amount.total : 0;
+  const channel = "channel" in payment ? payment.channel : null;
+  const method = "method" in payment ? payment.method : null;
+
+  return {
+    paymentId: "id" in payment && typeof payment.id === "string" ? payment.id : paymentId,
+    transactionId:
+      "transactionId" in payment && typeof payment.transactionId === "string"
+        ? payment.transactionId
+        : null,
+    amount,
+    status: typeof payment.status === "string" ? payment.status : "UNKNOWN",
+    pgProvider: channel?.pgProvider || null,
+    payMethod: getPaymentMethodLabel(method),
+    receiptUrl:
+      "receiptUrl" in payment && typeof payment.receiptUrl === "string" ? payment.receiptUrl : null,
+    cardName: getPaymentMethodLabel(method),
+  };
 }

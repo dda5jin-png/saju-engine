@@ -1,34 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import * as PortOne from "@portone/browser-sdk/v2";
 import { ArrowRight, Loader2 } from "lucide-react";
 import { getClientAuth } from "@/lib/auth";
 import { PRODUCTS, ProductId } from "@/lib/products";
-
-declare global {
-  interface Window {
-    IMP?: {
-      init: (merchantCode?: string) => void;
-      request_pay: (
-        request: {
-          pg?: string;
-          channelKey?: string;
-          pay_method: string;
-          merchant_uid: string;
-          name: string;
-          amount: number;
-          buyer_email: string;
-          buyer_name: string;
-        },
-        callback: (response: {
-          imp_uid?: string;
-          merchant_uid?: string;
-          error_msg?: string;
-        }) => void,
-      ) => void;
-    };
-  }
-}
 
 type Props = {
   productId: ProductId;
@@ -40,16 +16,6 @@ export default function PortOnePaymentButton({ productId, variant = "primary", o
   const [loading, setLoading] = useState(false);
   const product = PRODUCTS[productId];
 
-  useEffect(() => {
-    if (document.getElementById("portone-sdk")) return;
-
-    const script = document.createElement("script");
-    script.id = "portone-sdk";
-    script.src = "https://cdn.iamport.kr/v1/iamport.js";
-    script.async = true;
-    document.body.appendChild(script);
-  }, []);
-
   const requestPay = async () => {
     try {
       setLoading(true);
@@ -58,13 +24,6 @@ export default function PortOnePaymentButton({ productId, variant = "primary", o
 
       if (!user) {
         alert("로그인 후 결제할 수 있습니다.");
-        return;
-      }
-
-      const impCode = process.env.NEXT_PUBLIC_PORTONE_IMP_CODE;
-
-      if (!impCode) {
-        alert("결제 가맹점 코드가 설정되지 않았습니다.");
         return;
       }
 
@@ -85,60 +44,63 @@ export default function PortOnePaymentButton({ productId, variant = "primary", o
         return;
       }
 
-      if (!window.IMP) {
-        alert("결제 모듈을 불러오지 못했습니다.");
+      if (!orderData.storeId || !orderData.channelKey || !orderData.paymentId) {
+        alert("포트원 V2 결제 설정이 부족합니다.");
         return;
       }
 
-      window.IMP.init(impCode);
-      const channelKey = process.env.NEXT_PUBLIC_PORTONE_CHANNEL_KEY;
-      const pgProvider = process.env.NEXT_PUBLIC_PORTONE_PG_PROVIDER || "html5_inicis";
-
-      window.IMP.request_pay(
-        {
-          ...(channelKey ? { channelKey } : { pg: pgProvider }),
-          pay_method: "card",
-          merchant_uid: orderData.merchantUid,
-          name: product.name,
-          amount: product.amount,
-          buyer_email: orderData.buyerEmail || user.email || "",
-          buyer_name: orderData.buyerName || user.displayName || "사용자",
+      const payment = await PortOne.requestPayment({
+        storeId: orderData.storeId,
+        channelKey: orderData.channelKey,
+        paymentId: orderData.paymentId,
+        orderName: product.name,
+        totalAmount: product.amount,
+        currency: "KRW",
+        payMethod: "CARD",
+        customer: {
+          customerId: user.uid,
+          email: orderData.buyerEmail || user.email || undefined,
+          fullName: orderData.buyerName || user.displayName || "사용자",
         },
-        async (rsp) => {
-          if (!rsp.imp_uid || !rsp.merchant_uid) {
-            alert(rsp.error_msg || "결제가 완료되지 않았습니다.");
-            setLoading(false);
-            return;
-          }
+        productType: "DIGITAL",
+        redirectUrl: `${window.location.origin}/premium`,
+        noticeUrls: [`${window.location.origin}/api/webhooks/portone`],
+      } as Parameters<typeof PortOne.requestPayment>[0]);
 
-          const verifyRes = await fetch("/api/payments/verify", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${idToken}`,
-            },
-            body: JSON.stringify({
-              impUid: rsp.imp_uid,
-              merchantUid: rsp.merchant_uid,
-            }),
-          });
+      if (!payment) {
+        alert("결제 결과 확인을 위해 잠시 후 새로고침해 주세요.");
+        return;
+      }
 
-          const verifyData = await verifyRes.json();
+      if (payment.code) {
+        alert(payment.message || "결제가 완료되지 않았습니다.");
+        return;
+      }
 
-          if (verifyData.success) {
-            alert("결제가 완료되었습니다. 프리미엄 분석이 열렸습니다.");
-            onPaid?.();
-            window.location.reload();
-          } else {
-            alert(verifyData.message || "결제 검증 실패");
-          }
-
-          setLoading(false);
+      const verifyRes = await fetch("/api/payments/verify", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${idToken}`,
         },
-      );
+        body: JSON.stringify({
+          paymentId: payment.paymentId || orderData.paymentId,
+        }),
+      });
+
+      const verifyData = await verifyRes.json();
+
+      if (verifyData.success) {
+        alert(`결제가 완료되었습니다. 분석권 ${verifyData.credits || product.credits}회가 충전되었습니다.`);
+        onPaid?.();
+        window.location.reload();
+      } else {
+        alert(verifyData.message || "결제 검증 실패");
+      }
     } catch (error) {
       console.error("PortOne payment error:", error);
       alert("결제 중 오류가 발생했습니다.");
+    } finally {
       setLoading(false);
     }
   };

@@ -23,10 +23,6 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko" className="bg-black">
-      <head>
-        {/* 포트원 결제 SDK */}
-        <script src="https://cdn.iamport.kr/v1/iamport.js" async />
-      </head>
       <body className={`${inter.className} antialiased bg-black text-white`}>
         <div className="min-h-screen max-w-full overflow-x-hidden">
           {children}

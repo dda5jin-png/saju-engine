@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { applyVerifiedPayment } from "@/lib/paymentFulfillment";
-import { getPaymentInfo, getPortOneAccessToken } from "@/lib/portone";
+import { getPaymentInfo } from "@/lib/portone";
 import { verifyBearerToken } from "@/lib/serverAuth";
 
 export async function POST(req: Request) {
@@ -14,21 +14,23 @@ export async function POST(req: Request) {
       );
     }
 
-    const { impUid, merchantUid } = (await req.json()) as {
-      impUid?: string;
-      merchantUid?: string;
+    const { paymentId } = (await req.json()) as {
+      paymentId?: string;
     };
 
-    if (!impUid || !merchantUid) {
+    if (!paymentId) {
       return NextResponse.json(
         { success: false, message: "결제 정보가 부족합니다." },
         { status: 400 },
       );
     }
 
-    const accessToken = await getPortOneAccessToken();
-    const payment = await getPaymentInfo(impUid, accessToken);
-    const result = await applyVerifiedPayment({ merchantUid, impUid, payment });
+    const payment = await getPaymentInfo(paymentId);
+    const result = await applyVerifiedPayment({
+      merchantUid: paymentId,
+      impUid: payment.transactionId,
+      payment,
+    });
 
     if (!result.success) {
       return NextResponse.json(

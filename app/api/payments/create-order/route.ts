@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { randomUUID } from "crypto";
 import { getAdminDb } from "@/lib/firebaseAdmin";
 import { PRODUCTS, ProductId } from "@/lib/products";
 import { verifyBearerToken } from "@/lib/serverAuth";
@@ -24,10 +25,21 @@ export async function POST(req: Request) {
       );
     }
 
-    const merchantUid = `saju_${decoded.uid}_${product.id}_${Date.now()}`;
+    const storeId = process.env.NEXT_PUBLIC_PORTONE_STORE_ID;
+    const channelKey = process.env.NEXT_PUBLIC_PORTONE_CHANNEL_KEY;
 
-    await getAdminDb().collection("paymentOrders").doc(merchantUid).set({
-      merchantUid,
+    if (!storeId || !channelKey) {
+      return NextResponse.json(
+        { success: false, message: "포트원 V2 결제 설정이 부족합니다." },
+        { status: 500 },
+      );
+    }
+
+    const paymentId = `saju-${Date.now()}-${randomUUID()}`;
+
+    await getAdminDb().collection("paymentOrders").doc(paymentId).set({
+      merchantUid: paymentId,
+      paymentId,
       uid: decoded.uid,
       productId: product.id,
       productName: product.name,
@@ -46,7 +58,10 @@ export async function POST(req: Request) {
 
     return NextResponse.json({
       success: true,
-      merchantUid,
+      merchantUid: paymentId,
+      paymentId,
+      storeId,
+      channelKey,
       amount: product.amount,
       name: product.name,
       buyerEmail: decoded.email || "",

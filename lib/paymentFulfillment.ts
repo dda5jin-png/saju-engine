@@ -4,7 +4,7 @@ import { PortOnePaymentInfo } from "@/lib/portone";
 
 export async function applyVerifiedPayment(params: {
   merchantUid: string;
-  impUid: string;
+  impUid?: string | null;
   payment: PortOnePaymentInfo;
 }) {
   const { merchantUid, impUid, payment } = params;
@@ -25,9 +25,9 @@ export async function applyVerifiedPayment(params: {
   }
 
   const isValid =
-    payment.merchant_uid === merchantUid &&
+    payment.paymentId === merchantUid &&
     payment.amount === product.amount &&
-    payment.status === "paid";
+    payment.status === "PAID";
 
   if (!isValid) {
     await orderRef.update({
@@ -51,18 +51,19 @@ export async function applyVerifiedPayment(params: {
   await db.runTransaction(async (tx) => {
     tx.update(orderRef, {
       status: "PAID",
-      impUid,
-      pgProvider: payment.pg_provider || null,
-      payMethod: payment.pay_method || null,
-      receiptUrl: payment.receipt_url || null,
+      impUid: impUid || payment.transactionId || null,
+      paymentId: payment.paymentId,
+      pgProvider: payment.pgProvider || null,
+      payMethod: payment.payMethod || null,
+      receiptUrl: payment.receiptUrl || null,
       paidAt: now,
       verifiedAt: now,
       updatedAt: now,
       portonePayment: {
-        pgProvider: payment.pg_provider || null,
-        payMethod: payment.pay_method || null,
-        receiptUrl: payment.receipt_url || null,
-        cardName: payment.card_name || null,
+        pgProvider: payment.pgProvider || null,
+        payMethod: payment.payMethod || null,
+        receiptUrl: payment.receiptUrl || null,
+        cardName: payment.cardName || null,
       },
     });
 
@@ -84,7 +85,8 @@ export async function applyVerifiedPayment(params: {
 
     tx.set(userRef.collection("payments").doc(merchantUid), {
       merchantUid,
-      impUid,
+      paymentId: payment.paymentId,
+      impUid: impUid || payment.transactionId || null,
       productId: product.id,
       productName: product.name,
       amount: product.amount,
@@ -92,7 +94,7 @@ export async function applyVerifiedPayment(params: {
       status: "PAID",
       paidAt: now,
       expiresAt: null,
-      receiptUrl: payment.receipt_url || null,
+      receiptUrl: payment.receiptUrl || null,
     });
   });
 

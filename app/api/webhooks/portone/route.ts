@@ -1,34 +1,87 @@
 import { NextResponse } from "next/server";
+import { Webhook } from "@portone/server-sdk";
 import { getAdminDb } from "@/lib/firebaseAdmin";
 import { applyVerifiedPayment, markPaymentRefunded } from "@/lib/paymentFulfillment";
-import { getPaymentInfo, getPortOneAccessToken } from "@/lib/portone";
+import { getPaymentInfo } from "@/lib/portone";
+
+type PortOneWebhookBody = {
+  type?: string;
+  data?: {
+    paymentId?: string;
+    storeId?: string;
+    cancellationId?: string;
+  };
+  paymentId?: string;
+  merchant_uid?: string;
+  imp_uid?: string;
+  status?: string;
+};
+
+function parseFallbackWebhook(payload: string): PortOneWebhookBody {
+  try {
+    return JSON.parse(payload) as PortOneWebhookBody;
+  } catch {
+    return {};
+  }
+}
+
+async function parseWebhook(req: Request, payload: string) {
+  const webhookSecret = process.env.PORTONE_WEBHOOK_SECRET;
+
+  if (!webhookSecret) {
+    return parseFallbackWebhook(payload);
+  }
+
+  const headers = {
+    "webhook-id": req.headers.get("webhook-id") || "",
+    "webhook-signature": req.headers.get("webhook-signature") || "",
+    "webhook-timestamp": req.headers.get("webhook-timestamp") || "",
+  };
+
+  try {
+    return (await Webhook.verify(webhookSecret, payload, headers)) as PortOneWebhookBody;
+  } catch (error) {
+    await getAdminDb().collection("webhookLogs").add({
+      source: "portone",
+      error: "WEBHOOK_VERIFY_FAILED",
+      message: error instanceof Error ? error.message : String(error),
+      receivedAt: new Date(),
+    });
+    throw error;
+  }
+}
 
 export async function POST(req: Request) {
-  try {
-    const body = await req.json();
-    const impUid = body.imp_uid as string | undefined;
-    const merchantUid = body.merchant_uid as string | undefined;
-    const status = body.status as string | undefined;
+  const receivedAt = new Date();
 
-    if (!impUid || !merchantUid) {
+  try {
+    const payload = await req.text();
+    const body = await parseWebhook(req, payload);
+    const paymentId = body.data?.paymentId || body.paymentId || body.merchant_uid;
+    const rawStatus = body.status || body.type || null;
+
+    if (!paymentId) {
+      await getAdminDb().collection("webhookLogs").add({
+        source: "portone",
+        rawStatus,
+        error: "PAYMENT_ID_MISSING",
+        receivedAt,
+      });
       return NextResponse.json({ received: true });
     }
 
-    const accessToken = await getPortOneAccessToken();
-    const payment = await getPaymentInfo(impUid, accessToken);
+    const payment = await getPaymentInfo(paymentId);
     const db = getAdminDb();
-
-    const orderSnap = await db.collection("paymentOrders").doc(merchantUid).get();
+    const orderSnap = await db.collection("paymentOrders").doc(paymentId).get();
 
     if (!orderSnap.exists) {
       await db.collection("webhookLogs").add({
         source: "portone",
-        impUid,
-        merchantUid,
-        status: status || null,
+        paymentId,
+        status: rawStatus,
         paymentStatus: payment.status,
         error: "ORDER_NOT_FOUND",
-        receivedAt: new Date(),
+        receivedAt,
       });
 
       return NextResponse.json({ received: true });
@@ -36,37 +89,42 @@ export async function POST(req: Request) {
 
     const order = orderSnap.data()!;
 
-    await db.collection("paymentOrders").doc(merchantUid).set(
+    await db.collection("paymentOrders").doc(paymentId).set(
       {
-        impUid,
+        paymentId,
+        impUid: payment.transactionId,
         portoneStatus: payment.status,
-        webhookReceivedAt: new Date(),
-        webhookRawStatus: status || null,
+        webhookReceivedAt: receivedAt,
+        webhookRawStatus: rawStatus,
         updatedAt: new Date(),
       },
       { merge: true },
     );
 
-    if (payment.status === "paid") {
-      await applyVerifiedPayment({ merchantUid, impUid, payment });
+    if (payment.status === "PAID") {
+      await applyVerifiedPayment({
+        merchantUid: paymentId,
+        impUid: payment.transactionId,
+        payment,
+      });
     }
 
-    if (payment.status === "cancelled") {
+    if (payment.status === "CANCELLED" || payment.status === "PARTIAL_CANCELLED") {
       await markPaymentRefunded({
-        merchantUid,
-        impUid,
-        reason: "PORTONE_WEBHOOK_CANCELLED",
+        merchantUid: paymentId,
+        impUid: payment.transactionId,
+        reason: `PORTONE_WEBHOOK_${payment.status}`,
       });
     }
 
     await db.collection("webhookLogs").add({
       source: "portone",
       uid: order.uid,
-      impUid,
-      merchantUid,
-      status: status || null,
+      paymentId,
+      impUid: payment.transactionId,
+      status: rawStatus,
       paymentStatus: payment.status,
-      receivedAt: new Date(),
+      receivedAt,
     });
 
     return NextResponse.json({ received: true });
