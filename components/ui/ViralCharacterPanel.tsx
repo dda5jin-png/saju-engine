@@ -61,7 +61,7 @@ export default function ViralCharacterPanel({ analysis, resultUrl, resultId }: P
     const dataUrl = await toPng(node, {
       cacheBust: true,
       pixelRatio: Math.min(window.devicePixelRatio || 2, 2),
-      backgroundColor: '#05070d',
+      backgroundColor: '#f8fafc',
     });
     const blob = await (await fetch(dataUrl)).blob();
     return new File([blob], `saju-character-${resultId}.png`, { type: 'image/png' });
@@ -164,21 +164,21 @@ export default function ViralCharacterPanel({ analysis, resultUrl, resultId }: P
       <div className="space-y-4">
         <div
           id={shareCardId}
-          className="aspect-square rounded-[2rem] border border-white/12 bg-[radial-gradient(circle_at_30%_20%,rgba(79,70,229,0.28),transparent_34%),linear-gradient(145deg,#05070d,#080d1f_54%,#020308)] p-7 shadow-2xl flex flex-col justify-between overflow-hidden"
+          className="aspect-square rounded-[2rem] border border-slate-200 bg-[radial-gradient(circle_at_20%_18%,rgba(20,184,166,0.16),transparent_30%),radial-gradient(circle_at_82%_78%,rgba(245,158,11,0.16),transparent_34%),linear-gradient(145deg,#ffffff,#f4f8fb_48%,#eef7f5)] p-7 shadow-2xl flex flex-col justify-between overflow-hidden text-slate-950"
         >
-          <div className="flex items-center justify-between text-[11px] font-black tracking-[0.18em] text-white/45">
+          <div className="flex items-center justify-between text-[11px] font-black tracking-[0.14em] text-slate-500">
             <span>SAJU INSIGHT</span>
             <span>{String(new Date().getFullYear())}</span>
           </div>
           <div className="space-y-5 text-center">
-            <p className="mx-auto max-w-[14rem] text-3xl font-black leading-tight text-white md:max-w-[18rem] md:text-4xl break-keep">
+            <p className="mx-auto max-w-[15rem] text-[2rem] font-black leading-[1.22] text-slate-950 md:max-w-[18rem] md:text-[2.6rem] break-keep">
               {selectedLine}
             </p>
-            <div className="mx-auto h-px w-16 bg-white/18" />
+            <div className="mx-auto h-px w-16 bg-slate-300" />
           </div>
           <div className="text-center">
-            <p className="text-sm font-extrabold text-white/72">{viral.character_type}</p>
-            <p className="mt-2 text-[11px] font-semibold text-white/35">saju-engine.vercel.app</p>
+            <p className="text-sm font-extrabold text-slate-700">{viral.character_type}</p>
+            <p className="mt-2 text-[11px] font-semibold text-slate-400">saju-engine.vercel.app</p>
           </div>
         </div>
 
@@ -206,7 +206,7 @@ export default function ViralCharacterPanel({ analysis, resultUrl, resultId }: P
           </button>
           <button
             onClick={shareToKakao}
-            className="flex min-h-14 flex-col items-center justify-center gap-1 rounded-2xl bg-[#fee500] text-xs font-extrabold text-black transition active:scale-95"
+            className="flex min-h-14 flex-col items-center justify-center gap-1 rounded-2xl bg-[#fee500] text-xs font-extrabold text-black transition active:scale-95 shadow-[0_0_24px_rgba(254,229,0,0.18)]"
           >
             <MessageCircle size={18} />
             카카오톡 공유

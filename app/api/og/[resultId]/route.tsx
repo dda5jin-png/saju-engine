@@ -6,7 +6,7 @@ import { SajuAnalysis } from '@/types/saju';
 export const runtime = 'edge';
 
 export async function GET(
-  request: Request,
+  _request: Request,
   { params }: { params: Promise<{ resultId: string }> }
 ) {
   try {
@@ -19,6 +19,9 @@ export async function GET(
     }
 
     const data = docSnap.data() as SajuAnalysis;
+    const viral = data.viral_character;
+    const quote = viral?.one_liner || data.viral_sentences?.self_realization || data.summary;
+    const characterType = viral?.character_type || data.type_name;
 
     return new ImageResponse(
       (
@@ -30,7 +33,7 @@ export async function GET(
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-            backgroundColor: '#000',
+            background: 'linear-gradient(135deg, #08111f 0%, #102a34 48%, #f7f2e8 49%, #ffffff 100%)',
             padding: '40px',
           }}
         >
@@ -39,49 +42,107 @@ export async function GET(
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
-              justifyContent: 'center',
-              border: '1px solid #333',
-              borderRadius: '40px',
-              padding: '60px',
+              justifyContent: 'space-between',
+              border: '1px solid rgba(15, 23, 42, 0.18)',
+              borderRadius: '44px',
+              padding: '58px',
               width: '90%',
               height: '90%',
-              background: 'linear-gradient(135deg, #0f172a 0%, #020617 100%)',
+              background: 'linear-gradient(145deg, #ffffff 0%, #f7fbfc 56%, #eef8f4 100%)',
+              boxShadow: '0 34px 80px rgba(0,0,0,0.24)',
             }}
           >
-            <div style={{ fontSize: '24px', color: '#6366f1', marginBottom: '20px', fontWeight: 'bold' }}>
-              사주 구조 분석 리포트
-            </div>
             <div
               style={{
-                fontSize: '60px',
-                fontWeight: '900',
-                color: 'white',
-                textAlign: 'center',
-                marginBottom: '20px',
-                letterSpacing: '-2px',
-              }}
-            >
-              {data.type_name}
-            </div>
-            <div
-              style={{
-                fontSize: '28px',
-                color: '#94a3b8',
-                textAlign: 'center',
-                maxWidth: '80%',
-              }}
-            >
-              &quot;{data.summary.split('.')[0]}&quot;
-            </div>
-            <div
-              style={{
-                marginTop: '40px',
                 display: 'flex',
+                width: '100%',
                 alignItems: 'center',
-                color: '#6366f1',
+                justifyContent: 'space-between',
+                color: '#64748b',
+                fontSize: '24px',
+                fontWeight: 900,
+                letterSpacing: '8px',
               }}
             >
-              <div style={{ fontSize: '20px', letterSpacing: '4px' }}>ANALYSIS ENTITY</div>
+              <span>SAJU INSIGHT</span>
+              <span>{new Date().getFullYear()}</span>
+            </div>
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: '28px',
+                textAlign: 'center',
+                maxWidth: '860px',
+              }}
+            >
+              <div
+                style={{
+                  display: 'flex',
+                  border: '1px solid rgba(20, 184, 166, 0.28)',
+                  borderRadius: '999px',
+                  background: 'rgba(20, 184, 166, 0.10)',
+                  color: '#0f766e',
+                  fontSize: '24px',
+                  fontWeight: 900,
+                  padding: '12px 24px',
+                }}
+              >
+                사주 구조 분석 리포트
+              </div>
+              <div
+                style={{
+                  fontSize: quote.length > 18 ? '66px' : '76px',
+                  lineHeight: 1.18,
+                  fontWeight: 900,
+                  color: '#0f172a',
+                  textAlign: 'center',
+                }}
+              >
+                {quote}
+              </div>
+            </div>
+            <div
+              style={{
+                display: 'flex',
+                width: '100%',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                borderTop: '1px solid rgba(15, 23, 42, 0.12)',
+                paddingTop: '28px',
+              }}
+            >
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '8px',
+                }}
+              >
+                <div style={{ fontSize: '28px', color: '#334155', fontWeight: 900 }}>
+                  {characterType}
+                </div>
+                <div style={{ fontSize: '20px', color: '#94a3b8', fontWeight: 700 }}>
+                  saju-engine.vercel.app
+                </div>
+              </div>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: '88px',
+                  height: '88px',
+                  borderRadius: '28px',
+                  background: '#0f172a',
+                  color: '#ffffff',
+                  fontSize: '30px',
+                  fontWeight: 900,
+                }}
+              >
+                四
+              </div>
             </div>
           </div>
         </div>
@@ -93,8 +154,67 @@ export async function GET(
     );
   } catch (error) {
     console.error(error);
-    return new Response(`Failed to generate the image`, {
-      status: 500,
-    });
+    return new ImageResponse(
+      (
+        <div
+          style={{
+            height: '100%',
+            width: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: '#f8fafc',
+            color: '#0f172a',
+            padding: '60px',
+          }}
+        >
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              border: '1px solid #cbd5e1',
+              borderRadius: '44px',
+              padding: '60px',
+              width: '90%',
+              height: '90%',
+            }}
+          >
+            <div style={{ fontSize: '28px', color: '#0f766e', fontWeight: 900, letterSpacing: '6px' }}>
+              SAJU INSIGHT
+            </div>
+            <div
+              style={{
+                marginTop: '36px',
+                fontSize: '72px',
+                fontWeight: '900',
+                color: '#0f172a',
+                textAlign: 'center',
+                lineHeight: 1.15,
+              }}
+            >
+              사주 구조 분석 리포트
+            </div>
+            <div
+              style={{
+                marginTop: '32px',
+                fontSize: '28px',
+                color: '#64748b',
+                textAlign: 'center',
+              }}
+            >
+              진지한 해석과 공유 가능한 캐릭터 카드
+            </div>
+          </div>
+        </div>
+      ),
+      {
+        width: 1200,
+        height: 630,
+        status: 200,
+      }
+    );
   }
 }

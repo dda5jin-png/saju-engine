@@ -5,6 +5,7 @@ import {
   ElementDistribution,
   ElementProfile,
   ElementType,
+  JewelryRecommendation,
   SajuAnalysis,
   SajuInput,
   ViralCharacterMode,
@@ -72,6 +73,44 @@ const ELEMENT_MEANINGS: Record<ElementType, { trait: string; excess: string; pra
     practice: '정보 수집 시간을 제한하고 작은 실행부터 시작하세요.',
     image: '겉으로는 잔잔하지만 바닥에서는 물길이 계속 움직이는 강처럼, 보이지 않는 계산과 관찰이 많습니다.',
     lowImage: '지도는 있는데 물길이 마른 상태라, 정보와 휴식이 채워질 때 판단의 유연함이 살아납니다.',
+  },
+};
+
+const JEWELRY_RECOMMENDATIONS: Record<ElementType, Omit<JewelryRecommendation, 'support_element' | 'element_label'>> = {
+  wood: {
+    gemstone: '페리도트 또는 그린 투어멀린',
+    jewelry: '초록빛 포인트 펜던트',
+    tone: '맑은 그린, 새싹색, 브러시드 골드',
+    reason: '목은 성장과 방향을 상징합니다. 부족한 목을 보완할 때는 시선을 위로 끌어올리는 초록 포인트가 잘 맞습니다.',
+    styling_tip: '목선 가까이에 작은 펜던트를 두면 시작과 확장의 이미지를 가장 깔끔하게 살릴 수 있습니다.',
+  },
+  fire: {
+    gemstone: '가넷 또는 카넬리언',
+    jewelry: '로즈골드 포인트 링',
+    tone: '딥 레드, 코랄, 로즈골드',
+    reason: '화는 표현과 몰입을 상징합니다. 부족한 화를 보완할 때는 너무 큰 장식보다 따뜻한 색의 작은 포인트가 자연스럽습니다.',
+    styling_tip: '손을 쓸 때 보이는 링이나 얇은 브레이슬릿으로 활력을 더하는 쪽이 좋습니다.',
+  },
+  earth: {
+    gemstone: '시트린 또는 타이거 아이',
+    jewelry: '골드 체인 브레이슬릿',
+    tone: '허니 골드, 샴페인, 웜 브라운',
+    reason: '토는 안정과 축적을 상징합니다. 부족한 토를 보완할 때는 무게감 있는 골드 톤이 중심을 잡아줍니다.',
+    styling_tip: '매일 착용할 수 있는 브레이슬릿처럼 반복되는 루틴에 붙는 아이템이 잘 맞습니다.',
+  },
+  metal: {
+    gemstone: '화이트 사파이어 또는 클리어 쿼츠',
+    jewelry: '실버 미니멀 이어링',
+    tone: '실버, 아이스 화이트, 차분한 그레이',
+    reason: '금은 기준과 정리를 상징합니다. 부족한 금을 보완할 때는 선이 깨끗하고 과하지 않은 디자인이 좋습니다.',
+    styling_tip: '귀걸이나 얇은 링처럼 형태가 분명한 아이템을 고르면 판단의 선명함을 시각적으로 살릴 수 있습니다.',
+  },
+  water: {
+    gemstone: '아쿠아마린 또는 블루 토파즈',
+    jewelry: '블루 스톤 네크리스',
+    tone: '아이스 블루, 딥 네이비, 화이트 메탈',
+    reason: '수는 사고와 흐름을 상징합니다. 부족한 수를 보완할 때는 차분한 블루 계열이 과열된 판단을 식히는 이미지와 맞습니다.',
+    styling_tip: '가슴선 근처의 작은 블루 스톤은 깊이와 여백을 동시에 보여주는 포인트가 됩니다.',
   },
 };
 
@@ -268,6 +307,22 @@ function sentenceList(items: string[]) {
   return items.filter(Boolean).join(' ');
 }
 
+function getSupportElement(elementProfile: ElementProfile, distribution: ElementDistribution): ElementType {
+  const ranked = getRankedElements(distribution);
+  return elementProfile.missing[0] ?? elementProfile.weak[0] ?? ranked[ranked.length - 1]?.type ?? 'water';
+}
+
+function buildJewelryRecommendation(elementProfile: ElementProfile, distribution: ElementDistribution): JewelryRecommendation {
+  const supportElement = getSupportElement(elementProfile, distribution);
+  const recommendation = JEWELRY_RECOMMENDATIONS[supportElement];
+
+  return {
+    support_element: supportElement,
+    element_label: ELEMENT_LABELS[supportElement],
+    ...recommendation,
+  };
+}
+
 function buildDetailedReading(
   input: SajuInput,
   pillars: { year: string; month: string; day: string; hour: string },
@@ -280,7 +335,7 @@ function buildDetailedReading(
 ): DetailedReading {
   const ranked = getRankedElements(distribution);
   const dominant = elementProfile.dominant[0] ?? ranked[0]?.type ?? 'earth';
-  const support = elementProfile.missing[0] ?? elementProfile.weak[0] ?? ranked[ranked.length - 1]?.type ?? 'water';
+  const support = getSupportElement(elementProfile, distribution);
   const dominantMeaning = ELEMENT_MEANINGS[dominant];
   const supportMeaning = ELEMENT_MEANINGS[support];
   const dayScene = DAY_MASTER_SCENES[dayMaster];
@@ -319,9 +374,9 @@ function buildDetailedReading(
     ]),
     money: sentenceList([
       matchedRules[0]?.interpretation.money_style ?? '돈의 흐름은 안정성과 실행 속도의 균형을 함께 봐야 합니다.',
-      `${ELEMENT_LABELS[dominant]} 기운이 강한 시기에는 장점이 빠른 판단으로 나타나지만, 기록 없이 움직이면 반복 지출이나 무리한 선택으로 이어질 수 있습니다.`,
-      '돈은 감정의 온도계처럼 움직이기 쉬워서, 기분이 올라간 날일수록 지출과 투자를 하루 뒤로 미루는 장치가 필요합니다.',
-      '큰 결정보다 예산, 손절 기준, 보유 기간을 먼저 숫자로 정하는 방식이 잘 맞습니다.',
+      `${ELEMENT_LABELS[dominant]} 기운이 강할수록 판단의 속도와 기준이 선명해지지만, 기록 없이 움직이면 반복 지출이나 무리한 선택으로 번질 수 있습니다.`,
+      '기분이 올라간 날에는 지출과 투자를 바로 확정하지 말고 하루 뒤 다시 보는 장치가 필요합니다.',
+      '예산, 손절 기준, 보유 기간을 먼저 숫자로 정하면 돈의 흐름을 감정이 아니라 구조로 다루기 쉬워집니다.',
     ]),
     timing: sentenceList([
       timeKnown
@@ -333,7 +388,7 @@ function buildDetailedReading(
     balance_practice: sentenceList([
       elementProfile.recommendation,
       `${ELEMENT_LABELS[support]} 보완 실천: ${supportMeaning.practice}`,
-      `하루를 마감할 때 오늘의 선택을 ${ELEMENT_LABELS[dominant]}의 강점으로 한 일과 ${ELEMENT_LABELS[support]}로 보완할 일로 나눠 적어보세요.`,
+      `하루를 마감할 때 오늘의 선택을 ${ELEMENT_LABELS[dominant]}의 강점으로 처리한 일과 ${ELEMENT_LABELS[support]}로 보완할 일로 나눠 적어보세요.`,
       '사주는 확정된 운명표라기보다 반복되는 선택 습관을 읽는 참고 도구로 쓰는 편이 가장 안전합니다.',
     ]),
     reliability_note:
@@ -350,7 +405,7 @@ function buildViralCharacterMode(
 ): ViralCharacterMode {
   const ranked = getRankedElements(distribution);
   const dominant = elementProfile.dominant[0] ?? ranked[0]?.type ?? 'earth';
-  const support = elementProfile.missing[0] ?? elementProfile.weak[0] ?? ranked[ranked.length - 1]?.type ?? 'water';
+  const support = getSupportElement(elementProfile, distribution);
   const dominantLabel = ELEMENT_LABELS[dominant];
   const supportLabel = ELEMENT_LABELS[support];
   const primaryRule = matchedRules[0];
@@ -521,6 +576,7 @@ export function analyzeSaju(input: SajuInput): SajuAnalysis {
       : '태어난 시간이 없어 시주는 추정하지 않았고, 연주·월주·일주 6글자 기준으로 분석했습니다.',
     element_profile: elementProfile,
     day_master_profile: dayMasterProfile,
+    jewelry_recommendation: buildJewelryRecommendation(elementProfile, distribution),
     detailed_reading: buildDetailedReading(
       input,
       pillars,

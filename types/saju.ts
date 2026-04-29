@@ -43,6 +43,16 @@ export interface DetailedReading {
   reliability_note: string;
 }
 
+export interface JewelryRecommendation {
+  support_element: ElementType;
+  element_label: string;
+  gemstone: string;
+  jewelry: string;
+  tone: string;
+  reason: string;
+  styling_tip: string;
+}
+
 export interface ViralCharacterMode {
   character_type: string;
   character_definition: string;
@@ -86,6 +96,7 @@ export interface SajuAnalysis {
   confidence_note: string;
   element_profile: ElementProfile;
   day_master_profile: DayMasterProfile;
+  jewelry_recommendation?: JewelryRecommendation;
   detailed_reading: DetailedReading;
   viral_character?: ViralCharacterMode;
   viral_sentences: {
