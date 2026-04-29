@@ -58,7 +58,8 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: Props) {
     });
 
     if (!res.ok) {
-      throw new Error('회원 정보 동기화에 실패했습니다.');
+      const data = (await res.json().catch(() => null)) as { message?: string } | null;
+      throw new Error(data?.message || '회원 정보 동기화에 실패했습니다.');
     }
 
     onSuccess(user);
@@ -74,7 +75,11 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: Props) {
       }
     } catch (error) {
       console.error('Google login failed:', error);
-      alert(getAuthErrorMessage(error, 'Google 로그인에 실패했습니다. 다시 시도해주세요.'));
+      alert(
+        error instanceof Error && !(error instanceof FirebaseError)
+          ? error.message
+          : getAuthErrorMessage(error, 'Google 로그인에 실패했습니다. 다시 시도해주세요.'),
+      );
     } finally {
       setLoadingProvider(null);
     }
@@ -98,10 +103,12 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: Props) {
     } catch (error) {
       console.error('Email login failed:', error);
       alert(
-        getAuthErrorMessage(
-          error,
-          emailMode === 'signin' ? '이메일 로그인에 실패했습니다.' : '이메일 회원가입에 실패했습니다.',
-        ),
+        error instanceof Error && !(error instanceof FirebaseError)
+          ? error.message
+          : getAuthErrorMessage(
+              error,
+              emailMode === 'signin' ? '이메일 로그인에 실패했습니다.' : '이메일 회원가입에 실패했습니다.',
+            ),
       );
     } finally {
       setLoadingProvider(null);

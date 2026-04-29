@@ -8,7 +8,10 @@ export async function POST(req: Request) {
     const decoded = await verifyBearerToken(req);
 
     if (!decoded) {
-      return NextResponse.json({ success: false }, { status: 401 });
+      return NextResponse.json(
+        { success: false, message: "인증 토큰을 확인할 수 없습니다." },
+        { status: 401 },
+      );
     }
 
     const now = new Date();
@@ -49,6 +52,15 @@ export async function POST(req: Request) {
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Sync user error:", error);
-    return NextResponse.json({ success: false }, { status: 500 });
+    return NextResponse.json(
+      {
+        success: false,
+        message:
+          error instanceof Error
+            ? `회원 정보 동기화 실패: ${error.message}`
+            : "회원 정보 동기화 중 알 수 없는 오류가 발생했습니다.",
+      },
+      { status: 500 },
+    );
   }
 }
