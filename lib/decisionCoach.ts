@@ -9,6 +9,8 @@ import {
 type DecisionProfile = {
   characterType: string;
   decisionStyle: string;
+  dominantElementType: ElementType;
+  weakElementType: ElementType;
   dominantElement: string;
   weakElement: string;
   blindSpot: string;
@@ -23,6 +25,8 @@ type Scenario = {
   question: string;
   choices: string[];
   urgency: "now" | "soon" | "later";
+  intent: string;
+  stake: string;
   riskTheme: string;
   tension: string;
 };
@@ -99,6 +103,8 @@ function buildDecisionProfile(analysis: SajuAnalysis, category: DecisionCategory
   return {
     characterType: clean(analysis.viral_character?.character_type ?? analysis.type_name, "기준형 의사결정 타입"),
     decisionStyle: clean(analysis.viral_character?.decision_style, analysis.day_master_profile?.strategy ?? analysis.summary),
+    dominantElementType: dominant,
+    weakElementType: weak,
     dominantElement: `${elementLabels[dominant]} 기운`,
     weakElement: `${elementLabels[weak]} 기운`,
     blindSpot: elementBlindSpots[weak],
@@ -107,6 +113,43 @@ function buildDecisionProfile(analysis: SajuAnalysis, category: DecisionCategory
     strategy: clean(analysis.day_master_profile?.strategy, "결정 전에 조건을 숫자와 행동 기준으로 바꾸는 전략"),
     categoryInsight: categoryInsight[category],
   };
+}
+
+function elementDecisionCue(element: ElementType, category: DecisionCategory) {
+  const cues: Record<ElementType, Record<DecisionCategory, string>> = {
+    wood: {
+      love: "관계를 키울 명분과 성장 가능성",
+      money: "작게 시작해 키울 수 있는 구조",
+      career: "새 역할에서 확장될 권한",
+      general: "지금 선택이 다음 선택을 열어주는지",
+    },
+    fire: {
+      love: "감정을 숨기지 않고 확인할 표현 타이밍",
+      money: "속도에 취하지 않는 실행 온도",
+      career: "성과를 드러낼 무대와 속도",
+      general: "바로 움직일 추진력이 실제 결과로 이어지는지",
+    },
+    earth: {
+      love: "관계가 일상에서 버틸 수 있는 안정감",
+      money: "현금 흐름과 회복 가능한 손실 범위",
+      career: "보상, 루틴, 생활 기반의 안정성",
+      general: "선택 후 흔들리지 않을 기반",
+    },
+    metal: {
+      love: "애매한 관계를 정리할 기준",
+      money: "손절, 익절, 금액 제한 같은 통제선",
+      career: "역할 범위와 책임 경계",
+      general: "남길 것과 자를 것을 구분하는 기준",
+    },
+    water: {
+      love: "상대의 반복 패턴을 읽는 시간",
+      money: "정보, 유동성, 빠져나올 길",
+      career: "시장 흐름과 다음 이동 루트",
+      general: "정보가 충분히 모였는지",
+    },
+  };
+
+  return cues[element][category];
 }
 
 function extractExplicitChoices(question: string) {
@@ -168,6 +211,46 @@ function inferRiskTheme(question: string, category: DecisionCategory) {
   return "기회비용과 후회 가능성";
 }
 
+function inferIntent(question: string, category: DecisionCategory) {
+  if (category === "love") {
+    if (includesAny(question, ["이별", "헤어", "정리", "끝내"])) return "관계를 끝낼지 남길지 판단하는 문제";
+    if (includesAny(question, ["재회", "다시", "연락"])) return "다시 연결해도 되는지 검증하는 문제";
+    if (includesAny(question, ["고백", "표현", "말할"])) return "감정을 드러낼 타이밍을 정하는 문제";
+    if (includesAny(question, ["결혼", "동거"])) return "감정이 생활 구조를 버틸 수 있는지 보는 문제";
+    return "감정과 현실의 온도를 맞추는 관계 판단";
+  }
+
+  if (category === "money") {
+    if (includesAny(question, ["매수", "진입", "살까"])) return "들어갈 가격보다 빠져나올 기준을 정하는 문제";
+    if (includesAny(question, ["매도", "팔", "정리"])) return "욕심보다 회수 타이밍을 정하는 문제";
+    if (includesAny(question, ["대출", "부동산", "계약"])) return "레버리지와 현금 방어를 비교하는 문제";
+    if (includesAny(question, ["사업", "창업", "수익"])) return "확장 욕심과 손실 통제를 동시에 보는 문제";
+    return "수익 가능성과 방어선을 같이 계산하는 돈 판단";
+  }
+
+  if (category === "career") {
+    if (includesAny(question, ["이직", "퇴사", "옮", "이동"])) return "환경을 바꿀지 조건을 바꿀지 결정하는 문제";
+    if (includesAny(question, ["제안", "오퍼", "면접"])) return "기회 자체보다 조건의 질을 검증하는 문제";
+    if (includesAny(question, ["창업", "사업"])) return "직장 밖 판을 감당할 준비도를 보는 문제";
+    if (includesAny(question, ["버티", "힘들", "번아웃"])) return "버티는 비용과 이동 리스크를 비교하는 문제";
+    return "역할, 보상, 성장성을 다시 맞추는 커리어 판단";
+  }
+
+  if (includesAny(question, ["할까 말까", "해야 할까", "해도 될까"])) return "실행과 보류 사이에서 기준을 정하는 문제";
+  return "감정적 확신을 행동 기준으로 바꾸는 문제";
+}
+
+function inferStake(question: string, category: DecisionCategory) {
+  if (includesAny(question, ["오늘", "당장", "이번주", "이번 주"])) return "타이밍";
+  if (includesAny(question, ["돈", "투자", "대출", "계약", "연봉", "월급"])) return "금액";
+  if (includesAny(question, ["상대", "연락", "이별", "결혼", "고백"])) return "상대의 반복 행동";
+  if (includesAny(question, ["회사", "퇴사", "이직", "직장", "면접"])) return "역할과 보상";
+  if (category === "love") return "신뢰 회복 가능성";
+  if (category === "money") return "손실 한도";
+  if (category === "career") return "새 판의 조건";
+  return "되돌릴 수 있는 범위";
+}
+
 function inferTension(question: string, category: DecisionCategory) {
   if (includesAny(question, ["불안", "걱정", "무섭", "후회"])) return "불안이 판단 속도를 흐리는 상태";
   if (includesAny(question, ["답답", "지침", "힘들", "버티"])) return "버티는 힘과 탈출 욕구가 동시에 올라온 상태";
@@ -184,6 +267,8 @@ function buildScenario(question: string, category: DecisionCategory): Scenario {
     question,
     choices: buildDefaultChoices(question, category),
     urgency: inferUrgency(question),
+    intent: inferIntent(question, category),
+    stake: inferStake(question, category),
     riskTheme: inferRiskTheme(question, category),
     tension: inferTension(question, category),
   };
@@ -210,26 +295,88 @@ function buildChoice(
 ): DecisionChoice {
   const tone = choiceTone(label);
   const order = index === 0 ? "첫 번째 선택" : "두 번째 선택";
+  const supportCue = elementDecisionCue(profile.weakElementType, scenario.category);
+  const strengthCue = elementDecisionCue(profile.dominantElementType, scenario.category);
 
-  const flowByTone = {
-    active: `${order}은 판을 움직여 실제 반응을 빨리 확인하는 흐름입니다. ${profile.dominantElement}의 강점은 살지만, ${scenario.riskTheme}을 숫자나 약속으로 고정하지 않으면 속도가 리스크가 됩니다.`,
-    check: `${order}은 결론을 늦추는 선택이 아니라 조건을 더 선명하게 만드는 흐름입니다. ${profile.weakElement}의 빈틈을 보완하지만, 확인만 반복하면 타이밍을 잃을 수 있습니다.`,
-    defense: `${order}은 손실과 감정 소모를 먼저 줄이는 흐름입니다. 지금 흔들리는 에너지를 회복하는 데 유리하지만, 너무 빨리 닫으면 가능성까지 같이 잘릴 수 있습니다.`,
-    balance: `${order}은 선택의 방향보다 기준을 다시 세우는 흐름입니다. 지금은 맞고 틀림보다 어떤 조건에서 움직일지가 핵심입니다.`,
+  const flowByCategory: Record<DecisionCategory, Record<string, string>> = {
+    love: {
+      active: `${order}은 감정을 숨기지 않고 상대의 실제 반응을 보는 선택입니다. 다만 말의 온도보다 약속 이행, 연락 패턴, 태도 변화가 따라오는지 봐야 합니다.`,
+      check: `${order}은 관계를 멈추는 선택이 아니라 상대의 반복 행동을 검증하는 선택입니다. 기다림이 아니라 관찰 기준을 세우는 쪽이어야 합니다.`,
+      defense: `${order}은 감정 소모를 줄이고 나를 먼저 회복시키는 흐름입니다. 단, 자존심 때문에 닫는 것인지 실제 신뢰가 무너진 것인지는 구분해야 합니다.`,
+      balance: `${order}은 감정과 현실의 비율을 다시 맞추는 선택입니다. 지금은 좋아하는 마음보다 이 관계가 생활에서 버틸 수 있는지가 핵심입니다.`,
+    },
+    money: {
+      active: `${order}은 기회를 놓치지 않기 위해 작게 검증하는 선택입니다. 진입보다 중요한 것은 손실 한도, 회수 시점, 추가 투입 금지선입니다.`,
+      check: `${order}은 겁이 많아서 늦추는 선택이 아니라 손실 가능 금액을 계산하는 선택입니다. 기준가와 무효 조건이 생기면 기다림도 전략이 됩니다.`,
+      defense: `${order}은 현금과 회복력을 지키는 선택입니다. 수익을 포기하는 것이 아니라 다시 들어갈 체력을 남기는 판단입니다.`,
+      balance: `${order}은 수익 욕심과 방어선을 동시에 보는 선택입니다. 지금은 맞히는 것보다 틀렸을 때 작게 끝내는 구조가 중요합니다.`,
+    },
+    career: {
+      active: `${order}은 현재 판을 벗어나 새 역할과 보상을 확인하는 선택입니다. 이동 자체보다 새 판에서 권한과 책임이 선명한지가 승부처입니다.`,
+      check: `${order}은 머무르는 선택이 아니라 현재 판의 조건을 다시 협상하는 선택입니다. 역할, 보상, 업무 범위 중 하나라도 바뀌어야 의미가 있습니다.`,
+      defense: `${order}은 경력 손상을 줄이고 다음 이동을 준비하는 흐름입니다. 단, 버티는 동안 배울 것과 얻을 것이 남아 있어야 합니다.`,
+      balance: `${order}은 환경 교체보다 일의 구조를 다시 보는 선택입니다. 지금은 회사 이름보다 실제로 맡을 판이 중요합니다.`,
+    },
+    general: {
+      active: `${order}은 판을 움직여 실제 반응을 빨리 확인하는 흐름입니다. ${profile.dominantElement}의 강점은 살지만, ${scenario.riskTheme}을 기준으로 고정하지 않으면 속도가 리스크가 됩니다.`,
+      check: `${order}은 결론을 늦추는 선택이 아니라 조건을 더 선명하게 만드는 흐름입니다. ${profile.weakElement}의 빈틈을 보완하지만, 확인만 반복하면 타이밍을 잃을 수 있습니다.`,
+      defense: `${order}은 손실과 감정 소모를 먼저 줄이는 흐름입니다. 지금 흔들리는 에너지를 회복하는 데 유리하지만, 너무 빨리 닫으면 가능성까지 같이 잘릴 수 있습니다.`,
+      balance: `${order}은 선택의 방향보다 기준을 다시 세우는 흐름입니다. 지금은 맞고 틀림보다 어떤 조건에서 움직일지가 핵심입니다.`,
+    },
   };
 
-  const prosByTone = {
-    active: `${profile.strength}을 바로 쓰면서 실제 데이터를 얻을 수 있습니다.`,
-    check: `판단 기준이 정리되어 같은 고민을 반복할 확률이 줄어듭니다.`,
-    defense: `불필요한 손실과 소모를 줄이고 다음 선택을 위한 여유를 확보합니다.`,
-    balance: `감정과 현실을 동시에 놓고 볼 수 있어 결정 후 후회가 줄어듭니다.`,
+  const prosByCategory: Record<DecisionCategory, Record<string, string>> = {
+    love: {
+      active: `상대가 말이 아니라 행동으로 답하는지 빨리 볼 수 있습니다.`,
+      check: `감정에 끌려가는 시간을 줄이고 신뢰를 검증할 수 있습니다.`,
+      defense: `소모된 자존감과 생활 리듬을 먼저 회복할 수 있습니다.`,
+      balance: `관계의 온도와 현실 조건을 같이 볼 수 있습니다.`,
+    },
+    money: {
+      active: `작은 금액으로 시장 반응을 확인하고 기회감을 살릴 수 있습니다.`,
+      check: `손실 한도와 무효 기준이 생겨 충동 매매를 줄입니다.`,
+      defense: `현금을 지켜 다음 기회에 다시 움직일 체력을 남깁니다.`,
+      balance: `수익 기대와 리스크 관리를 한 장에 놓고 볼 수 있습니다.`,
+    },
+    career: {
+      active: `새 역할, 보상, 성장 가능성을 실제 제안으로 확인할 수 있습니다.`,
+      check: `현재 판에서 얻을 수 있는 것을 뽑아낸 뒤 움직일 수 있습니다.`,
+      defense: `평판과 수입 공백 리스크를 줄이면서 다음 카드를 준비합니다.`,
+      balance: `이동 욕구와 현실 조건을 분리해 볼 수 있습니다.`,
+    },
+    general: {
+      active: `${profile.strength}을 바로 쓰면서 실제 데이터를 얻을 수 있습니다.`,
+      check: `판단 기준이 정리되어 같은 고민을 반복할 확률이 줄어듭니다.`,
+      defense: `불필요한 손실과 소모를 줄이고 다음 선택을 위한 여유를 확보합니다.`,
+      balance: `감정과 현실을 동시에 놓고 볼 수 있어 결정 후 후회가 줄어듭니다.`,
+    },
   };
 
-  const consByTone = {
-    active: `${profile.risk}이 커지면 후속 대응이 늦어질 수 있습니다.`,
-    check: `검증이라는 이름으로 시간을 끌면 선택권이 줄어듭니다.`,
-    defense: `안전을 택하는 동안 관계, 기회, 수익 중 하나는 약해질 수 있습니다.`,
-    balance: `기준을 너무 많이 세우면 결정 자체가 무거워집니다.`,
+  const consByCategory: Record<DecisionCategory, Record<string, string>> = {
+    love: {
+      active: `상대 반응이 약한데도 의미를 과하게 부여하면 더 지칩니다.`,
+      check: `관찰만 오래 하면 관계의 주도권을 계속 넘겨줄 수 있습니다.`,
+      defense: `가능성이 남은 관계까지 자존심으로 닫을 수 있습니다.`,
+      balance: `마음을 계산하려 들면 표현 타이밍이 늦어질 수 있습니다.`,
+    },
+    money: {
+      active: `손실 기준 없이 들어가면 판단이 투자에서 도박으로 바뀝니다.`,
+      check: `완벽한 타이밍만 기다리면 실제 기회를 놓칠 수 있습니다.`,
+      defense: `과하게 방어하면 수익 기회를 전부 남의 것으로 볼 수 있습니다.`,
+      balance: `기준을 복잡하게 만들면 실행력이 떨어집니다.`,
+    },
+    career: {
+      active: `조건 확인 없이 이동하면 같은 답답함을 다른 회사에서 반복할 수 있습니다.`,
+      check: `협상만 하다가 이동 타이밍과 시장 감각을 잃을 수 있습니다.`,
+      defense: `버티는 시간이 길어지면 에너지와 자신감이 먼저 닳습니다.`,
+      balance: `너무 많은 조건을 비교하면 결정이 계속 미뤄질 수 있습니다.`,
+    },
+    general: {
+      active: `${profile.risk}이 커지면 후속 대응이 늦어질 수 있습니다.`,
+      check: `검증이라는 이름으로 시간을 끌면 선택권이 줄어듭니다.`,
+      defense: `안전을 택하는 동안 관계, 기회, 수익 중 하나는 약해질 수 있습니다.`,
+      balance: `기준을 너무 많이 세우면 결정 자체가 무거워집니다.`,
+    },
   };
 
   const firstActionByCategory: Record<DecisionCategory, string> = {
@@ -241,18 +388,18 @@ function buildChoice(
 
   return {
     label,
-    expected_flow: flowByTone[tone],
-    pros: prosByTone[tone],
-    cons: consByTone[tone],
+    expected_flow: `${flowByCategory[scenario.category][tone]} 이 명식은 ${strengthCue}을 살리되, ${supportCue}을 보완해야 결정 후 흔들림이 줄어듭니다.`,
+    pros: prosByCategory[scenario.category][tone],
+    cons: consByCategory[scenario.category][tone],
     when_to_choose:
       tone === "active"
-        ? "손실 기준과 다음 행동이 이미 정해져 있을 때 맞습니다."
-        : "아직 상대, 돈, 역할 중 핵심 변수가 흐릴 때 맞습니다.",
+        ? `${scenario.stake}에 대한 기준과 다음 행동이 이미 정해져 있을 때 맞습니다.`
+        : `${scenario.stake}가 아직 흐리거나 확인할 증거가 부족할 때 맞습니다.`,
     first_action: firstActionByCategory[scenario.category],
     watch_signal:
       tone === "active"
-        ? "결정 후 바로 불안이 커지면 기준 없이 움직인 신호입니다."
-        : "확인할수록 기준이 늘어나기만 하면 회피로 바뀐 신호입니다.",
+        ? `${scenario.stake}를 확인하지 못했는데 마음만 급해지면 기준 없이 움직인 신호입니다.`
+        : `확인할수록 ${scenario.stake}의 기준이 선명해지지 않고 항목만 늘어나면 회피로 바뀐 신호입니다.`,
   };
 }
 
@@ -268,7 +415,14 @@ function buildRecommendedAction(profile: DecisionProfile, scenario: Scenario) {
 }
 
 function buildRiskWarning(profile: DecisionProfile, scenario: Scenario) {
-  return `가장 큰 리스크는 ${scenario.riskTheme}을 흐린 채 감정으로 보정하는 것입니다. 특히 ${profile.blindSpot}이 올라오면, 맞는 선택도 늦어지거나 과하게 커질 수 있습니다.`;
+  const categoryWarning: Record<DecisionCategory, string> = {
+    love: "관계 판단에서 가장 위험한 것은 상대의 말과 행동이 다른데도 내가 해석으로 메우는 것입니다.",
+    money: "돈 판단에서 가장 위험한 것은 손실 한도 없이 확신만 키우는 것입니다.",
+    career: "커리어 판단에서 가장 위험한 것은 회사 이름이나 감정 피로만 보고 실제 역할 조건을 놓치는 것입니다.",
+    general: "선택 판단에서 가장 위험한 것은 기준을 정하기 전에 마음의 불안을 결론처럼 믿는 것입니다.",
+  };
+
+  return `${categoryWarning[scenario.category]} 지금은 ${scenario.riskTheme}을 흐린 채 감정으로 보정하면 안 됩니다. 특히 ${profile.blindSpot}이 올라오면, 맞는 선택도 늦어지거나 과하게 커질 수 있습니다.`;
 }
 
 function buildOneLineGuide(scenario: Scenario) {
@@ -291,7 +445,7 @@ export function buildDecisionCoachResult(
   return {
     decision_basis: `${profile.characterType} / 강점: ${profile.dominantElement} / 보완점: ${profile.weakElement}`,
     situation:
-      `지금 질문은 "${scenario.question}"입니다. 표면적으로는 선택의 문제지만, 실제 핵심은 ${scenario.tension}입니다. ` +
+      `지금 질문은 "${scenario.question}"입니다. 이건 ${scenario.intent}이고, 핵심 변수는 ${scenario.stake}입니다. 현재 흐름은 ${scenario.tension}입니다. ` +
       `${profile.categoryInsight} ${profile.decisionStyle}`,
     choices,
     recommended_action: buildRecommendedAction(profile, scenario),
