@@ -35,3 +35,78 @@ h1, h2, h3, h4, h5, h6 {
   font-family: "SF Pro Rounded", "Apple SD Gothic Neo", "Noto Sans KR", "Pretendard", ui-rounded, system-ui, sans-serif;
   letter-spacing: 0;
 }
+
+.result-theme {
+  --result-text: #172033;
+  --result-muted: rgba(31, 41, 55, 0.68);
+  --result-faint: rgba(31, 41, 55, 0.46);
+  --result-surface: rgba(255, 255, 255, 0.78);
+  --result-surface-strong: rgba(255, 255, 255, 0.92);
+  --result-card: rgba(255, 255, 255, 0.66);
+  --result-border: rgba(15, 23, 42, 0.12);
+  --result-border-strong: rgba(15, 23, 42, 0.18);
+  --result-gold: #a77c2f;
+  --result-shadow: 0 24px 80px rgba(15, 23, 42, 0.1);
+  background:
+    radial-gradient(circle at 18% 4%, rgba(214, 180, 106, 0.24), transparent 28%),
+    radial-gradient(circle at 80% 12%, rgba(124, 58, 237, 0.1), transparent 26%),
+    linear-gradient(180deg, #fffaf0 0%, #f8f4ea 44%, #eef2f7 100%);
+  color: var(--result-text);
+  transition: background 0.25s ease, color 0.25s ease;
+}
+
+.result-theme-dark {
+  --result-text: #f8f4ea;
+  --result-muted: rgba(248, 244, 234, 0.62);
+  --result-faint: rgba(248, 244, 234, 0.42);
+  --result-surface: rgba(255, 255, 255, 0.035);
+  --result-surface-strong: rgba(255, 255, 255, 0.07);
+  --result-card: rgba(0, 0, 0, 0.24);
+  --result-border: rgba(255, 255, 255, 0.1);
+  --result-border-strong: rgba(255, 255, 255, 0.16);
+  --result-gold: #d6b46a;
+  --result-shadow: 0 24px 80px rgba(0, 0, 0, 0.34);
+  background: radial-gradient(circle at top center, #111827 0%, #000000 100%);
+}
+
+.brightness-toggle {
+  border-color: var(--result-border);
+  background: var(--result-surface-strong);
+  color: var(--result-text);
+  box-shadow: 0 12px 40px rgba(15, 23, 42, 0.08);
+}
+
+.brightness-toggle-state {
+  color: var(--result-muted);
+}
+
+.result-theme-light .text-white,
+.result-theme-light [class*="text-white/"] {
+  color: var(--result-text) !important;
+}
+
+.result-theme-light .text-gray-300,
+.result-theme-light .text-gray-500,
+.result-theme-light [class*="text-gray-"],
+.result-theme-light [class*="text-[#F8F4EA]/"] {
+  color: var(--result-muted) !important;
+}
+
+.result-theme-light .border-white\/10,
+.result-theme-light [class*="border-white/"] {
+  border-color: var(--result-border) !important;
+}
+
+.result-theme-light .bg-white\/\[0\.035\],
+.result-theme-light .bg-white\/\[0\.045\],
+.result-theme-light .bg-white\/5,
+.result-theme-light .bg-black\/22,
+.result-theme-light .bg-black\/24,
+.result-theme-light .bg-black\/25,
+.result-theme-light .bg-black\/30 {
+  background: var(--result-surface) !important;
+}
+
+.result-theme-light .shadow-2xl {
+  box-shadow: var(--result-shadow);
+}
