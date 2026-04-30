@@ -129,10 +129,10 @@ export default function SajuInputForm() {
           <div className="absolute -inset-1 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl blur opacity-30 group-hover:opacity-100 transition duration-1000 group-hover:duration-200" />
           <div className="relative w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-black py-5 rounded-2xl shadow-xl flex items-center justify-center gap-3 transition-all active:scale-[0.97]">
             {status === 'loading' ? (
-              <span className="animate-pulse">구조 해석 가동 중...</span>
+              <span className="animate-pulse">ORABIT 분석 가동 중...</span>
             ) : (
               <>
-                <span className="text-lg">내 사주 구조 분석하기</span>
+                <span className="text-lg">내 에너지 구조 분석하기</span>
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                 </svg>

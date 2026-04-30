@@ -1,12 +1,25 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google"; // 폰트 로딩 방식 수정
+import { DEFAULT_SITE_URL, SITE_DESCRIPTION, SITE_NAME, SITE_TITLE } from "@/lib/site";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "구조 해석 : 사주 분석 엔진",
-  description: "당신의 사주는 성격 테스트가 아닙니다. 구조입니다. 데이터로 증명하는 당신의 행동 알고리즘.",
+  metadataBase: new URL(DEFAULT_SITE_URL),
+  title: {
+    default: SITE_TITLE,
+    template: `%s | ${SITE_NAME}`,
+  },
+  description: SITE_DESCRIPTION,
+  applicationName: SITE_NAME,
+  openGraph: {
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
+    url: DEFAULT_SITE_URL,
+    siteName: SITE_NAME,
+    type: "website",
+  },
 };
 
 export const viewport: Viewport = {

@@ -18,7 +18,7 @@ export default function ShareButton({
   title,
   description,
   captureTargetId,
-  fileName = 'saju-result.png',
+  fileName = 'orabit-result.png',
   className = "",
 }: Props) {
   const [copied, setCopied] = useState(false);
@@ -26,8 +26,8 @@ export default function ShareButton({
   const [notice, setNotice] = useState('');
 
   const shareUrl = url || (typeof window !== 'undefined' ? window.location.href : '');
-  const shareTitle = title || '내 사주 구조 분석 결과 확인하기';
-  const shareText = description || '우리는 모두 각자만의 독특한 구조를 가지고 태어납니다.';
+  const shareTitle = title || 'ORABIT 에너지 분석 결과 확인하기';
+  const shareText = description || '사주의 오행 흐름을 색, 보석, 주얼리 선택으로 연결합니다.';
 
   const copyToClipboard = async () => {
     try {

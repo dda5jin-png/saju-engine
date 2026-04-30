@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react';
 import { toPng } from 'html-to-image';
 import { Download, Link as LinkIcon, Loader2, MessageCircle } from 'lucide-react';
 import { SajuAnalysis, ViralCharacterMode } from '@/types/saju';
+import { SITE_DOMAIN, SITE_NAME } from '@/lib/site';
 
 interface Props {
   analysis: SajuAnalysis;
@@ -64,7 +65,7 @@ export default function ViralCharacterPanel({ analysis, resultUrl, resultId }: P
       backgroundColor: '#f8fafc',
     });
     const blob = await (await fetch(dataUrl)).blob();
-    return new File([blob], `saju-character-${resultId}.png`, { type: 'image/png' });
+    return new File([blob], `orabit-character-${resultId}.png`, { type: 'image/png' });
   };
 
   const saveImage = async () => {
@@ -94,7 +95,7 @@ export default function ViralCharacterPanel({ analysis, resultUrl, resultId }: P
     try {
       if (navigator.share) {
         await navigator.share({
-          title: `SAJU INSIGHT - ${viral.character_type}`,
+          title: `${SITE_NAME} INSIGHT - ${viral.character_type}`,
           text: shareText,
           url: resultUrl,
         });
@@ -167,7 +168,7 @@ export default function ViralCharacterPanel({ analysis, resultUrl, resultId }: P
           className="aspect-square rounded-[2rem] border border-slate-200 bg-[radial-gradient(circle_at_20%_18%,rgba(20,184,166,0.16),transparent_30%),radial-gradient(circle_at_82%_78%,rgba(245,158,11,0.16),transparent_34%),linear-gradient(145deg,#ffffff,#f4f8fb_48%,#eef7f5)] p-7 shadow-2xl flex flex-col justify-between overflow-hidden text-slate-950"
         >
           <div className="flex items-center justify-between text-[11px] font-black tracking-[0.14em] text-slate-500">
-            <span>SAJU INSIGHT</span>
+            <span>{SITE_NAME} INSIGHT</span>
             <span>{String(new Date().getFullYear())}</span>
           </div>
           <div className="space-y-5 text-center">
@@ -178,7 +179,7 @@ export default function ViralCharacterPanel({ analysis, resultUrl, resultId }: P
           </div>
           <div className="text-center">
             <p className="text-sm font-extrabold text-slate-700">{viral.character_type}</p>
-            <p className="mt-2 text-[11px] font-semibold text-slate-400">saju-engine.vercel.app</p>
+            <p className="mt-2 text-[11px] font-semibold text-slate-400">{SITE_DOMAIN}</p>
           </div>
         </div>
 

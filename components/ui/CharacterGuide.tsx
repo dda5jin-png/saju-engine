@@ -29,20 +29,23 @@ export default function CharacterGuide({ size = 120, animate = true }: { size?: 
             transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
             className="text-gray-400 opacity-30"
           />
-          <rect x="30" y="30" width="40" height="40" rx="2" className="fill-indigo-500/20 stroke-indigo-500" strokeWidth="2" />
-          <path d="M40 45H60M40 55H55" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="text-white" />
-          {/* 눈 - 분석 중인 느낌 */}
+          <path
+            d="M50 20L72 38L63 72H37L28 38L50 20Z"
+            className="fill-[#D6B46A]/15 stroke-[#D6B46A]"
+            strokeWidth="2"
+          />
+          <path d="M28 38H72M37 72L50 38L63 72M50 20V38" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" className="text-[#F8F4EA]/78" />
           <motion.circle
-            cx="40" cy="38" r="1.5"
+            cx="36" cy="38" r="1.5"
             fill="currentColor"
-            className="text-indigo-400"
+            className="text-[#7C3AED]"
             animate={{ opacity: [1, 0, 1] }}
             transition={{ duration: 2, repeat: Infinity }}
           />
           <motion.circle
-            cx="60" cy="38" r="1.5"
+            cx="64" cy="38" r="1.5"
             fill="currentColor"
-            className="text-indigo-400"
+            className="text-[#D6B46A]"
             animate={{ opacity: [1, 0, 1] }}
             transition={{ duration: 2, repeat: Infinity, delay: 0.2 }}
           />

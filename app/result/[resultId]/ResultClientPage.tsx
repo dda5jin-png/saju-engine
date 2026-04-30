@@ -57,14 +57,14 @@ export default function ResultClientPage({ resultId }: Props) {
   }, [resultId]);
 
   if (loading) return (
-    <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center space-y-4">
+    <div className="min-h-screen bg-[#0F172A] text-[#F8F4EA] flex flex-col items-center justify-center space-y-4">
       <CharacterGuide size={80} />
-      <p className="text-gray-400 animate-pulse">구조 해석을 불러오는 중...</p>
+      <p className="text-[#F8F4EA]/55 animate-pulse">ORABIT 리포트를 불러오는 중...</p>
     </div>
   );
 
   if (!analysis) return (
-    <div className="min-h-screen bg-black text-white flex items-center justify-center">
+    <div className="min-h-screen bg-[#0F172A] text-[#F8F4EA] flex items-center justify-center">
       <p>존재하지 않는 분석 결과입니다.</p>
     </div>
   );
@@ -72,14 +72,14 @@ export default function ResultClientPage({ resultId }: Props) {
   const resultUrl = `${typeof window !== 'undefined' ? window.location.origin : ''}/result/${resultId}`;
 
   return (
-    <main className="min-h-screen bg-black text-white p-5 pb-24 md:pt-16">
-      <div className="result-report-font max-w-2xl mx-auto space-y-8 bg-black pb-8">
+    <main className="min-h-screen bg-[#0F172A] text-[#F8F4EA] p-5 pb-24 md:pt-16">
+      <div className="result-report-font max-w-2xl mx-auto space-y-8 pb-8">
         <header className="text-center space-y-4 px-1">
-          <div className="inline-block px-4 py-1 rounded-full bg-white/[0.04] text-white/62 text-xs font-bold border border-white/10">
-            사주 구조 분석 리포트
+          <div className="inline-block px-4 py-1 rounded-full bg-[#D6B46A]/10 text-[#D6B46A] text-xs font-black tracking-[0.18em] border border-[#D6B46A]/20">
+            ORABIT ENERGY REPORT
           </div>
-          <h1 className="text-3xl md:text-4xl font-extrabold bg-gradient-to-b from-white to-white/72 bg-clip-text text-transparent">{analysis.type_name}의 구조</h1>
-          <p className="text-white/62 text-base md:text-lg font-medium leading-8 max-w-lg mx-auto break-keep">{analysis.summary}</p>
+          <h1 className="text-3xl md:text-4xl font-extrabold text-[#F8F4EA]">{analysis.type_name}의 에너지 구조</h1>
+          <p className="text-[#F8F4EA]/62 text-base md:text-lg font-medium leading-8 max-w-lg mx-auto break-keep">{analysis.summary}</p>
         </header>
 
         <JewelryRecommendationPanel analysis={analysis} />

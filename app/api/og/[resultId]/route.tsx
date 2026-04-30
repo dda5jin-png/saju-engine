@@ -2,6 +2,7 @@ import { ImageResponse } from 'next/og';
 import { getDb } from '@/lib/firebase';
 import { doc, getDoc } from 'firebase/firestore';
 import { SajuAnalysis } from '@/types/saju';
+import { SITE_DOMAIN, SITE_NAME } from '@/lib/site';
 
 export const runtime = 'edge';
 
@@ -28,7 +29,7 @@ export async function GET(
     const { resultId } = await params;
     const data = await getAnalysisWithTimeout(resultId);
     const viral = data?.viral_character;
-    const quote = viral?.one_liner || data?.viral_sentences?.self_realization || '사주 구조 분석 리포트';
+    const quote = viral?.one_liner || data?.viral_sentences?.self_realization || 'ORABIT 에너지 분석 리포트';
     const characterType = viral?.character_type || data?.type_name || '진지한 해석과 공유 가능한 캐릭터 카드';
 
     return new ImageResponse(
@@ -72,7 +73,7 @@ export async function GET(
                 letterSpacing: '8px',
               }}
             >
-              <span>SAJU INSIGHT</span>
+              <span>{SITE_NAME} INSIGHT</span>
               <span>{new Date().getFullYear()}</span>
             </div>
             <div
@@ -97,7 +98,7 @@ export async function GET(
                   padding: '12px 24px',
                 }}
               >
-                사주 구조 분석 리포트
+                오행 에너지 분석 리포트
               </div>
               <div
                 style={{
@@ -132,7 +133,7 @@ export async function GET(
                   {characterType}
                 </div>
                 <div style={{ fontSize: '20px', color: '#94a3b8', fontWeight: 700 }}>
-                  saju-engine.vercel.app
+                  {SITE_DOMAIN}
                 </div>
               </div>
               <div
@@ -190,7 +191,7 @@ export async function GET(
             }}
           >
             <div style={{ fontSize: '28px', color: '#0f766e', fontWeight: 900, letterSpacing: '6px' }}>
-              SAJU INSIGHT
+              {SITE_NAME} INSIGHT
             </div>
             <div
               style={{
@@ -202,7 +203,7 @@ export async function GET(
                 lineHeight: 1.15,
               }}
             >
-              사주 구조 분석 리포트
+              ORABIT 에너지 분석 리포트
             </div>
             <div
               style={{

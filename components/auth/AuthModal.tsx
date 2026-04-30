@@ -23,7 +23,7 @@ function getAuthErrorMessage(error: unknown, fallback: string) {
 
   const messages: Record<string, string> = {
     'auth/unauthorized-domain':
-      '현재 도메인이 Firebase 승인 도메인에 등록되지 않았습니다. Firebase Authentication 설정에서 saju-engine.vercel.app을 추가해주세요.',
+      '현재 도메인이 Firebase 승인 도메인에 등록되지 않았습니다. Firebase Authentication 설정에서 orabit.info를 추가해주세요.',
     'auth/operation-not-allowed':
       'Firebase에서 해당 로그인 제공업체가 아직 활성화되지 않았습니다. Google 로그인 또는 이메일/비밀번호 제공업체를 사용 설정해주세요.',
     'auth/popup-closed-by-user': '로그인 창이 닫혔습니다. 다시 시도해주세요.',

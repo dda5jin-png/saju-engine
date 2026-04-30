@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { getPublicSiteUrl, SITE_DESCRIPTION, SITE_NAME } from '@/lib/site';
 import ResultClientPage from './ResultClientPage';
 
 type Props = {
@@ -6,7 +7,7 @@ type Props = {
 };
 
 function getBaseUrl() {
-  return process.env.NEXT_PUBLIC_SITE_URL || 'https://saju-engine.vercel.app';
+  return getPublicSiteUrl();
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -14,8 +15,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const baseUrl = getBaseUrl();
   const resultUrl = `${baseUrl}/result/${resultId}`;
   const imageUrl = `${baseUrl}/api/og/${resultId}`;
-  const title = '사주 구조 분석 리포트';
-  const description = '진지한 사주 해석과 공유 가능한 캐릭터 카드를 확인하세요.';
+  const title = 'ORABIT 에너지 분석 리포트';
+  const description = SITE_DESCRIPTION;
 
   return {
     title,
@@ -27,14 +28,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       title,
       description,
       url: resultUrl,
-      siteName: 'SAJU INSIGHT',
+      siteName: SITE_NAME,
       type: 'website',
       images: [
         {
           url: imageUrl,
           width: 1200,
           height: 630,
-          alt: '사주 구조 분석 공유 미리보기',
+          alt: 'ORABIT 에너지 분석 공유 미리보기',
         },
       ],
     },
