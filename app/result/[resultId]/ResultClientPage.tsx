@@ -82,8 +82,6 @@ export default function ResultClientPage({ resultId }: Props) {
           <p className="text-[#F8F4EA]/62 text-base md:text-lg font-medium leading-8 max-w-lg mx-auto break-keep">{analysis.summary}</p>
         </header>
 
-        <JewelryRecommendationPanel analysis={analysis} />
-
         <ElementBalancePanel
           distribution={analysis.element_distribution}
           profile={analysis.element_profile}
@@ -92,6 +90,8 @@ export default function ResultClientPage({ resultId }: Props) {
         />
 
         <DetailedReadingPanel analysis={analysis} />
+
+        <JewelryRecommendationPanel analysis={analysis} />
 
         <ViralCharacterPanel
           analysis={analysis}

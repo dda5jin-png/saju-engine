@@ -261,26 +261,6 @@ export default function JewelryRecommendationPanel({ analysis }: Props) {
           </div>
         </div>
 
-        {jewelry.practical_strategy && (
-          <div className="space-y-3">
-            <h3 className="text-sm font-black text-white/88">실전 활용 전략</h3>
-            <div className="grid gap-2 text-sm leading-6 text-white/64 sm:grid-cols-2">
-              <p className="rounded-2xl border border-white/10 bg-white/[0.035] p-4 break-keep">
-                <b className="text-white/88">연애:</b> {jewelry.practical_strategy.love}
-              </p>
-              <p className="rounded-2xl border border-white/10 bg-white/[0.035] p-4 break-keep">
-                <b className="text-white/88">재물:</b> {jewelry.practical_strategy.money}
-              </p>
-              <p className="rounded-2xl border border-white/10 bg-white/[0.035] p-4 break-keep">
-                <b className="text-white/88">사업:</b> {jewelry.practical_strategy.business}
-              </p>
-              <p className="rounded-2xl border border-white/10 bg-white/[0.035] p-4 break-keep">
-                <b className="text-white/88">인간관계:</b> {jewelry.practical_strategy.relationship}
-              </p>
-            </div>
-          </div>
-        )}
-
         {jewelry.wearing_guide && (
           <div className="space-y-3">
             <h3 className="text-sm font-black text-white/88">착용 가이드</h3>
