@@ -4,6 +4,8 @@ import { DEFAULT_SITE_URL, SITE_DESCRIPTION, SITE_NAME, SITE_TITLE } from "@/lib
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
+const googleVerification = process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION;
+const naverVerification = process.env.NEXT_PUBLIC_NAVER_SITE_VERIFICATION;
 
 export const metadata: Metadata = {
   metadataBase: new URL(DEFAULT_SITE_URL),
@@ -13,12 +15,49 @@ export const metadata: Metadata = {
   },
   description: SITE_DESCRIPTION,
   applicationName: SITE_NAME,
+  alternates: {
+    canonical: DEFAULT_SITE_URL,
+  },
+  keywords: [
+    "ORABIT",
+    "오라빗",
+    "사주 분석",
+    "오행 분석",
+    "에너지 분석",
+    "보석 추천",
+    "주얼리 추천",
+  ],
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
+  },
+  verification: {
+    google: googleVerification,
+    other: naverVerification
+      ? {
+          "naver-site-verification": naverVerification,
+        }
+      : undefined,
+  },
   openGraph: {
     title: SITE_TITLE,
     description: SITE_DESCRIPTION,
     url: DEFAULT_SITE_URL,
     siteName: SITE_NAME,
     type: "website",
+    locale: "ko_KR",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
   },
 };
 
