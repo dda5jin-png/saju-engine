@@ -6,8 +6,10 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 const googleVerification = process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION;
 const naverVerification =
-  process.env.NEXT_PUBLIC_NAVER_SITE_VERIFICATION ||
-  "be0198d96618ec7b606dab2780e20d72b55b478a";
+  (
+    process.env.NEXT_PUBLIC_NAVER_SITE_VERIFICATION ||
+    "be0198d96618ec7b606dab2780e20d72b55b478a"
+  ).trim();
 
 export const metadata: Metadata = {
   metadataBase: new URL(DEFAULT_SITE_URL),
