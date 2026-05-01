@@ -1,6 +1,6 @@
 'use client';
 
-import { BookOpenCheck, CircleHelp, Compass, Landmark, ShieldCheck, Users } from 'lucide-react';
+import { BookOpenCheck, CircleHelp, Compass, Landmark, ListChecks, ShieldCheck, Users } from 'lucide-react';
 import { DetailedReading, SajuAnalysis } from '@/types/saju';
 
 interface Props {
@@ -22,6 +22,7 @@ const fallbackReading = (analysis: SajuAnalysis): DetailedReading => ({
   timing: analysis.timing_flow,
   balance_practice: analysis.element_profile?.recommendation ?? '강한 기운과 약한 기운의 균형을 생활 루틴에서 맞추는 것이 좋습니다.',
   reliability_note: analysis.confidence_note ?? '입력된 생년월일시를 기준으로 한 구조 분석입니다.',
+  coaching_sections: undefined,
 });
 
 const sectionItems = [
@@ -35,6 +36,7 @@ const sectionItems = [
 
 export default function DetailedReadingPanel({ analysis }: Props) {
   const reading = analysis.detailed_reading ?? fallbackReading(analysis);
+  const coachingSections = reading.coaching_sections;
   const reliabilityNote = '역법 계산과 일간·오행 규칙을 바탕으로 한 참고 리포트입니다.';
 
   return (
@@ -47,7 +49,7 @@ export default function DetailedReadingPanel({ analysis }: Props) {
           <div className="space-y-2">
             <h2 className="text-2xl md:text-3xl font-black text-white">상세 풀이</h2>
             <p className="text-sm md:text-base leading-relaxed text-white/62">
-              일간, 네 기둥, 오행 강약을 나눠 읽고 생활에서 바로 확인할 수 있는 방식으로 정리했습니다.
+              사주 구조를 생활 언어로 바꾸어, 성향과 선택 방식을 바로 확인할 수 있게 정리했습니다.
             </p>
           </div>
         </div>
@@ -64,19 +66,36 @@ export default function DetailedReadingPanel({ analysis }: Props) {
         </div>
       </div>
 
-      <div className="grid gap-4">
-        {sectionItems.map(({ key, label, icon: Icon }) => (
-          <article key={key} className="grid gap-3 border-t border-white/10 pt-5 md:grid-cols-[140px_1fr]">
-            <div className="flex items-center gap-2 text-sm font-black text-white">
-              <Icon size={17} className="text-cyan-300" />
-              {label}
-            </div>
-            <p className="text-[15px] leading-7 text-white/72 break-keep">
-              {reading[key]}
-            </p>
-          </article>
-        ))}
-      </div>
+      {coachingSections && coachingSections.length > 0 ? (
+        <div className="grid gap-4">
+          {coachingSections.map((section, index) => (
+            <article key={section.title} className="grid gap-3 border-t border-white/10 pt-5 md:grid-cols-[160px_1fr]">
+              <div className="flex items-center gap-2 text-sm font-black text-white">
+                <ListChecks size={17} className="text-cyan-300" />
+                <span className="text-cyan-200">{String(index + 1).padStart(2, '0')}</span>
+                {section.title}
+              </div>
+              <p className="whitespace-pre-line text-[15px] leading-7 text-white/72 break-keep">
+                {section.content}
+              </p>
+            </article>
+          ))}
+        </div>
+      ) : (
+        <div className="grid gap-4">
+          {sectionItems.map(({ key, label, icon: Icon }) => (
+            <article key={key} className="grid gap-3 border-t border-white/10 pt-5 md:grid-cols-[140px_1fr]">
+              <div className="flex items-center gap-2 text-sm font-black text-white">
+                <Icon size={17} className="text-cyan-300" />
+                {label}
+              </div>
+              <p className="text-[15px] leading-7 text-white/72 break-keep">
+                {reading[key]}
+              </p>
+            </article>
+          ))}
+        </div>
+      )}
 
       <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-5">
         <div className="flex items-center gap-2 text-sm font-extrabold text-white/85">

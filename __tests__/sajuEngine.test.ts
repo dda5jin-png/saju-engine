@@ -58,6 +58,10 @@ describe('analyzeSaju', () => {
     expect(analysis.detailed_reading.timing).toContain('세운');
     expect(analysis.detailed_reading.money).toContain('재물 감각');
     expect(analysis.detailed_reading.balance_practice).toContain('루틴');
+    expect(analysis.detailed_reading.coaching_sections).toHaveLength(10);
+    expect(analysis.detailed_reading.coaching_sections?.[0].title).toBe('한 줄 요약');
+    expect(analysis.detailed_reading.coaching_sections?.[0].content).toContain('사람입니다');
+    expect(analysis.detailed_reading.coaching_sections?.some((section) => section.title === '현재 운의 흐름')).toBe(true);
     expect(analysis.luck_timing?.current_daeyun?.gan_zhi).toBeTruthy();
     expect(analysis.luck_timing?.current_sewoon?.gan_zhi).toBeTruthy();
   });

@@ -41,6 +41,12 @@ export interface DetailedReading {
   timing: string;
   balance_practice: string;
   reliability_note: string;
+  coaching_sections?: DetailedReadingSection[];
+}
+
+export interface DetailedReadingSection {
+  title: string;
+  content: string;
 }
 
 export interface LuckTiming {

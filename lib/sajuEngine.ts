@@ -40,6 +40,87 @@ const ELEMENT_LABELS: Record<ElementType, string> = {
   water: '수',
 };
 
+const ELEMENT_PRACTICAL_NAMES: Record<ElementType, string> = {
+  wood: '시작과 방향을 세우는 에너지',
+  fire: '표현과 추진의 에너지',
+  earth: '기반과 현실감을 잡는 에너지',
+  metal: '정리와 기준을 세우는 에너지',
+  water: '관찰과 사고를 깊게 하는 에너지',
+};
+
+const DAY_MASTER_COACHING: Record<string, { summary: string; thinking: string; emotion: string; presence: string; strength: string }> = {
+  '甲': {
+    summary: '큰 방향을 먼저 보고, 한 번 마음이 서면 주변까지 움직이게 만드는 사람입니다.',
+    thinking: '생각은 큰 줄기와 방향부터 잡는 편입니다.',
+    emotion: '마음이 정해지면 기다리기보다 앞으로 뻗어가려 합니다.',
+    presence: '사람들 앞에서는 책임감 있고 주도적인 인상으로 보이기 쉽습니다.',
+    strength: '새 판을 만들고 사람을 모으는 힘이 가장 눈에 띕니다.',
+  },
+  '乙': {
+    summary: '상황을 섬세하게 읽고, 막힌 길에서도 다른 통로를 찾아내는 사람입니다.',
+    thinking: '생각은 직선보다 우회로와 가능성을 함께 봅니다.',
+    emotion: '관계의 분위기를 빨리 감지해서 스스로를 맞추려는 편입니다.',
+    presence: '사람들 앞에서는 부드럽고 유연한 사람으로 보이기 쉽습니다.',
+    strength: '변화하는 상황에 적응하며 끝까지 살아남는 힘이 강합니다.',
+  },
+  '丙': {
+    summary: '분위기를 밝히고, 확신이 생기면 빠르게 행동으로 옮기는 사람입니다.',
+    thinking: '생각은 복잡하게 오래 숨기기보다 밖으로 꺼내며 정리되는 편입니다.',
+    emotion: '감정이 올라오면 표정과 말에도 비교적 빨리 드러납니다.',
+    presence: '사람들 앞에서는 존재감과 속도가 먼저 느껴질 수 있습니다.',
+    strength: '침체된 분위기를 바꾸고 일을 앞으로 밀어내는 힘이 큽니다.',
+  },
+  '丁': {
+    summary: '겉으로는 차분해도 안쪽에서는 오래 집중하며 답을 찾아가는 사람입니다.',
+    thinking: '생각은 작은 단서와 사람의 마음을 오래 붙잡고 살핍니다.',
+    emotion: '감정은 바로 터뜨리기보다 속에서 오래 데우는 편입니다.',
+    presence: '사람들 앞에서는 조용하지만 깊이 있는 인상으로 남기 쉽습니다.',
+    strength: '필요한 순간까지 집중을 유지하는 힘이 장점입니다.',
+  },
+  '戊': {
+    summary: '쉽게 흔들리지 않고, 복잡한 상황에서 중심을 잡아주는 사람입니다.',
+    thinking: '생각은 안정성과 지속 가능성을 먼저 확인합니다.',
+    emotion: '감정이 흔들려도 겉으로는 버티는 모습을 보이기 쉽습니다.',
+    presence: '사람들 앞에서는 든든하고 신뢰할 수 있는 사람으로 보입니다.',
+    strength: '판을 안정시키고 책임을 오래 가져가는 힘이 큽니다.',
+  },
+  '己': {
+    summary: '흩어진 사람과 일을 현실적인 결과로 묶어내는 사람입니다.',
+    thinking: '생각은 실제로 굴러갈 수 있는지부터 확인하는 편입니다.',
+    emotion: '주변을 챙기다 보면 자기 피로를 늦게 알아차릴 수 있습니다.',
+    presence: '사람들 앞에서는 세심하고 실속 있는 사람으로 보이기 쉽습니다.',
+    strength: '작은 일을 쌓아 결과로 만드는 운영 감각이 강합니다.',
+  },
+  '庚': {
+    summary: '복잡한 상황에서 남길 것과 정리할 것을 빠르게 구분하는 사람입니다.',
+    thinking: '생각은 기준과 결론을 먼저 찾는 편입니다.',
+    emotion: '애매한 상태가 길어지면 답답함을 느끼기 쉽습니다.',
+    presence: '사람들 앞에서는 단단하고 명확한 사람으로 보일 수 있습니다.',
+    strength: '문제를 단순하게 만들고 결정을 내리는 힘이 큽니다.',
+  },
+  '辛': {
+    summary: '작은 차이를 발견하고, 결과의 완성도를 끝까지 다듬는 사람입니다.',
+    thinking: '생각은 디테일과 품질 기준을 세밀하게 살핍니다.',
+    emotion: '스스로에게 엄격해질 때 피로가 쌓이기 쉽습니다.',
+    presence: '사람들 앞에서는 섬세하고 기준이 높은 사람으로 보일 수 있습니다.',
+    strength: '작은 어긋남을 잡아 결과를 좋아지게 만드는 힘이 강합니다.',
+  },
+  '壬': {
+    summary: '눈앞의 사건보다 큰 흐름을 보고, 여러 정보를 연결해 방향을 찾는 사람입니다.',
+    thinking: '생각은 한 가지보다 여러 가능성을 동시에 펼쳐봅니다.',
+    emotion: '마음이 복잡해지면 실행보다 시뮬레이션이 길어질 수 있습니다.',
+    presence: '사람들 앞에서는 여유 있고 전략적인 인상으로 보이기 쉽습니다.',
+    strength: '흐름을 읽고 판을 넓게 보는 힘이 장점입니다.',
+  },
+  '癸': {
+    summary: '작은 신호를 빠르게 감지하고, 분위기가 달아오를수록 실행 속도가 빨라지는 사람입니다.',
+    thinking: '생각은 작은 단서와 분위기의 변화를 먼저 포착합니다.',
+    emotion: '감정은 조용히 올라오지만, 확신이 생기면 선택이 빨라질 수 있습니다.',
+    presence: '사람들 앞에서는 섬세하고 눈치가 빠른 사람으로 보이기 쉽습니다.',
+    strength: '남들이 넘긴 신호에서 해법을 찾는 감각이 가장 눈에 띕니다.',
+  },
+};
+
 const ELEMENT_MEANINGS: Record<ElementType, { trait: string; excess: string; practice: string; image: string; lowImage: string }> = {
   wood: {
     trait: '성장, 기획, 확장, 시작의 힘',
@@ -417,6 +498,181 @@ function describeGanZhiFocus(ganZhi: string) {
   return labels.length > 0 ? `${labels.join('·')} 기운` : '해당 운의 기운';
 }
 
+function getElementRelation(dayMaster: string, target: ElementType) {
+  const dayElement = STEM_ELEMENTS[dayMaster] ?? 'water';
+  const generates: Record<ElementType, ElementType> = {
+    wood: 'fire',
+    fire: 'earth',
+    earth: 'metal',
+    metal: 'water',
+    water: 'wood',
+  };
+  const controls: Record<ElementType, ElementType> = {
+    wood: 'earth',
+    fire: 'metal',
+    earth: 'water',
+    metal: 'wood',
+    water: 'fire',
+  };
+
+  if (target === dayElement) return '자존감, 독립성, 자기주장';
+  if (generates[dayElement] === target) return '표현력, 말, 창작, 실행력';
+  if (controls[dayElement] === target) return '돈, 현실감각, 결과물, 선택의 대가';
+  if (controls[target] === dayElement) return '책임감, 규칙, 압박, 역할';
+  if (generates[target] === dayElement) return '공부, 보호, 생각, 문서, 자격';
+
+  return '생활에서 반복되는 선택 습관';
+}
+
+function getBranchRelationNote(pillars: { year: string; month: string; day: string; hour: string }) {
+  const branches = [pillars.year[1], pillars.month[1], pillars.day[1], pillars.hour[1]].filter((branch) => branch && branch !== UNKNOWN_HOUR);
+  const relationPairs = [
+    { pair: ['子', '午'], note: '차분히 생각하려는 마음과 빠르게 표현하려는 마음이 부딪칠 수 있습니다.' },
+    { pair: ['丑', '未'], note: '안정적으로 지키려는 마음과 바꿔야 한다는 압력이 함께 올라올 수 있습니다.' },
+    { pair: ['寅', '申'], note: '새로 시작하려는 힘과 정리하려는 힘이 동시에 작동할 수 있습니다.' },
+    { pair: ['卯', '酉'], note: '관계의 부드러움과 기준을 세우려는 태도 사이에서 흔들릴 수 있습니다.' },
+    { pair: ['辰', '戌'], note: '익숙한 기반과 새로운 책임 사이에서 조정이 필요할 수 있습니다.' },
+    { pair: ['巳', '亥'], note: '확신이 생겨 움직이려는 마음과 더 확인하려는 마음이 엇갈릴 수 있습니다.' },
+    { pair: ['寅', '巳'], note: '시작의 속도와 표현의 온도가 함께 올라가면 말이나 선택이 빨라질 수 있습니다.' },
+    { pair: ['子', '未'], note: '생각은 많은데 현실적인 마감이 따라오면 부담을 크게 느낄 수 있습니다.' },
+    { pair: ['午', '未'], note: '따뜻하게 밀어붙이는 힘과 현실적으로 마무리하는 힘이 함께 살아납니다.' },
+  ];
+  const relation = relationPairs.find(({ pair }) => pair.every((branch) => branches.includes(branch)));
+
+  return relation?.note ?? '큰 충돌 신호보다는 강한 기운을 어떻게 조절하느냐가 더 중요합니다.';
+}
+
+function buildCoachingSections(
+  pillars: { year: string; month: string; day: string; hour: string },
+  dayMaster: string,
+  elementProfile: ElementProfile,
+  distribution: ElementDistribution,
+  timeKnown: boolean,
+  luckTiming: LuckTiming,
+) {
+  const ranked = getRankedElements(distribution);
+  const dominant = elementProfile.dominant[0] ?? ranked[0]?.type ?? 'earth';
+  const support = getSupportElement(elementProfile, distribution);
+  const dominantName = ELEMENT_PRACTICAL_NAMES[dominant];
+  const supportName = ELEMENT_PRACTICAL_NAMES[support];
+  const coaching = DAY_MASTER_COACHING[dayMaster] ?? DAY_MASTER_COACHING['癸'];
+  const moneyAdvice = MONEY_ELEMENT_ADVICE[dominant];
+  const timingAdvice = TIMING_ELEMENT_ADVICE[dominant];
+  const supportTimingAdvice = TIMING_ELEMENT_ADVICE[support];
+  const relationNote = getBranchRelationNote(pillars);
+  const dominantMeaning = ELEMENT_MEANINGS[dominant];
+  const supportMeaning = ELEMENT_MEANINGS[support];
+  const dominantRelation = getElementRelation(dayMaster, dominant);
+  const supportRelation = getElementRelation(dayMaster, support);
+  const daeyun = luckTiming.current_daeyun;
+  const sewoon = luckTiming.current_sewoon;
+  const daeyunLead = daeyun
+    ? `현재는 ${daeyun.gan_zhi} 대운(${daeyun.start_year}~${daeyun.end_year}) 안에 있습니다.`
+    : '현재는 기본 성향과 올해 흐름을 중심으로 보는 편이 좋습니다.';
+  const sewoonLead = sewoon
+    ? `올해 세운은 ${sewoon.gan_zhi}라서 ${describeGanZhiFocus(sewoon.gan_zhi)}이 더 강하게 들어옵니다.`
+    : '올해 흐름은 원래 성향의 강약을 기준으로 조절하는 편이 좋습니다.';
+
+  return [
+    {
+      title: '한 줄 요약',
+      content: coaching.summary,
+    },
+    {
+      title: '당신의 기본 성향',
+      content: sentenceList([
+        coaching.thinking,
+        coaching.emotion,
+        coaching.presence,
+        coaching.strength,
+        timeKnown
+          ? '실행 습관까지 비교적 구체적으로 볼 수 있어, 생각이 행동으로 바뀌는 속도도 함께 읽습니다.'
+          : '태어난 시간이 없어 실행 습관은 단정하지 않고, 큰 성향 중심으로 읽습니다.',
+      ]),
+    },
+    {
+      title: '강하게 쓰는 에너지',
+      content: sentenceList([
+        `${dominantName}가 강하게 드러납니다.`,
+        `이 에너지는 생활에서 ${dominantRelation}와 연결됩니다.`,
+        dominant === 'fire'
+          ? '그래서 분위기를 바꾸고 일을 빠르게 밀어붙이는 힘이 있습니다.'
+          : `${dominantMeaning.trait}을 빠르게 활용하는 장점이 있습니다.`,
+        `${dominantMeaning.excess}`,
+        '중요한 말이나 큰 결정은 하루의 여백을 두면 장점이 더 안정적으로 살아납니다.',
+      ]),
+    },
+    {
+      title: '보완하면 좋아지는 부분',
+      content: sentenceList([
+        `${supportName}를 생활에서 보완하면 좋습니다.`,
+        `이 부분은 ${supportRelation}와 연결됩니다.`,
+        `${supportMeaning.lowImage}`,
+        `${supportMeaning.practice}`,
+        '시작하기 전에는 목표, 마감, 판단 기준을 먼저 적어두면 훨씬 오래 갑니다.',
+      ]),
+    },
+    {
+      title: '일과 선택 방식',
+      content: sentenceList([
+        '당신은 작은 변화를 빨리 읽고, 필요한 정보를 빠르게 배우는 방식으로 일할 때 강합니다.',
+        `${dominantName}가 올라오면 선택 속도가 빨라집니다.`,
+        `${relationNote}`,
+        '실수는 정보가 부족해서보다, 마음이 이미 결론을 향해 달릴 때 생기기 쉽습니다.',
+        '중요한 일은 결정 기준 3가지를 먼저 쓰고, 실행은 작은 단위로 나누면 좋습니다.',
+      ]),
+    },
+    {
+      title: '관계 패턴',
+      content: sentenceList([
+        '관계에서는 상대의 분위기와 작은 변화에 민감하게 반응하는 편입니다.',
+        '그래서 필요한 말을 빨리 알아차리고, 상황을 부드럽게 맞추는 장점이 있습니다.',
+        '다만 계속 맞춰주다 보면 내가 줄 수 있는 범위를 늦게 말할 수 있습니다.',
+        '관계가 지치기 전에 “내가 가능한 것”과 “지금은 어려운 것”을 짧게 말하는 연습이 필요합니다.',
+      ]),
+    },
+    {
+      title: '돈과 소비 성향',
+      content: sentenceList([
+        `돈을 다룰 때는 ${moneyAdvice.strength}이 강점으로 작동합니다.`,
+        '기회가 보이면 빠르게 반응할 수 있습니다.',
+        `${moneyAdvice.risk}이 생길 수 있습니다.`,
+        `${moneyAdvice.rule}`,
+        '계약이나 투자는 제3자 검토, 월별 즉흥 지출 한도, 하루 뒤 재확인을 기준으로 삼으면 돈을 지키기 쉽습니다.',
+      ]),
+    },
+    {
+      title: '현재 운의 흐름',
+      content: sentenceList([
+        daeyunLead,
+        sewoonLead,
+        '현재 흐름은 표현, 실행, 선택의 속도가 빨라지는 쪽으로 작동합니다.',
+        `${timingAdvice.whenFast}에는 힘이 붙습니다.`,
+        `${timingAdvice.whenSlow}은 천천히 결정하는 편이 안정적입니다.`,
+        `${supportTimingAdvice.whenFast}을 일정 안에 넣어두면 속도와 방향의 균형이 좋아집니다.`,
+        '올해의 핵심 기준은 “빠르게 반응하되, 큰 결정은 하루 뒤 확정하기”입니다.',
+      ]),
+    },
+    {
+      title: '바로 적용할 생활 루틴',
+      content: [
+        '1. 큰돈을 쓰기 전에는 하루 뒤 다시 보기',
+        '2. 새로운 일을 시작할 때 목표와 마감 먼저 쓰기',
+        '3. 감정이 올라온 대화는 메시지를 보내기 전 10분 보류하기',
+      ].join('\n'),
+    },
+    {
+      title: '마지막 조언',
+      content: sentenceList([
+        '당신에게는 빠르게 감지하고 빠르게 움직이는 힘이 있습니다.',
+        '그래서 기회가 왔을 때 남들보다 먼저 반응할 수 있습니다.',
+        '다만 속도가 강점인 만큼, 중요한 결정에서는 짧은 여백이 필요합니다.',
+        '속도를 조절하는 순간, 판단력은 훨씬 더 안정적으로 빛납니다.',
+      ]),
+    },
+  ];
+}
+
 function buildLuckTiming(input: SajuInput, solar: ReturnType<typeof Solar.fromYmd>, timeKnown: boolean): LuckTiming {
   const gender = input.gender === 'male' ? 1 : 0;
   const eightChar = solar.getLunar().getEightChar() as unknown as EightCharWithYun;
@@ -582,6 +838,14 @@ function buildDetailedReading(
   const sewoonText = sewoon
     ? `올해 세운은 ${sewoon.gan_zhi}라서 ${describeGanZhiFocus(sewoon.gan_zhi)}이 그해의 사건 속도와 선택 압력을 더합니다.`
     : '올해 세운은 별도 구간으로 잡지 못해 대운과 원국의 균형 중심으로 읽습니다.';
+  const coachingSections = buildCoachingSections(
+    pillars,
+    dayMaster,
+    elementProfile,
+    distribution,
+    timeKnown,
+    luckTiming,
+  );
 
   return {
     basis: [
@@ -593,7 +857,7 @@ function buildDetailedReading(
       `오행 총 ${elementProfile.total_count}글자`,
     ],
     temperament: sentenceList([
-      `${genderContext}로 입력된 이 명식은 일간 ${dayMaster}을 중심축으로 봅니다.`,
+      `${genderContext}로 입력된 사주는 ${DAY_MASTER_COACHING[dayMaster]?.summary ?? dayMasterProfile.core}`,
       dayMasterProfile.core,
       dayScene?.metaphor ?? '',
       `가장 강한 ${ELEMENT_LABELS[dominant]} 기운은 ${dominantMeaning.trait}을 뜻합니다. ${dominantMeaning.image}`,
@@ -631,11 +895,12 @@ function buildDetailedReading(
     balance_practice: sentenceList([
       `${dominantLabel} 기운이 강한 날에는 ${dominantMeaning.excess}`,
       `${supportLabel} 기운을 채우는 루틴은 단순해야 오래 갑니다. ${supportMeaning.practice}`,
-      `하루 끝에는 오늘의 선택 중 ${dominantLabel}의 강점으로 잘 처리한 일 1개와 ${supportLabel}로 보완할 일 1개만 적어보세요.`,
+      `하루 끝에는 오늘의 선택 중 ${dominantLabel}의 강점으로 잘 처리한 일 1개와 ${supportLabel} 기운으로 보완할 일 1개만 적어보세요.`,
       `이 루틴은 운을 바꾸는 의식이라기보다, 강한 기운은 덜 과하게 쓰고 약한 기운은 생활 속에서 반복해 채우는 장치입니다.`,
     ]),
     reliability_note:
       '음양력 변환은 천문 역법 기준 계산 라이브러리를 사용하고, 해석은 일간 중심·오행 분포·강약 보완이라는 명리학의 전통적 구조를 앱 안에서 규칙화한 것입니다. 개인의 실제 삶, 환경, 선택을 대체하는 판단으로 사용하지 마세요.',
+    coaching_sections: coachingSections,
   };
 }
 
