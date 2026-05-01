@@ -21,14 +21,15 @@ export default function LandingPage() {
             <div className="space-y-5">
               <h1 className="mx-auto max-w-3xl text-[2rem] font-black leading-[1.18] tracking-tight md:text-6xl break-keep">
                 당신의 사주를<br />
-                <span className="text-[#D6B46A]">에너지 구조</span>로<br className="sm:hidden" /> 해석합니다.
+                <span className="text-[#D6B46A]">분석해드립니다.</span>
               </h1>
               <p className="mx-auto max-w-2xl text-base font-semibold leading-8 text-[#F8F4EA]/70 md:text-xl break-keep">
-                보이지 않는 흐름을 분석하고, 나에게 맞는 색, 보석, 주얼리 선택으로 연결합니다.
+                보이지 않는 기운의 흐름을 읽고,<br />
+                타고난 기질과 지금의 운이 향하는 방향을 살펴봅니다.
               </p>
               <p className="mx-auto max-w-3xl text-sm leading-7 text-[#F8F4EA]/52 md:text-base break-keep">
-                사주는 운명을 단정하는 도구가 아니라, 내 안의 에너지 균형을 이해하는 지도입니다.
-                ORABIT은 오행 흐름을 분석해 부족한 기운, 과한 기운, 그리고 이를 보완할 수 있는 색상과 주얼리 조합을 제안합니다.
+                ORABIT은 오행의 균형을 바탕으로 강하게 드러나는 기운과 보완이 필요한 기운을 분석하고,
+                그 흐름에 어울리는 보석/주얼리를 제안합니다.
               </p>
             </div>
 
@@ -47,7 +48,7 @@ export default function LandingPage() {
           </section>
 
           <section className="grid gap-3 text-left md:grid-cols-4">
-            {['사주 에너지 분석', '오행 균형', '보석 추천', '착용 가이드'].map((item, index) => (
+            {['사주 분석', '오행 균형', '보석 추천', '착용 가이드'].map((item, index) => (
               <div key={item} className="rounded-2xl border border-[#D6B46A]/25 bg-white/[0.035] p-4">
                 <p className="text-xs font-black text-[#D6B46A]">0{index + 1}</p>
                 <p className="mt-3 text-sm font-extrabold text-[#F8F4EA]">{item}</p>
