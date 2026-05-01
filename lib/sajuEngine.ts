@@ -77,6 +77,62 @@ const ELEMENT_MEANINGS: Record<ElementType, { trait: string; excess: string; pra
   },
 };
 
+const MONEY_ELEMENT_ADVICE: Record<ElementType, { strength: string; risk: string; rule: string }> = {
+  wood: {
+    strength: '새 수입원이나 성장 가능성을 빠르게 발견하는 감각',
+    risk: '확장 욕심 때문에 회수 시점과 고정비를 늦게 볼 수 있음',
+    rule: '새 지출은 예상 수익보다 유지 비용과 회수 날짜를 먼저 적어두세요.',
+  },
+  fire: {
+    strength: '기회가 왔을 때 망설이지 않고 움직이는 추진력',
+    risk: '분위기와 확신이 올라온 순간 결제나 투자를 빠르게 확정할 수 있음',
+    rule: '큰돈은 하루를 넘기고, 작은돈도 한도 안에서만 즉시 쓰는 기준이 필요합니다.',
+  },
+  earth: {
+    strength: '돈을 기반으로 묶어두고 오래 지키는 현실 감각',
+    risk: '안정된 방식에 익숙해져 바꿔야 할 상품이나 지출을 계속 끌고 갈 수 있음',
+    rule: '매달 고정비와 묶인 돈을 확인하고, 유지할 이유가 약한 항목부터 정리하세요.',
+  },
+  metal: {
+    strength: '숫자를 자르고 손익 기준을 분명히 세우는 판단력',
+    risk: '기준이 강해져 유연한 조정 없이 너무 빨리 닫거나 끊을 수 있음',
+    rule: '손절선과 익절선을 함께 정해두면 냉정함이 수익 관리로 이어집니다.',
+  },
+  water: {
+    strength: '정보를 모으고 흐름을 비교해 위험을 피하는 감각',
+    risk: '더 확인하려는 마음이 길어져 실행 타이밍을 놓치거나 불안을 키울 수 있음',
+    rule: '조사 시간을 정해놓고, 결정은 소액 테스트와 재검토 날짜로 나누세요.',
+  },
+};
+
+const TIMING_ELEMENT_ADVICE: Record<ElementType, { whenFast: string; whenSlow: string; signal: string }> = {
+  wood: {
+    whenFast: '시작, 제안, 확장처럼 판을 여는 일',
+    whenSlow: '마감, 계약 확정, 장기 고정비를 늘리는 일',
+    signal: '해야 할 일이 세 갈래 이상으로 늘어나면 속도를 줄일 신호입니다.',
+  },
+  fire: {
+    whenFast: '표현, 발표, 관계 회복처럼 열을 올려야 하는 일',
+    whenSlow: '감정이 뜨거운 상태의 지출, 이별 통보, 즉흥 결정',
+    signal: '말이 빨라지고 결론을 바로 내고 싶을 때 하루를 넘기세요.',
+  },
+  earth: {
+    whenFast: '기반을 다지고 책임 범위를 정하는 일',
+    whenSlow: '익숙하다는 이유만으로 그대로 유지하는 선택',
+    signal: '변화 제안을 계속 미루고 있다면 작은 예외부터 열어야 합니다.',
+  },
+  metal: {
+    whenFast: '정리, 협상, 기준 확정처럼 선을 그어야 하는 일',
+    whenSlow: '관계의 온도가 필요한 대화나 감정 확인',
+    signal: '맞고 틀림만 보이고 상대의 사정이 안 보일 때 한 박자 늦추세요.',
+  },
+  water: {
+    whenFast: '자료 확인, 전략 설계, 위험 탐지',
+    whenSlow: '정보가 완벽해질 때까지 실행을 미루는 선택',
+    signal: '자료는 충분한데 같은 검색을 반복하면 바로 작은 실행으로 옮길 때입니다.',
+  },
+};
+
 const JEWELRY_MATCHING: Record<ElementType, {
   meaning: string;
   gems: string[];
@@ -437,6 +493,12 @@ function buildDetailedReading(
   const ruleStrengths = matchedRules.map((rule) => rule.interpretation.strength).slice(0, 3);
   const ruleWeaknesses = matchedRules.map((rule) => rule.interpretation.weakness).slice(0, 2);
   const genderContext = input.gender === 'female' ? '여성 사주' : '남성 사주';
+  const dominantLabel = ELEMENT_LABELS[dominant];
+  const supportLabel = ELEMENT_LABELS[support];
+  const moneyAdvice = MONEY_ELEMENT_ADVICE[dominant];
+  const supportMoneyAdvice = MONEY_ELEMENT_ADVICE[support];
+  const timingAdvice = TIMING_ELEMENT_ADVICE[dominant];
+  const supportTimingAdvice = TIMING_ELEMENT_ADVICE[support];
 
   return {
     basis: [
@@ -468,23 +530,24 @@ function buildDetailedReading(
       '상대가 원하는 답보다 내가 줄 수 있는 답의 범위를 먼저 말하면 관계가 덜 소모됩니다.',
     ]),
     money: sentenceList([
-      matchedRules[0]?.interpretation.money_style ?? '돈의 흐름은 안정성과 실행 속도의 균형을 함께 봐야 합니다.',
-      `${ELEMENT_LABELS[dominant]} 기운이 강할수록 판단의 속도와 기준이 선명해지지만, 기록 없이 움직이면 반복 지출이나 무리한 선택으로 번질 수 있습니다.`,
-      '기분이 올라간 날에는 지출과 투자를 바로 확정하지 말고 하루 뒤 다시 보는 장치가 필요합니다.',
-      '예산, 손절 기준, 보유 기간을 먼저 숫자로 정하면 돈의 흐름을 감정이 아니라 구조로 다루기 쉬워집니다.',
+      matchedRules[0]?.interpretation.money_style ?? '돈은 안정성과 실행 속도의 균형이 핵심입니다.',
+      `${dominantLabel} 기운이 강해 ${moneyAdvice.strength}이 재물 감각으로 드러납니다.`,
+      `다만 ${moneyAdvice.risk}이 약점이 될 수 있으니, ${moneyAdvice.rule}`,
+      `부족한 ${supportLabel} 기운은 돈을 다룰 때 ${supportMoneyAdvice.strength}을 보완해 줍니다.`,
     ]),
     timing: sentenceList([
       timeKnown
-        ? '태어난 시간이 있어 시주까지 포함했기 때문에 말년, 실행 습관, 외부로 드러나는 행동 패턴을 조금 더 구체적으로 볼 수 있습니다.'
+        ? `태어난 시간이 있어 시주까지 포함했기 때문에 실행 습관과 겉으로 드러나는 반응 속도까지 함께 봅니다.`
         : '태어난 시간이 없어 시주는 해석하지 않았습니다. 그래서 말년운이나 세밀한 실행 패턴은 단정하지 않고 큰 구조 중심으로 봅니다.',
-      '현재 결과는 대운·세운까지 계산한 예측이 아니라, 태어난 사주의 기본 구조를 설명하는 정적 해석입니다.',
-      '다음 고도화 단계에서는 절기 기준 대운 시작 시점과 연도별 세운을 분리해 타이밍 해석을 붙이는 것이 좋습니다.',
+      `${dominantLabel} 기운이 앞서는 명식이라 ${timingAdvice.whenFast}은 빠르게 잡아도 힘이 붙습니다.`,
+      `반대로 ${timingAdvice.whenSlow}은 서두르면 흐름이 흐트러질 수 있습니다.`,
+      `${timingAdvice.signal} 부족한 ${supportLabel} 기운을 살리려면 ${supportTimingAdvice.whenFast}을 일정 안에 의식적으로 넣어두는 편이 좋습니다.`,
     ]),
     balance_practice: sentenceList([
-      elementProfile.recommendation,
-      `${ELEMENT_LABELS[support]} 보완 실천: ${supportMeaning.practice}`,
-      `하루를 마감할 때 오늘의 선택을 ${ELEMENT_LABELS[dominant]}의 강점으로 처리한 일과 ${ELEMENT_LABELS[support]}로 보완할 일로 나눠 적어보세요.`,
-      '사주는 확정된 운명표라기보다 반복되는 선택 습관을 읽는 참고 도구로 쓰는 편이 가장 안전합니다.',
+      `${dominantLabel} 기운이 강한 날에는 ${dominantMeaning.excess}`,
+      `${supportLabel} 기운을 채우는 루틴은 단순해야 오래 갑니다. ${supportMeaning.practice}`,
+      `하루 끝에는 오늘의 선택 중 ${dominantLabel}의 강점으로 잘 처리한 일 1개와 ${supportLabel}로 보완할 일 1개만 적어보세요.`,
+      `이 루틴은 운을 바꾸는 의식이라기보다, 강한 기운은 덜 과하게 쓰고 약한 기운은 생활 속에서 반복해 채우는 장치입니다.`,
     ]),
     reliability_note:
       '음양력 변환은 천문 역법 기준 계산 라이브러리를 사용하고, 해석은 일간 중심·오행 분포·강약 보완이라는 명리학의 전통적 구조를 앱 안에서 규칙화한 것입니다. 개인의 실제 삶, 환경, 선택을 대체하는 판단으로 사용하지 마세요.',

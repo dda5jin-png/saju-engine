@@ -52,6 +52,10 @@ describe('analyzeSaju', () => {
     expect(analysis.element_profile.summary).toContain('시간 미상');
     expect(analysis.detailed_reading.basis).toContain('시주 미상');
     expect(analysis.detailed_reading.timing).toContain('시주는 해석하지 않았습니다');
+    expect(analysis.detailed_reading.timing).not.toContain('고도화');
+    expect(analysis.detailed_reading.timing).not.toContain('시스템');
+    expect(analysis.detailed_reading.money).toContain('재물 감각');
+    expect(analysis.detailed_reading.balance_practice).toContain('루틴');
   });
 
   it('includes the hour pillar in element distribution when birth time is provided', () => {

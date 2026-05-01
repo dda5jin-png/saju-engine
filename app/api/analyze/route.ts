@@ -5,10 +5,23 @@ import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { randomUUID } from 'crypto';
 import { SajuAnalysis, SajuInput } from '@/types/saju';
 
+function isValidBirthDate(value: string) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+
+  const [year, month, day] = value.split('-').map(Number);
+  const date = new Date(year, month - 1, day);
+
+  return (
+    date.getFullYear() === year &&
+    date.getMonth() === month - 1 &&
+    date.getDate() === day
+  );
+}
+
 function isValidInput(body: Partial<SajuInput>): body is SajuInput {
   return (
     typeof body.birthDate === 'string' &&
-    /^\d{4}-\d{2}-\d{2}$/.test(body.birthDate) &&
+    isValidBirthDate(body.birthDate) &&
     (body.birthTime === undefined || body.birthTime === '' || /^\d{2}:\d{2}$/.test(body.birthTime)) &&
     (body.gender === 'male' || body.gender === 'female')
   );

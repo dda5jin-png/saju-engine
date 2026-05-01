@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { SajuInput } from '@/types/saju';
 import AnalysisLoading from './AnalysisLoading';
@@ -14,14 +14,59 @@ interface AnalyzeResponse {
   error?: string;
 }
 
+function isValidBirthDateParts(parts: { year: string; month: string; day: string }) {
+  if (parts.year.length !== 4 || parts.month.length !== 2 || parts.day.length !== 2) {
+    return false;
+  }
+
+  const year = Number(parts.year);
+  const month = Number(parts.month);
+  const day = Number(parts.day);
+  const date = new Date(year, month - 1, day);
+
+  return (
+    date.getFullYear() === year &&
+    date.getMonth() === month - 1 &&
+    date.getDate() === day
+  );
+}
+
 export default function SajuInputForm() {
   const router = useRouter();
+  const monthInputRef = useRef<HTMLInputElement>(null);
+  const dayInputRef = useRef<HTMLInputElement>(null);
   const [status, setStatus] = useState<'idle' | 'loading' | 'error'>('idle');
   const [form, setForm] = useState<SajuInput>({
     birthDate: '',
     birthTime: '',
     gender: 'male'
   });
+  const [birthDateParts, setBirthDateParts] = useState({
+    year: '',
+    month: '',
+    day: '',
+  });
+
+  const updateBirthDatePart = (
+    part: keyof typeof birthDateParts,
+    value: string,
+    maxLength: number,
+    nextInput?: React.RefObject<HTMLInputElement | null>,
+  ) => {
+    const numericValue = value.replace(/\D/g, '').slice(0, maxLength);
+    const nextParts = { ...birthDateParts, [part]: numericValue };
+    const birthDate =
+      isValidBirthDateParts(nextParts)
+        ? `${nextParts.year}-${nextParts.month}-${nextParts.day}`
+        : '';
+
+    setBirthDateParts(nextParts);
+    setForm({ ...form, birthDate });
+
+    if (numericValue.length === maxLength) {
+      nextInput?.current?.focus();
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -77,13 +122,43 @@ export default function SajuInputForm() {
             <label className="block text-xs font-bold text-indigo-300 uppercase tracking-widest mb-3 ml-1">
               생년월일
             </label>
-            <input
-              required
-              type="date"
-              value={form.birthDate}
-              onChange={(e) => setForm({ ...form, birthDate: e.target.value })}
-              className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white focus:ring-2 focus:ring-indigo-500 focus:bg-white/10 outline-none transition-all text-lg"
-            />
+            <div className="grid grid-cols-[1.4fr_1fr_1fr] gap-3">
+              <input
+                required
+                aria-label="출생 연도"
+                type="text"
+                inputMode="numeric"
+                autoComplete="bday-year"
+                placeholder="YYYY"
+                value={birthDateParts.year}
+                onChange={(e) => updateBirthDatePart('year', e.target.value, 4, monthInputRef)}
+                className="min-w-0 bg-white/5 border border-white/10 rounded-2xl px-4 py-4 text-white focus:ring-2 focus:ring-indigo-500 focus:bg-white/10 outline-none transition-all text-lg"
+              />
+              <input
+                required
+                ref={monthInputRef}
+                aria-label="출생 월"
+                type="text"
+                inputMode="numeric"
+                autoComplete="bday-month"
+                placeholder="MM"
+                value={birthDateParts.month}
+                onChange={(e) => updateBirthDatePart('month', e.target.value, 2, dayInputRef)}
+                className="min-w-0 bg-white/5 border border-white/10 rounded-2xl px-4 py-4 text-white focus:ring-2 focus:ring-indigo-500 focus:bg-white/10 outline-none transition-all text-lg"
+              />
+              <input
+                required
+                ref={dayInputRef}
+                aria-label="출생 일"
+                type="text"
+                inputMode="numeric"
+                autoComplete="bday-day"
+                placeholder="DD"
+                value={birthDateParts.day}
+                onChange={(e) => updateBirthDatePart('day', e.target.value, 2)}
+                className="min-w-0 bg-white/5 border border-white/10 rounded-2xl px-4 py-4 text-white focus:ring-2 focus:ring-indigo-500 focus:bg-white/10 outline-none transition-all text-lg"
+              />
+            </div>
           </div>
 
           <div>
