@@ -9,7 +9,7 @@ export default function LandingPage() {
     <BrightnessThemeShell className="min-h-screen">
       <main className="relative min-h-screen overflow-hidden px-6 py-8 text-[var(--result-text)]">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_8%,rgba(214,180,106,0.18),transparent_34%),radial-gradient(circle_at_82%_72%,rgba(124,58,237,0.12),transparent_30%)]" />
-        <HeaderAuthButton className="right-4 top-16 md:right-8 md:top-20" />
+        <HeaderAuthButton />
 
         <div className="relative mx-auto flex min-h-[calc(100vh-4rem)] max-w-5xl flex-col justify-center gap-10 text-center">
           <section className="space-y-7">

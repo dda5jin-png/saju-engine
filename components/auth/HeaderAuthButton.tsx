@@ -14,7 +14,12 @@ export default function HeaderAuthButton({ className = "right-4 top-4 md:right-8
   const [showAuthModal, setShowAuthModal] = useState(false);
 
   useEffect(() => {
-    return subscribeToAuthChanges(setUser);
+    try {
+      return subscribeToAuthChanges(setUser);
+    } catch (error) {
+      console.warn("Auth initialization skipped", error);
+      return undefined;
+    }
   }, []);
 
   return (

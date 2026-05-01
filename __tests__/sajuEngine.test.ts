@@ -54,8 +54,12 @@ describe('analyzeSaju', () => {
     expect(analysis.detailed_reading.timing).toContain('시주는 해석하지 않았습니다');
     expect(analysis.detailed_reading.timing).not.toContain('고도화');
     expect(analysis.detailed_reading.timing).not.toContain('시스템');
+    expect(analysis.detailed_reading.timing).toContain('대운');
+    expect(analysis.detailed_reading.timing).toContain('세운');
     expect(analysis.detailed_reading.money).toContain('재물 감각');
     expect(analysis.detailed_reading.balance_practice).toContain('루틴');
+    expect(analysis.luck_timing?.current_daeyun?.gan_zhi).toBeTruthy();
+    expect(analysis.luck_timing?.current_sewoon?.gan_zhi).toBeTruthy();
   });
 
   it('includes the hour pillar in element distribution when birth time is provided', () => {

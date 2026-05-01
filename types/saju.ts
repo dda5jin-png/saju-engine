@@ -43,6 +43,25 @@ export interface DetailedReading {
   reliability_note: string;
 }
 
+export interface LuckTiming {
+  current_year: number;
+  start_solar: string;
+  direction: 'forward' | 'reverse';
+  current_daeyun?: {
+    gan_zhi: string;
+    start_year: number;
+    end_year: number;
+    start_age: number;
+    end_age: number;
+  };
+  current_sewoon?: {
+    gan_zhi: string;
+    year: number;
+    age: number;
+  };
+  precision_note: string;
+}
+
 export interface JewelryRecommendation {
   support_element: ElementType;
   element_label: string;
@@ -128,6 +147,7 @@ export interface SajuAnalysis {
   day_master: string;
   time_known: boolean;
   confidence_note: string;
+  luck_timing?: LuckTiming;
   element_profile: ElementProfile;
   day_master_profile: DayMasterProfile;
   jewelry_recommendation?: JewelryRecommendation;

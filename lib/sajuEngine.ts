@@ -7,6 +7,7 @@ import {
   ElementType,
   JewelryRecommendation,
   JewelryOption,
+  LuckTiming,
   SajuAnalysis,
   SajuInput,
   ViralCharacterMode,
@@ -132,6 +133,31 @@ const TIMING_ELEMENT_ADVICE: Record<ElementType, { whenFast: string; whenSlow: s
     signal: '자료는 충분한데 같은 검색을 반복하면 바로 작은 실행으로 옮길 때입니다.',
   },
 };
+
+interface LunarDaYun {
+  getGanZhi(): string;
+  getStartYear(): number;
+  getEndYear(): number;
+  getStartAge(): number;
+  getEndAge(): number;
+  getLiuNian(n?: number): LunarLiuNian[];
+}
+
+interface LunarLiuNian {
+  getGanZhi(): string;
+  getYear(): number;
+  getAge(): number;
+}
+
+interface LunarYun {
+  getStartSolar(): { toYmd(): string };
+  isForward(): boolean;
+  getDaYun(n?: number): LunarDaYun[];
+}
+
+interface EightCharWithYun {
+  getYun(gender: number, sect?: number): LunarYun;
+}
 
 const JEWELRY_MATCHING: Record<ElementType, {
   meaning: string;
@@ -338,6 +364,10 @@ function addPillarElements(pillar: string, distribution: ElementDistribution) {
   if (branchType) distribution[branchType]++;
 }
 
+function getGanZhiElements(ganZhi: string): ElementType[] {
+  return [STEM_ELEMENTS[ganZhi[0]], BRANCH_ELEMENTS[ganZhi[1]]].filter(Boolean) as ElementType[];
+}
+
 function getRankedElements(distribution: ElementDistribution) {
   return (Object.keys(distribution) as ElementType[])
     .map((type) => ({ type, count: distribution[type] }))
@@ -380,6 +410,50 @@ function buildElementProfile(distribution: ElementDistribution, timeKnown: boole
 
 function sentenceList(items: string[]) {
   return items.filter(Boolean).join(' ');
+}
+
+function describeGanZhiFocus(ganZhi: string) {
+  const labels = [...new Set(getGanZhiElements(ganZhi).map((type) => ELEMENT_LABELS[type]))];
+  return labels.length > 0 ? `${labels.join('·')} 기운` : '해당 운의 기운';
+}
+
+function buildLuckTiming(input: SajuInput, solar: ReturnType<typeof Solar.fromYmd>, timeKnown: boolean): LuckTiming {
+  const gender = input.gender === 'male' ? 1 : 0;
+  const eightChar = solar.getLunar().getEightChar() as unknown as EightCharWithYun;
+  const yun = eightChar.getYun(gender);
+  const currentYear = new Date().getFullYear();
+  const daYunList = yun.getDaYun(12);
+  const currentDaYun = daYunList.find((daYun) => (
+    currentYear >= daYun.getStartYear() && currentYear <= daYun.getEndYear()
+  ));
+  const currentSewoon = currentDaYun
+    ?.getLiuNian(10)
+    .find((liuNian) => liuNian.getYear() === currentYear);
+
+  return {
+    current_year: currentYear,
+    start_solar: yun.getStartSolar().toYmd(),
+    direction: yun.isForward() ? 'forward' : 'reverse',
+    current_daeyun: currentDaYun && currentDaYun.getGanZhi()
+      ? {
+          gan_zhi: currentDaYun.getGanZhi(),
+          start_year: currentDaYun.getStartYear(),
+          end_year: currentDaYun.getEndYear(),
+          start_age: currentDaYun.getStartAge(),
+          end_age: currentDaYun.getEndAge(),
+        }
+      : undefined,
+    current_sewoon: currentSewoon
+      ? {
+          gan_zhi: currentSewoon.getGanZhi(),
+          year: currentSewoon.getYear(),
+          age: currentSewoon.getAge(),
+        }
+      : undefined,
+    precision_note: timeKnown
+      ? '태어난 시간이 있어 절기 기준 기운 시작점을 시각까지 포함해 계산했습니다.'
+      : '태어난 시간이 없어 정오 기준으로 대운 시작점을 계산했으므로 시작 월일은 참고값으로 보세요.',
+  };
 }
 
 function getSupportElement(elementProfile: ElementProfile, distribution: ElementDistribution): ElementType {
@@ -483,6 +557,7 @@ function buildDetailedReading(
   distribution: ElementDistribution,
   timeKnown: boolean,
   matchedRules: typeof sajuRules,
+  luckTiming: LuckTiming,
 ): DetailedReading {
   const ranked = getRankedElements(distribution);
   const dominant = elementProfile.dominant[0] ?? ranked[0]?.type ?? 'earth';
@@ -499,6 +574,14 @@ function buildDetailedReading(
   const supportMoneyAdvice = MONEY_ELEMENT_ADVICE[support];
   const timingAdvice = TIMING_ELEMENT_ADVICE[dominant];
   const supportTimingAdvice = TIMING_ELEMENT_ADVICE[support];
+  const daeyun = luckTiming.current_daeyun;
+  const sewoon = luckTiming.current_sewoon;
+  const daeyunText = daeyun
+    ? `${luckTiming.current_year}년 현재는 ${daeyun.gan_zhi} 대운(${daeyun.start_year}~${daeyun.end_year}, ${daeyun.start_age}~${daeyun.end_age}세)의 큰 흐름 안에 있습니다. ${describeGanZhiFocus(daeyun.gan_zhi)}이 10년 단위의 배경으로 깔립니다.`
+    : `${luckTiming.current_year}년 현재 적용할 대운 구간을 찾지 못해, 기본 명식의 흐름을 중심으로 봅니다.`;
+  const sewoonText = sewoon
+    ? `올해 세운은 ${sewoon.gan_zhi}라서 ${describeGanZhiFocus(sewoon.gan_zhi)}이 그해의 사건 속도와 선택 압력을 더합니다.`
+    : '올해 세운은 별도 구간으로 잡지 못해 대운과 원국의 균형 중심으로 읽습니다.';
 
   return {
     basis: [
@@ -539,9 +622,11 @@ function buildDetailedReading(
       timeKnown
         ? `태어난 시간이 있어 시주까지 포함했기 때문에 실행 습관과 겉으로 드러나는 반응 속도까지 함께 봅니다.`
         : '태어난 시간이 없어 시주는 해석하지 않았습니다. 그래서 말년운이나 세밀한 실행 패턴은 단정하지 않고 큰 구조 중심으로 봅니다.',
+      daeyunText,
+      sewoonText,
       `${dominantLabel} 기운이 앞서는 명식이라 ${timingAdvice.whenFast}은 빠르게 잡아도 힘이 붙습니다.`,
       `반대로 ${timingAdvice.whenSlow}은 서두르면 흐름이 흐트러질 수 있습니다.`,
-      `${timingAdvice.signal} 부족한 ${supportLabel} 기운을 살리려면 ${supportTimingAdvice.whenFast}을 일정 안에 의식적으로 넣어두는 편이 좋습니다.`,
+      `${timingAdvice.signal} 부족한 ${supportLabel} 기운을 살리려면 ${supportTimingAdvice.whenFast}을 일정 안에 의식적으로 넣어두는 편이 좋습니다. ${luckTiming.precision_note}`,
     ]),
     balance_practice: sentenceList([
       `${dominantLabel} 기운이 강한 날에는 ${dominantMeaning.excess}`,
@@ -700,6 +785,7 @@ export function analyzeSaju(input: SajuInput): SajuAnalysis {
   const dayMaster = pillars.day[0];
   const info = DAY_MASTER_INFO[dayMaster] || { typeName: '미지의 구조', summary: '알 수 없는 구조입니다.' };
   const elementProfile = buildElementProfile(distribution, timeKnown);
+  const luckTiming = buildLuckTiming(input, solar, timeKnown);
   const dayMasterProfile = DAY_MASTER_PROFILES[dayMaster] || {
     core: info.summary,
     strength: '자기 구조를 읽고 조정하는 힘',
@@ -732,6 +818,7 @@ export function analyzeSaju(input: SajuInput): SajuAnalysis {
     confidence_note: timeKnown
       ? '태어난 시간이 입력되어 시주까지 포함한 8글자 기준 분석입니다.'
       : '태어난 시간이 없어 시주는 추정하지 않았고, 연주·월주·일주 6글자 기준으로 분석했습니다.',
+    luck_timing: luckTiming,
     element_profile: elementProfile,
     day_master_profile: dayMasterProfile,
     jewelry_recommendation: buildJewelryRecommendation(elementProfile, distribution),
@@ -744,6 +831,7 @@ export function analyzeSaju(input: SajuInput): SajuAnalysis {
       distribution,
       timeKnown,
       matchedRules,
+      luckTiming,
     ),
     viral_character: buildViralCharacterMode(
       dayMaster,

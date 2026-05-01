@@ -85,19 +85,20 @@ h1, h2, h3, h4, h5, h6 {
   background: var(--result-surface-strong);
   color: var(--result-text);
   box-shadow: 0 12px 40px rgba(15, 23, 42, 0.08);
+  min-width: 5.25rem;
+  white-space: nowrap;
 }
 
 .brightness-toggle-wrap {
   position: fixed;
-  top: 0.75rem;
-  left: calc(100vw - 0.75rem);
-  transform: translateX(-100%);
+  top: 3.75rem;
+  right: 1rem;
 }
 
 @media (min-width: 768px) {
   .brightness-toggle-wrap {
-    top: 2rem;
-    left: calc(100vw - 2rem);
+    top: 5rem;
+    right: 2rem;
   }
 }
 
