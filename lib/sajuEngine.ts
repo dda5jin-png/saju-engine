@@ -493,6 +493,10 @@ function sentenceList(items: string[]) {
   return items.filter(Boolean).join(' ');
 }
 
+function lineList(items: string[]) {
+  return items.filter(Boolean).join('\n');
+}
+
 function describeGanZhiFocus(ganZhi: string) {
   const labels = [...new Set(getGanZhiElements(ganZhi).map((type) => ELEMENT_LABELS[type]))];
   return labels.length > 0 ? `${labels.join('·')} 기운` : '해당 운의 기운';
@@ -558,7 +562,6 @@ function buildCoachingSections(
   const coaching = DAY_MASTER_COACHING[dayMaster] ?? DAY_MASTER_COACHING['癸'];
   const moneyAdvice = MONEY_ELEMENT_ADVICE[dominant];
   const timingAdvice = TIMING_ELEMENT_ADVICE[dominant];
-  const supportTimingAdvice = TIMING_ELEMENT_ADVICE[support];
   const relationNote = getBranchRelationNote(pillars);
   const dominantMeaning = ELEMENT_MEANINGS[dominant];
   const supportMeaning = ELEMENT_MEANINGS[support];
@@ -580,77 +583,79 @@ function buildCoachingSections(
     },
     {
       title: '당신의 기본 성향',
-      content: sentenceList([
+      content: lineList([
         coaching.thinking,
         coaching.emotion,
         coaching.presence,
         coaching.strength,
         timeKnown
-          ? '실행 습관까지 비교적 구체적으로 볼 수 있어, 생각이 행동으로 바뀌는 속도도 함께 읽습니다.'
-          : '태어난 시간이 없어 실행 습관은 단정하지 않고, 큰 성향 중심으로 읽습니다.',
+          ? '생각이 행동으로 옮겨지는 방식도 함께 볼 수 있습니다.'
+          : '태어난 시간이 없어 실행 습관은 큰 방향만 참고합니다.',
       ]),
     },
     {
       title: '강하게 쓰는 에너지',
-      content: sentenceList([
-        `${dominantName}가 강하게 드러납니다.`,
-        `이 에너지는 생활에서 ${dominantRelation}와 연결됩니다.`,
+      content: lineList([
+        `당신은 ${dominantName}를 강하게 씁니다.`,
+        `생활에서는 ${dominantRelation}로 나타납니다.`,
         dominant === 'fire'
-          ? '그래서 분위기를 바꾸고 일을 빠르게 밀어붙이는 힘이 있습니다.'
-          : `${dominantMeaning.trait}을 빠르게 활용하는 장점이 있습니다.`,
-        `${dominantMeaning.excess}`,
-        '중요한 말이나 큰 결정은 하루의 여백을 두면 장점이 더 안정적으로 살아납니다.',
+          ? '분위기를 바꾸고 일을 앞으로 밀어내는 힘이 있습니다.'
+          : `${dominantMeaning.trait}을 현실에서 잘 꺼내 쓰는 편입니다.`,
+        dominantMeaning.excess,
+        '중요한 말은 바로 내보내기보다 한 번 정리한 뒤 전하는 편이 좋습니다.',
       ]),
     },
     {
       title: '보완하면 좋아지는 부분',
-      content: sentenceList([
-        `${supportName}를 생활에서 보완하면 좋습니다.`,
-        `이 부분은 ${supportRelation}와 연결됩니다.`,
-        `${supportMeaning.lowImage}`,
-        `${supportMeaning.practice}`,
-        '시작하기 전에는 목표, 마감, 판단 기준을 먼저 적어두면 훨씬 오래 갑니다.',
+      content: lineList([
+        `${supportName}를 보완하면 균형이 좋아집니다.`,
+        `생활에서는 ${supportRelation}와 연결됩니다.`,
+        supportMeaning.lowImage,
+        '막연히 시작하면 금방 피로해질 수 있습니다.',
+        supportMeaning.practice,
       ]),
     },
     {
       title: '일과 선택 방식',
-      content: sentenceList([
-        '당신은 작은 변화를 빨리 읽고, 필요한 정보를 빠르게 배우는 방식으로 일할 때 강합니다.',
-        `${dominantName}가 올라오면 선택 속도가 빨라집니다.`,
-        `${relationNote}`,
-        '실수는 정보가 부족해서보다, 마음이 이미 결론을 향해 달릴 때 생기기 쉽습니다.',
-        '중요한 일은 결정 기준 3가지를 먼저 쓰고, 실행은 작은 단위로 나누면 좋습니다.',
+      content: lineList([
+        '작은 변화를 읽고 필요한 정보를 배우는 속도가 빠릅니다.',
+        '그래서 새 업무나 낯선 상황에서도 감을 잡는 편입니다.',
+        relationNote,
+        '흔들리는 순간은 마음이 이미 결론을 정했을 때입니다.',
+        '중요한 일은 기준 3가지를 먼저 쓰고 시작하세요.',
+        '그다음 실행 단위를 작게 나누면 훨씬 안정됩니다.',
       ]),
     },
     {
       title: '관계 패턴',
-      content: sentenceList([
-        '관계에서는 상대의 분위기와 작은 변화에 민감하게 반응하는 편입니다.',
-        '그래서 필요한 말을 빨리 알아차리고, 상황을 부드럽게 맞추는 장점이 있습니다.',
-        '다만 계속 맞춰주다 보면 내가 줄 수 있는 범위를 늦게 말할 수 있습니다.',
-        '관계가 지치기 전에 “내가 가능한 것”과 “지금은 어려운 것”을 짧게 말하는 연습이 필요합니다.',
+      content: lineList([
+        '상대의 분위기 변화를 잘 알아차립니다.',
+        '필요한 말을 먼저 건네거나 상황을 부드럽게 맞추는 장점이 있습니다.',
+        '다만 계속 맞추다 보면 내 기준을 늦게 말할 수 있습니다.',
+        '지치기 전에 가능한 것과 어려운 것을 짧게 말하세요.',
+        '설명은 길게 하지 않아도 됩니다.',
       ]),
     },
     {
       title: '돈과 소비 성향',
-      content: sentenceList([
-        `돈을 다룰 때는 ${moneyAdvice.strength}이 강점으로 작동합니다.`,
-        '기회가 보이면 빠르게 반응할 수 있습니다.',
-        `${moneyAdvice.risk}이 생길 수 있습니다.`,
-        `${moneyAdvice.rule}`,
-        '계약이나 투자는 제3자 검토, 월별 즉흥 지출 한도, 하루 뒤 재확인을 기준으로 삼으면 돈을 지키기 쉽습니다.',
+      content: lineList([
+        `돈을 다룰 때는 ${moneyAdvice.strength}이 장점입니다.`,
+        '좋은 기회처럼 보이는 것을 빨리 알아차립니다.',
+        moneyAdvice.risk.replace('있음', '있습니다.'),
+        '결제와 투자는 금액보다 기준이 먼저입니다.',
+        moneyAdvice.rule,
+        '계약은 혼자 확정하기보다 한 번 검토받는 편이 안전합니다.',
       ]),
     },
     {
       title: '현재 운의 흐름',
-      content: sentenceList([
+      content: lineList([
         daeyunLead,
         sewoonLead,
-        '현재 흐름은 표현, 실행, 선택의 속도가 빨라지는 쪽으로 작동합니다.',
-        `${timingAdvice.whenFast}에는 힘이 붙습니다.`,
-        `${timingAdvice.whenSlow}은 천천히 결정하는 편이 안정적입니다.`,
-        `${supportTimingAdvice.whenFast}을 일정 안에 넣어두면 속도와 방향의 균형이 좋아집니다.`,
-        '올해의 핵심 기준은 “빠르게 반응하되, 큰 결정은 하루 뒤 확정하기”입니다.',
+        '지금은 생각을 안에만 두기보다 밖으로 꺼낼 때 흐름이 살아납니다.',
+        `${timingAdvice.whenFast}은 미루지 않아도 됩니다.`,
+        `${timingAdvice.whenSlow}은 시간을 두고 정하세요.`,
+        '올해의 기준은 “표현은 빠르게, 확정은 천천히”입니다.',
       ]),
     },
     {
@@ -663,11 +668,11 @@ function buildCoachingSections(
     },
     {
       title: '마지막 조언',
-      content: sentenceList([
-        '당신에게는 빠르게 감지하고 빠르게 움직이는 힘이 있습니다.',
-        '그래서 기회가 왔을 때 남들보다 먼저 반응할 수 있습니다.',
-        '다만 속도가 강점인 만큼, 중요한 결정에서는 짧은 여백이 필요합니다.',
-        '속도를 조절하는 순간, 판단력은 훨씬 더 안정적으로 빛납니다.',
+      content: lineList([
+        '당신은 작은 신호를 놓치지 않는 사람입니다.',
+        '그 감각은 분명한 장점입니다.',
+        '다만 모든 감지에 바로 반응할 필요는 없습니다.',
+        '잠깐 멈춰 기준을 확인하면 선택이 더 단단해집니다.',
       ]),
     },
   ];

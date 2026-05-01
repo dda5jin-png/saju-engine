@@ -2,6 +2,7 @@ import Link from 'next/link';
 import CharacterGuide from '@/components/ui/CharacterGuide';
 import HeaderAuthButton from '@/components/auth/HeaderAuthButton';
 import BrightnessThemeShell from '@/components/ui/BrightnessThemeShell';
+import VisitorCounter from '@/components/ui/VisitorCounter';
 import { SITE_NAME } from '@/lib/site';
 
 export default function LandingPage() {
@@ -69,9 +70,7 @@ export default function LandingPage() {
             ))}
           </section>
 
-          <p className="text-center text-sm text-[#F8F4EA]/42">
-            현재까지 12,402명의 에너지 구조가 분석되었습니다.
-          </p>
+          <VisitorCounter />
         </div>
       </main>
     </BrightnessThemeShell>
