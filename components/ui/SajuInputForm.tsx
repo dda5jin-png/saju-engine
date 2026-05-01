@@ -110,7 +110,7 @@ export default function SajuInputForm() {
                   onClick={() => setForm({ ...form, gender: g })}
                   className={`py-4 rounded-2xl border font-bold transition-all ${
                     form.gender === g 
-                      ? 'bg-indigo-600 border-indigo-400 text-white shadow-lg shadow-indigo-500/30 scale-[1.02]' 
+                      ? 'bg-indigo-600 border-indigo-400 text-[var(--result-accent-contrast)] shadow-lg shadow-indigo-500/30 scale-[1.02]' 
                       : 'bg-white/5 border-white/10 text-gray-400 hover:bg-white/10'
                   }`}
                 >
@@ -127,7 +127,7 @@ export default function SajuInputForm() {
           className="w-full relative group"
         >
           <div className="absolute -inset-1 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl blur opacity-30 group-hover:opacity-100 transition duration-1000 group-hover:duration-200" />
-          <div className="relative w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-black py-5 rounded-2xl shadow-xl flex items-center justify-center gap-3 transition-all active:scale-[0.97]">
+          <div className="relative w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-[var(--result-accent-contrast)] font-black py-5 rounded-2xl shadow-xl flex items-center justify-center gap-3 transition-all active:scale-[0.97]">
             {status === 'loading' ? (
               <span className="animate-pulse">ORABIT 분석 가동 중...</span>
             ) : (

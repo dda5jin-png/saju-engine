@@ -36,7 +36,7 @@ export default function AnalysisLoading() {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-[100] bg-black flex flex-col items-center justify-center p-6"
+      className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-[var(--result-bg,#F8F4EA)] p-6 text-[var(--result-text,#1F2937)]"
     >
       <div className="w-full max-w-xs space-y-12">
         <CharacterGuide size={120} />
@@ -49,15 +49,15 @@ export default function AnalysisLoading() {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
-                className="text-white font-medium tracking-tight h-6"
+                className="h-6 font-medium tracking-tight text-[var(--result-text,#1F2937)]"
               >
                 {MOCK_STEPS[stepIndex]}
               </motion.p>
             </AnimatePresence>
-            <p className="text-gray-500 text-xs font-mono">{progress}%</p>
+            <p className="text-xs font-mono text-[color:var(--result-muted,rgba(31,41,55,0.62))]">{progress}%</p>
           </div>
           
-          <div className="w-full h-1 bg-white/5 rounded-full overflow-hidden">
+          <div className="h-1 w-full overflow-hidden rounded-full bg-[var(--result-soft,rgba(15,23,42,0.08))]">
             <motion.div 
               className="h-full bg-indigo-500"
               initial={{ width: 0 }}

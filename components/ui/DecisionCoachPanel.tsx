@@ -101,15 +101,15 @@ export default function DecisionCoachPanel({ resultId }: Props) {
   };
 
   return (
-    <section className="space-y-5 rounded-[2rem] border border-white/10 bg-[#080b12] p-6 md:p-8">
+    <section className="space-y-5 rounded-[2rem] border border-[color:var(--result-border)] bg-[var(--result-surface-strong)] p-6 shadow-2xl md:p-8">
       <div className="space-y-3">
-        <span className="inline-flex items-center gap-2 rounded-full border border-emerald-300/25 bg-emerald-300/10 px-3 py-1 text-[11px] font-bold text-emerald-100">
+        <span className="inline-flex items-center gap-2 rounded-full border border-emerald-300/25 bg-emerald-300/10 px-3 py-1 text-[11px] font-bold text-emerald-700">
           <BrainCircuit size={14} />
           DECISION COACH MODE
         </span>
         <div className="space-y-2">
-          <h2 className="text-2xl font-black text-white">지금 선택이 맞는지 확인해볼래?</h2>
-          <p className="text-sm leading-6 text-white/58">
+          <h2 className="text-2xl font-black text-[var(--result-text)]">지금 선택이 맞는지 확인해볼래?</h2>
+          <p className="text-sm leading-6 text-[color:var(--result-muted)]">
             같은 사주라도 상황이 바뀌면 답은 달라진다. 지금 고민을 적으면 선택지별 흐름과 리스크를 나눠드립니다.
           </p>
         </div>
@@ -123,7 +123,7 @@ export default function DecisionCoachPanel({ resultId }: Props) {
             className={`rounded-2xl px-3 py-3 text-xs font-extrabold transition ${
               category === item.id
                 ? 'bg-emerald-400 text-black'
-                : 'border border-white/10 bg-white/[0.035] text-white/58'
+                : 'border border-[color:var(--result-border)] bg-[var(--result-soft)] text-[color:var(--result-muted)]'
             }`}
           >
             {item.label}
@@ -136,7 +136,7 @@ export default function DecisionCoachPanel({ resultId }: Props) {
         onChange={(event) => setQuestion(event.target.value)}
         rows={5}
         placeholder="예: 지금 이직을 해야 할까, 아니면 3개월 더 버티는 게 맞을까? / 연락을 다시 해볼까, 거리를 둘까?"
-        className="w-full resize-none rounded-3xl border border-white/10 bg-black/35 p-5 text-[15px] leading-7 text-white outline-none placeholder:text-white/28 focus:border-emerald-300/60"
+        className="w-full resize-none rounded-3xl border border-[color:var(--result-border)] bg-[var(--result-soft)] p-5 text-[15px] leading-7 text-[var(--result-text)] outline-none placeholder:text-[color:var(--result-faint)] focus:border-emerald-300/60"
       />
 
       <button
@@ -149,20 +149,20 @@ export default function DecisionCoachPanel({ resultId }: Props) {
       </button>
 
       {!user && (
-        <div className="flex items-center gap-2 rounded-2xl border border-white/10 bg-white/[0.035] px-4 py-3 text-sm font-bold text-white/58">
+        <div className="flex items-center gap-2 rounded-2xl border border-[color:var(--result-border)] bg-[var(--result-soft)] px-4 py-3 text-sm font-bold text-[color:var(--result-muted)]">
           <LockKeyhole size={16} />
           질문 분석은 로그인 후 무료 1회 사용할 수 있습니다.
         </div>
       )}
 
       {typeof remainingFreeUses === 'number' && (
-        <p className="text-center text-xs font-bold text-white/42">
+        <p className="text-center text-xs font-bold text-[color:var(--result-faint)]">
           무료 질문 {remainingFreeUses}회 남음
         </p>
       )}
 
       {message && (
-        <div className="rounded-2xl border border-amber-300/25 bg-amber-300/10 px-4 py-3 text-sm font-extrabold text-amber-100">
+        <div className="rounded-2xl border border-amber-300/25 bg-amber-300/10 px-4 py-3 text-sm font-extrabold text-amber-700">
           {message}
         </div>
       )}
@@ -182,9 +182,9 @@ export default function DecisionCoachPanel({ resultId }: Props) {
 
 function DecisionResultView({ result }: { result: DecisionCoachResult }) {
   return (
-    <div className="space-y-5 border-t border-white/10 pt-6">
+    <div className="space-y-5 border-t border-[color:var(--result-border)] pt-6">
       {result.decision_basis && (
-        <div className="rounded-2xl border border-emerald-300/20 bg-emerald-300/10 px-4 py-3 text-xs font-extrabold leading-5 text-emerald-50">
+        <div className="rounded-2xl border border-emerald-300/20 bg-emerald-300/10 px-4 py-3 text-xs font-extrabold leading-5 text-emerald-700">
           {result.decision_basis}
         </div>
       )}
@@ -192,41 +192,41 @@ function DecisionResultView({ result }: { result: DecisionCoachResult }) {
       <DecisionSection title="현재 상황 해석" content={result.situation} />
 
       <div className="space-y-3">
-        <h3 className="text-sm font-black text-white/88">선택지 분석</h3>
+        <h3 className="text-sm font-black text-[var(--result-text)]">선택지 분석</h3>
         <div className="grid gap-3">
           {result.choices.map((choice, index) => (
-            <article key={choice.label} className="rounded-3xl border border-white/10 bg-white/[0.035] p-5">
-              <h4 className="font-black text-white">
+            <article key={choice.label} className="rounded-3xl border border-[color:var(--result-border)] bg-[var(--result-soft)] p-5">
+              <h4 className="font-black text-[var(--result-text)]">
                 {index + 1}. {choice.label}
               </h4>
-              <dl className="mt-4 space-y-3 text-sm leading-6 text-white/64">
+              <dl className="mt-4 space-y-3 text-sm leading-6 text-[color:var(--result-muted)]">
                 <div>
-                  <dt className="font-extrabold text-white/82">예상 흐름</dt>
+                  <dt className="font-extrabold text-[var(--result-text)]">예상 흐름</dt>
                   <dd>{choice.expected_flow}</dd>
                 </div>
                 <div>
-                  <dt className="font-extrabold text-white/82">장점</dt>
+                  <dt className="font-extrabold text-[var(--result-text)]">장점</dt>
                   <dd>{choice.pros}</dd>
                 </div>
                 <div>
-                  <dt className="font-extrabold text-white/82">단점</dt>
+                  <dt className="font-extrabold text-[var(--result-text)]">단점</dt>
                   <dd>{choice.cons}</dd>
                 </div>
                 {choice.when_to_choose && (
                   <div>
-                    <dt className="font-extrabold text-white/82">이 선택이 맞는 조건</dt>
+                    <dt className="font-extrabold text-[var(--result-text)]">이 선택이 맞는 조건</dt>
                     <dd>{choice.when_to_choose}</dd>
                   </div>
                 )}
                 {choice.first_action && (
                   <div>
-                    <dt className="font-extrabold text-white/82">첫 행동</dt>
+                    <dt className="font-extrabold text-[var(--result-text)]">첫 행동</dt>
                     <dd>{choice.first_action}</dd>
                   </div>
                 )}
                 {choice.watch_signal && (
                   <div>
-                    <dt className="font-extrabold text-white/82">주의 신호</dt>
+                    <dt className="font-extrabold text-[var(--result-text)]">주의 신호</dt>
                     <dd>{choice.watch_signal}</dd>
                   </div>
                 )}
@@ -243,7 +243,7 @@ function DecisionResultView({ result }: { result: DecisionCoachResult }) {
         <p className="text-xs font-black text-black/45">한줄 가이드</p>
         <p className="mt-2 text-xl font-black text-black">{result.one_line_guide}</p>
       </div>
-      <p className="whitespace-pre-line text-center text-sm font-bold leading-6 text-white/50">
+      <p className="whitespace-pre-line text-center text-sm font-bold leading-6 text-[color:var(--result-muted)]">
         {result.closing_message}
       </p>
     </div>
@@ -255,10 +255,10 @@ function DecisionSection({ title, content, warning = false }: { title: string; c
     <article className={`rounded-3xl border p-5 ${
       warning
         ? 'border-red-300/20 bg-red-300/10'
-        : 'border-white/10 bg-white/[0.035]'
+        : 'border-[color:var(--result-border)] bg-[var(--result-soft)]'
     }`}>
-      <h3 className="text-sm font-black text-white/88">{title}</h3>
-      <p className="mt-3 text-[15px] leading-7 text-white/66 break-keep">{content}</p>
+      <h3 className="text-sm font-black text-[var(--result-text)]">{title}</h3>
+      <p className="mt-3 text-[15px] leading-7 text-[color:var(--result-muted)] break-keep">{content}</p>
     </article>
   );
 }

@@ -5,7 +5,11 @@ import { User } from "firebase/auth";
 import AuthModal from "@/components/auth/AuthModal";
 import { logout, subscribeToAuthChanges } from "@/lib/auth";
 
-export default function HeaderAuthButton() {
+interface Props {
+  className?: string;
+}
+
+export default function HeaderAuthButton({ className = "right-4 top-4 md:right-8 md:top-8" }: Props) {
   const [user, setUser] = useState<User | null>(null);
   const [showAuthModal, setShowAuthModal] = useState(false);
 
@@ -15,7 +19,7 @@ export default function HeaderAuthButton() {
 
   return (
     <>
-      <div className="fixed right-4 top-4 z-50 flex items-center gap-2 md:right-8 md:top-8">
+      <div className={`fixed z-50 flex items-center gap-2 ${className}`}>
         {user ? (
           <>
             <span className="hidden max-w-[160px] truncate text-xs font-bold text-white/45 sm:block">

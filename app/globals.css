@@ -1,14 +1,14 @@
 @import "tailwindcss";
 
 :root {
-  --foreground-rgb: 255, 255, 255;
-  --background-start-rgb: 3, 7, 18;
-  --background-end-rgb: 0, 0, 0;
+  --foreground-rgb: 31, 41, 55;
+  --background-start-rgb: 248, 244, 234;
+  --background-end-rgb: 238, 242, 247;
 }
 
 body {
   color: rgb(var(--foreground-rgb));
-  background: radial-gradient(circle at top center, #111827 0%, #000000 100%);
+  background: linear-gradient(180deg, #fffaf0 0%, #f8f4ea 44%, #eef2f7 100%);
   min-height: 100vh;
   letter-spacing: 0;
 }
@@ -20,10 +20,8 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-/* Date/Time Input Dark Mode Fix */
 input[type="date"]::-webkit-calendar-picker-indicator,
 input[type="time"]::-webkit-calendar-picker-indicator {
-  filter: invert(1);
   cursor: pointer;
 }
 
@@ -37,6 +35,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .result-theme {
+  --result-bg: #f8f4ea;
   --result-text: #172033;
   --result-muted: rgba(31, 41, 55, 0.68);
   --result-faint: rgba(31, 41, 55, 0.46);
@@ -46,6 +45,9 @@ h1, h2, h3, h4, h5, h6 {
   --result-border: rgba(15, 23, 42, 0.12);
   --result-border-strong: rgba(15, 23, 42, 0.18);
   --result-gold: #a77c2f;
+  --result-accent: #7c3aed;
+  --result-accent-contrast: #ffffff;
+  --result-soft: rgba(15, 23, 42, 0.05);
   --result-shadow: 0 24px 80px rgba(15, 23, 42, 0.1);
   background:
     radial-gradient(circle at 18% 4%, rgba(214, 180, 106, 0.24), transparent 28%),
@@ -56,6 +58,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .result-theme-dark {
+  --result-bg: #030712;
   --result-text: #f8f4ea;
   --result-muted: rgba(248, 244, 234, 0.62);
   --result-faint: rgba(248, 244, 234, 0.42);
@@ -65,8 +68,16 @@ h1, h2, h3, h4, h5, h6 {
   --result-border: rgba(255, 255, 255, 0.1);
   --result-border-strong: rgba(255, 255, 255, 0.16);
   --result-gold: #d6b46a;
+  --result-accent: #8b5cf6;
+  --result-accent-contrast: #ffffff;
+  --result-soft: rgba(255, 255, 255, 0.055);
   --result-shadow: 0 24px 80px rgba(0, 0, 0, 0.34);
   background: radial-gradient(circle at top center, #111827 0%, #000000 100%);
+}
+
+.result-theme-dark input[type="date"]::-webkit-calendar-picker-indicator,
+.result-theme-dark input[type="time"]::-webkit-calendar-picker-indicator {
+  filter: invert(1);
 }
 
 .brightness-toggle {
@@ -76,12 +87,27 @@ h1, h2, h3, h4, h5, h6 {
   box-shadow: 0 12px 40px rgba(15, 23, 42, 0.08);
 }
 
+.brightness-toggle-wrap {
+  position: fixed;
+  top: 0.75rem;
+  left: calc(100vw - 0.75rem);
+  transform: translateX(-100%);
+}
+
+@media (min-width: 768px) {
+  .brightness-toggle-wrap {
+    top: 2rem;
+    left: calc(100vw - 2rem);
+  }
+}
+
 .brightness-toggle-state {
   color: var(--result-muted);
 }
 
 .result-theme-light .text-white,
-.result-theme-light [class*="text-white/"] {
+.result-theme-light [class*="text-white/"],
+.result-theme-light .text-\[\#F8F4EA\] {
   color: var(--result-text) !important;
 }
 
@@ -100,13 +126,66 @@ h1, h2, h3, h4, h5, h6 {
 .result-theme-light .bg-white\/\[0\.035\],
 .result-theme-light .bg-white\/\[0\.045\],
 .result-theme-light .bg-white\/5,
+.result-theme-light .bg-white\/\[0\.03\],
+.result-theme-light .bg-white\/\[0\.06\],
+.result-theme-light .bg-white\/\[0\.1\],
 .result-theme-light .bg-black\/22,
 .result-theme-light .bg-black\/24,
 .result-theme-light .bg-black\/25,
-.result-theme-light .bg-black\/30 {
+.result-theme-light .bg-black\/30,
+.result-theme-light .bg-black\/35,
+.result-theme-light .bg-\[\#080b12\],
+.result-theme-light .bg-\[\#0F172A\],
+.result-theme-light .bg-\[\#1F2937\]\/62 {
   background: var(--result-surface) !important;
 }
 
 .result-theme-light .shadow-2xl {
   box-shadow: var(--result-shadow);
+}
+
+.result-theme-light .glass {
+  background: var(--result-surface-strong);
+  border-color: var(--result-border);
+  box-shadow: var(--result-shadow);
+}
+
+.result-theme-light .bg-indigo-600 {
+  background: var(--result-accent) !important;
+}
+
+.result-theme-light .border-indigo-400 {
+  border-color: rgba(124, 58, 237, 0.55) !important;
+}
+
+.result-theme-light .text-indigo-300 {
+  color: #6d28d9 !important;
+}
+
+.result-theme-dark .text-fuchsia-700 {
+  color: #fae8ff !important;
+}
+
+.result-theme-dark .text-emerald-700 {
+  color: #d1fae5 !important;
+}
+
+.result-theme-dark .text-amber-700 {
+  color: #fef3c7 !important;
+}
+
+.result-theme-light .auth-modal .text-white {
+  color: #ffffff !important;
+}
+
+.result-theme-light .auth-modal [class*="text-white/"] {
+  color: rgba(255, 255, 255, 0.62) !important;
+}
+
+.result-theme-light .auth-modal .text-black {
+  color: #000000 !important;
+}
+
+.result-theme-light .auth-modal [class*="bg-black/"] {
+  background: rgba(0, 0, 0, 0.35) !important;
 }
