@@ -15,7 +15,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const baseUrl = getBaseUrl();
   const resultUrl = `${baseUrl}/result/${resultId}`;
   const imageUrl = `${baseUrl}/api/og/${resultId}`;
-  const title = 'ORABIT 에너지 분석 리포트';
+  const title = 'ORABIT 사주 오행 보석 리포트';
   const description = SITE_DESCRIPTION;
 
   return {
@@ -39,7 +39,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
           url: imageUrl,
           width: 1200,
           height: 630,
-          alt: 'ORABIT 에너지 분석 공유 미리보기',
+          alt: 'ORABIT 사주 오행 보석 리포트 공유 미리보기',
         },
       ],
     },

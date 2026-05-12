@@ -29,7 +29,7 @@ export async function GET(
     const { resultId } = await params;
     const data = await getAnalysisWithTimeout(resultId);
     const viral = data?.viral_character;
-    const quote = viral?.one_liner || data?.viral_sentences?.self_realization || 'ORABIT 에너지 분석 리포트';
+    const quote = viral?.one_liner || data?.viral_sentences?.self_realization || 'ORABIT 사주 오행 보석 리포트';
     const characterType = viral?.character_type || data?.type_name || '진지한 해석과 공유 가능한 캐릭터 카드';
 
     return new ImageResponse(
@@ -98,7 +98,7 @@ export async function GET(
                   padding: '12px 24px',
                 }}
               >
-                오행 에너지 분석 리포트
+                오행 보석 리포트
               </div>
               <div
                 style={{
@@ -203,7 +203,7 @@ export async function GET(
                 lineHeight: 1.15,
               }}
             >
-              ORABIT 에너지 분석 리포트
+              ORABIT 사주 오행 보석 리포트
             </div>
             <div
               style={{

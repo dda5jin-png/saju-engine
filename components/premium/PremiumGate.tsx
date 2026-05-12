@@ -15,13 +15,13 @@ export default function PremiumGate() {
       <div className="space-y-5">
         <div className="inline-flex items-center gap-2 rounded-full border border-amber-300/25 bg-amber-300/10 px-3 py-1 text-[11px] font-bold text-amber-700">
           <Sparkles size={14} />
-          PREMIUM DECISION
+          CHOICE GUIDE PLUS
         </div>
 
         <div className="space-y-2">
-          <h2 className="text-2xl font-black text-[var(--result-text)]">이 분석은 더 깊게 들어갈수록 정확해진다</h2>
+          <h2 className="text-2xl font-black text-[var(--result-text)]">오늘의 선택 가이드를 더 이어서 보기</h2>
           <p className="text-sm leading-6 text-[color:var(--result-muted)]">
-            자동갱신 없이 필요한 만큼만 결제하세요. 결제한 횟수만큼 Decision Coach 정밀 분석을 사용할 수 있습니다.
+            자동갱신 없이 필요한 만큼만 결제하세요. 결제한 횟수만큼 선택 기준 정리와 선택지 비교를 추가로 사용할 수 있습니다.
           </p>
         </div>
 

@@ -207,7 +207,7 @@ export default function SajuInputForm() {
               <span className="animate-pulse">ORABIT 분석 가동 중...</span>
             ) : (
               <>
-                <span className="text-lg">내 에너지 구조 분석하기</span>
+                <span className="text-lg">내 사주 보석 리포트 보기</span>
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                 </svg>
@@ -217,7 +217,7 @@ export default function SajuInputForm() {
         </button>
 
         <p className="text-center text-[10px] text-gray-500 font-medium tracking-tight relative z-10 leading-relaxed">
-          제공된 데이터는 구조 분석을 위해서만<br /> 사용되며 별도로 외부에 노출되지 않습니다.
+          제공된 데이터는 리포트 생성을 위해서만<br /> 사용되며 별도로 외부에 노출되지 않습니다.
         </p>
       </motion.form>
     </div>

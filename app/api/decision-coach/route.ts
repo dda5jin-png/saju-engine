@@ -22,7 +22,7 @@ export async function POST(req: Request) {
 
     if (!decoded) {
       return NextResponse.json(
-        { success: false, message: "Decision Coach는 로그인 후 사용할 수 있습니다." },
+        { success: false, message: "오늘의 선택 가이드는 로그인 후 사용할 수 있습니다." },
         { status: 401 },
       );
     }
@@ -136,7 +136,7 @@ export async function POST(req: Request) {
     console.error("Decision coach error:", error);
 
     return NextResponse.json(
-      { success: false, message: "Decision Coach 실행 중 오류가 발생했습니다." },
+      { success: false, message: "오늘의 선택 가이드 실행 중 오류가 발생했습니다." },
       { status: 500 },
     );
   }

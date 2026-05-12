@@ -76,7 +76,7 @@ export interface JewelryRecommendation {
   tone: string;
   reason: string;
   styling_tip: string;
-  element_states?: Record<ElementType, '부족' | '적정' | '과다'>;
+  element_states?: Record<ElementType, '부족' | '적정' | '과다' | '보완 포인트' | '균형권' | '강하게 드러남'>;
   needed_element?: ElementType;
   avoid_element?: ElementType;
   needed_element_label?: string;
@@ -92,6 +92,10 @@ export interface JewelryOption {
   reason: string;
   metal: string;
   shape: string;
+  element?: string;
+  keywords?: string[];
+  situations?: string[];
+  styling_tip?: string;
 }
 
 export interface JewelryPracticalStrategy {

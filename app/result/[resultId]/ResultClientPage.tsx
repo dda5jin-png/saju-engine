@@ -11,6 +11,7 @@ import DetailedReadingPanel from '@/components/ui/DetailedReadingPanel';
 import JewelryRecommendationPanel from '@/components/ui/JewelryRecommendationPanel';
 import ViralCharacterPanel from '@/components/ui/ViralCharacterPanel';
 import DecisionCoachPanel from '@/components/ui/DecisionCoachPanel';
+import PersonalSummaryPanel from '@/components/ui/PersonalSummaryPanel';
 
 interface Props {
   resultId: string;
@@ -84,13 +85,7 @@ export default function ResultClientPage({ resultId }: Props) {
     <BrightnessThemeShell className="min-h-screen">
       <main className="min-h-screen p-5 pb-24 pt-24 md:pt-24">
         <div className="result-report-font max-w-2xl mx-auto space-y-8 pb-8">
-          <header className="text-center space-y-4 px-1">
-            <div className="inline-block px-4 py-1 rounded-full bg-[#D6B46A]/15 text-[#9A6D22] text-xs font-black tracking-[0.18em] border border-[#D6B46A]/35">
-              ORABIT ENERGY REPORT
-            </div>
-            <h1 className="text-3xl md:text-4xl font-extrabold text-[var(--result-text)]">{analysis.type_name}의 에너지 구조</h1>
-            <p className="text-base md:text-lg font-medium leading-8 max-w-lg mx-auto break-keep text-[color:var(--result-muted)]">{analysis.summary}</p>
-          </header>
+          <PersonalSummaryPanel analysis={analysis} resultUrl={resultUrl} />
 
           <ElementBalancePanel
             distribution={analysis.element_distribution}
@@ -110,6 +105,15 @@ export default function ResultClientPage({ resultId }: Props) {
           />
 
           <DecisionCoachPanel resultId={resultId} />
+
+          <section className="rounded-[1.5rem] border border-[color:var(--result-border)] bg-[var(--result-surface)] p-5 text-xs font-medium leading-6 text-[color:var(--result-faint)]">
+            <p className="break-keep">
+              ORABIT의 리포트는 사주명리학의 오행 구조를 바탕으로 한 참고용 콘텐츠입니다. 개인의 운명이나 미래를 단정하지 않으며, 자신의 성향과 선택 방향을 돌아보는 데 도움을 주기 위한 해석입니다.
+            </p>
+            <p className="mt-3 break-keep">
+              보석/주얼리 추천은 명리학적 상징과 스타일링 관점의 제안이며, 의학적, 법률적, 재정적 효능을 보장하지 않습니다.
+            </p>
+          </section>
         </div>
 
         <footer data-share-exclude className="max-w-2xl mx-auto pt-20 text-center space-y-12">

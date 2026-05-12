@@ -86,15 +86,15 @@ export default function DecisionCoachPanel({ resultId }: Props) {
       }
 
       if (!data.success || !data.decision) {
-        setMessage(data.message || 'Decision Coach 실행에 실패했습니다.');
+        setMessage(data.message || '오늘의 선택 가이드를 실행하지 못했습니다.');
         return;
       }
 
       setResult(data.decision);
       setRemainingFreeUses(typeof data.remainingFreeUses === 'number' ? data.remainingFreeUses : null);
     } catch (error) {
-      console.error('Decision coach request failed:', error);
-      setMessage('Decision Coach 실행 중 오류가 발생했습니다.');
+      console.error('Decision guide request failed:', error);
+      setMessage('오늘의 선택 가이드 실행 중 오류가 발생했습니다.');
     } finally {
       setLoading(false);
     }
@@ -105,12 +105,12 @@ export default function DecisionCoachPanel({ resultId }: Props) {
       <div className="space-y-3">
         <span className="inline-flex items-center gap-2 rounded-full border border-emerald-300/25 bg-emerald-300/10 px-3 py-1 text-[11px] font-bold text-emerald-700">
           <BrainCircuit size={14} />
-          DECISION COACH MODE
+          TODAY CHOICE GUIDE
         </span>
         <div className="space-y-2">
-          <h2 className="text-2xl font-black text-[var(--result-text)]">지금 선택이 맞는지 확인해볼래?</h2>
+          <h2 className="text-2xl font-black text-[var(--result-text)]">오늘의 선택 가이드</h2>
           <p className="text-sm leading-6 text-[color:var(--result-muted)]">
-            같은 사주라도 상황이 바뀌면 답은 달라진다. 지금 고민을 적으면 선택지별 흐름과 리스크를 나눠드립니다.
+            지금 고민 중인 선택을 적어보세요. 당신의 사주 흐름을 기준으로 감정, 기준, 리스크, 실행 타이밍을 나누어 정리해드립니다.
           </p>
         </div>
       </div>
@@ -135,7 +135,7 @@ export default function DecisionCoachPanel({ resultId }: Props) {
         value={question}
         onChange={(event) => setQuestion(event.target.value)}
         rows={5}
-        placeholder="예: 지금 이직을 해야 할까, 아니면 3개월 더 버티는 게 맞을까? / 연락을 다시 해볼까, 거리를 둘까?"
+        placeholder="예: 지금 이직을 준비할지, 3개월 더 조건을 확인할지 고민돼요. / 다시 연락해볼지, 거리를 둘지 정리하고 싶어요."
         className="w-full resize-none rounded-3xl border border-[color:var(--result-border)] bg-[var(--result-soft)] p-5 text-[15px] leading-7 text-[var(--result-text)] outline-none placeholder:text-[color:var(--result-faint)] focus:border-emerald-300/60"
       />
 
@@ -145,19 +145,19 @@ export default function DecisionCoachPanel({ resultId }: Props) {
         className="flex w-full items-center justify-center gap-2 rounded-2xl bg-emerald-400 px-5 py-4 font-black text-black transition active:scale-95 disabled:opacity-50"
       >
         {loading ? <Loader2 size={20} className="animate-spin" /> : <ArrowRight size={20} />}
-        {loading ? '상황 분석 중...' : 'Decision Coach 실행'}
+        {loading ? '상황 정리 중...' : '내 고민 정리하기'}
       </button>
 
       {!user && (
         <div className="flex items-center gap-2 rounded-2xl border border-[color:var(--result-border)] bg-[var(--result-soft)] px-4 py-3 text-sm font-bold text-[color:var(--result-muted)]">
           <LockKeyhole size={16} />
-          질문 분석은 로그인 후 무료 1회 사용할 수 있습니다.
+          로그인하면 오늘의 선택 가이드를 1회 무료로 사용할 수 있어요.
         </div>
       )}
 
       {typeof remainingFreeUses === 'number' && (
         <p className="text-center text-xs font-bold text-[color:var(--result-faint)]">
-          무료 질문 {remainingFreeUses}회 남음
+          오늘의 선택 가이드 무료 사용 {remainingFreeUses}회 남음
         </p>
       )}
 
@@ -236,9 +236,9 @@ function DecisionResultView({ result }: { result: DecisionCoachResult }) {
         </div>
       </div>
 
-      <DecisionSection title="추천 행동" content={result.recommended_action} />
-      <DecisionSection title="리스크 경고" content={result.risk_warning} warning />
-      {result.avoid_action && <DecisionSection title="피해야 할 행동" content={result.avoid_action} warning />}
+      <DecisionSection title="확인해볼 행동" content={result.recommended_action} />
+      <DecisionSection title="주의해서 볼 포인트" content={result.risk_warning} warning />
+      {result.avoid_action && <DecisionSection title="잠시 멈춰볼 행동" content={result.avoid_action} warning />}
       <div className="rounded-3xl bg-white p-5 text-center">
         <p className="text-xs font-black text-black/45">한줄 가이드</p>
         <p className="mt-2 text-xl font-black text-black">{result.one_line_guide}</p>

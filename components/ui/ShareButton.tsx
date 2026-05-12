@@ -26,7 +26,7 @@ export default function ShareButton({
   const [notice, setNotice] = useState('');
 
   const shareUrl = url || (typeof window !== 'undefined' ? window.location.href : '');
-  const shareTitle = title || 'ORABIT 에너지 분석 결과 확인하기';
+  const shareTitle = title || 'ORABIT 사주 오행 보석 리포트 확인하기';
   const shareText = description || '사주의 오행 흐름을 색, 보석, 주얼리 선택으로 연결합니다.';
 
   const copyToClipboard = async () => {

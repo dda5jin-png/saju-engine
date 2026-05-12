@@ -21,16 +21,15 @@ export default function LandingPage() {
 
             <div className="space-y-5">
               <h1 className="mx-auto max-w-3xl text-[2rem] font-black leading-[1.18] tracking-tight md:text-6xl break-keep">
-                당신의 사주를<br />
-                <span className="text-[#D6B46A]">분석해드립니다.</span>
+                사주로 보는 나의 기질,<br />
+                <span className="text-[#D6B46A]">오행으로 찾는 보석 리포트.</span>
               </h1>
               <p className="mx-auto max-w-2xl text-base font-semibold leading-8 text-[#F8F4EA]/70 md:text-xl break-keep">
-                보이지 않는 기운의 흐름을 읽고,<br />
-                타고난 기질과 지금의 운이 향하는 방향을 살펴봅니다.
+                오행 구조를 바탕으로 성향과 균형 포인트를 살피고,<br />
+                나에게 어울리는 보석/주얼리 조합을 제안합니다.
               </p>
               <p className="mx-auto max-w-3xl text-sm leading-7 text-[#F8F4EA]/52 md:text-base break-keep">
-                ORABIT은 오행의 균형을 바탕으로 강하게 드러나는 기운과 보완이 필요한 기운을 분석하고,
-                그 흐름에 어울리는 보석/주얼리를 제안합니다.
+                운명을 단정하기보다, 자신의 기질과 선택 방향을 돌아보는 데 도움을 주는 참고용 콘텐츠입니다.
               </p>
             </div>
 
@@ -39,11 +38,11 @@ export default function LandingPage() {
                 href="/input"
                 className="block w-full rounded-2xl bg-[#D6B46A] px-6 py-5 text-lg font-black text-[#0F172A] transition-all hover:bg-[#e4c477] active:scale-95"
               >
-                ORABIT 분석 시작하기
+                내 사주 보석 리포트 보기
               </Link>
               <p className="mt-3 text-xs font-semibold leading-5 text-[#F8F4EA]/48">
                 비회원도 바로 체험할 수 있어요.<br />
-                결과 저장과 프리미엄 질문은 로그인 후 이용됩니다.
+                결과 저장과 오늘의 선택 가이드는 로그인 후 더 편하게 이용할 수 있어요.
               </p>
             </div>
           </section>
@@ -59,7 +58,7 @@ export default function LandingPage() {
 
           <section className="grid gap-3 text-left md:grid-cols-3">
             {[
-              ['나의 부족한 에너지', '오행의 빈 곳을 찾아 필요한 흐름을 읽습니다.'],
+              ['나의 균형 포인트', '오행의 빈 곳을 찾아 보완하면 좋은 흐름을 읽습니다.'],
               ['나에게 맞는 보석', '색상, 보석, 금속을 한 조합으로 제안합니다.'],
               ['오늘의 착용 가이드', '연애, 재물, 사업, 관계 상황별 착용법을 정리합니다.'],
             ].map(([title, desc]) => (

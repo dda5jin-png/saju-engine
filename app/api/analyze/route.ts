@@ -28,11 +28,21 @@ function isValidInput(body: Partial<SajuInput>): body is SajuInput {
 }
 
 async function persistAnalysis(input: SajuInput, analysis: SajuAnalysis) {
-  const writePromise = addDoc(collection(getDb(), "results"), {
-    ...analysis,
-    input,
-    createdAt: serverTimestamp(),
-  }).then((docRef) => docRef.id);
+  let writePromise: Promise<string>;
+
+  try {
+    writePromise = addDoc(collection(getDb(), "results"), {
+      ...analysis,
+      input,
+      createdAt: serverTimestamp(),
+    }).then((docRef) => docRef.id);
+  } catch (error) {
+    console.warn(
+      'Firestore is unavailable; returning local analysis result:',
+      error instanceof Error ? error.message : error,
+    );
+    return null;
+  }
 
   writePromise.catch((error) => {
     console.error('Firestore write failed:', error);

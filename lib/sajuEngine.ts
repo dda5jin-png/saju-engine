@@ -13,6 +13,7 @@ import {
   ViralCharacterMode,
 } from '../types/saju';
 import { sajuRules } from './knowledge/sajuRules';
+import { recommendJewelry } from '../src/utils/recommendJewelry';
 
 const STEM_ELEMENTS: Record<string, ElementType> = {
   '甲': 'wood', '乙': 'wood',
@@ -41,11 +42,11 @@ const ELEMENT_LABELS: Record<ElementType, string> = {
 };
 
 const ELEMENT_PRACTICAL_NAMES: Record<ElementType, string> = {
-  wood: '시작과 방향을 세우는 에너지',
-  fire: '표현과 추진의 에너지',
-  earth: '기반과 현실감을 잡는 에너지',
-  metal: '정리와 기준을 세우는 에너지',
-  water: '관찰과 사고를 깊게 하는 에너지',
+  wood: '시작과 방향을 세우는 흐름',
+  fire: '표현과 추진의 흐름',
+  earth: '기반과 현실감을 잡는 흐름',
+  metal: '정리와 기준을 세우는 흐름',
+  water: '관찰과 사고를 깊게 하는 흐름',
 };
 
 const DAY_MASTER_COACHING: Record<string, { summary: string; thinking: string; emotion: string; presence: string; strength: string }> = {
@@ -124,13 +125,13 @@ const DAY_MASTER_COACHING: Record<string, { summary: string; thinking: string; e
 const ELEMENT_MEANINGS: Record<ElementType, { trait: string; excess: string; practice: string; image: string; lowImage: string }> = {
   wood: {
     trait: '성장, 기획, 확장, 시작의 힘',
-    excess: '일을 크게 벌리지만 마무리 에너지가 분산되기 쉽습니다.',
+    excess: '일을 크게 벌리지만 마무리 집중이 분산되기 쉽습니다.',
     practice: '목표를 작게 쪼개고 마감 기준을 먼저 정하세요.',
     image: '봄비를 맞고 한 번에 가지를 뻗는 나무처럼, 기회를 보면 먼저 몸이 앞으로 나갑니다.',
     lowImage: '화분의 흙은 있는데 새순이 늦게 올라오는 모습처럼, 시작의 명분과 방향을 더 분명히 세워야 힘이 붙습니다.',
   },
   fire: {
-    trait: '표현, 열정, 몰입, 드러나는 에너지',
+    trait: '표현, 열정, 몰입, 드러나는 흐름',
     excess: '감정 온도가 높아질 때 말과 선택이 빨라질 수 있습니다.',
     practice: '중요한 대화와 결제는 한 번 식힌 뒤 진행하세요.',
     image: '방 안의 조명을 단숨에 켜는 사람처럼, 분위기와 속도를 바꾸는 존재감이 있습니다.',
@@ -240,62 +241,6 @@ interface EightCharWithYun {
   getYun(gender: number, sect?: number): LunarYun;
 }
 
-const JEWELRY_MATCHING: Record<ElementType, {
-  meaning: string;
-  gems: string[];
-  colors: string[];
-  metals: string[];
-  shapes: string[];
-  jewelry: string;
-  tone: string;
-}> = {
-  wood: {
-    meaning: '성장, 확장, 시작',
-    gems: ['에메랄드', '페리도트', '그린 투어말린', '제이드'],
-    colors: ['그린'],
-    metals: ['화이트골드', '옐로우골드'],
-    shapes: ['길쭉한 형태'],
-    jewelry: '그린 스톤 펜던트',
-    tone: '그린, 새싹색, 브러시드 골드',
-  },
-  fire: {
-    meaning: '추진력, 행동력, 표현',
-    gems: ['루비', '가넷', '레드 스피넬', '핑크 사파이어'],
-    colors: ['레드', '핑크'],
-    metals: ['옐로우골드', '핑크골드'],
-    shapes: ['날카롭고 역동적인 컷'],
-    jewelry: '레드 스톤 링',
-    tone: '레드, 핑크, 로즈골드',
-  },
-  earth: {
-    meaning: '안정, 재물, 기반',
-    gems: ['시트린', '타이거아이', '옐로우 토파즈', '스모키 쿼츠'],
-    colors: ['브라운', '옐로우'],
-    metals: ['순금', '옐로우골드'],
-    shapes: ['둥근 형태'],
-    jewelry: '골드 브레이슬릿',
-    tone: '브라운, 옐로우, 순금',
-  },
-  metal: {
-    meaning: '결단력, 통제, 구조',
-    gems: ['다이아몬드', '화이트 사파이어', '화이트 토파즈'],
-    colors: ['화이트', '실버'],
-    metals: ['화이트골드', '플래티넘'],
-    shapes: ['각진 컷'],
-    jewelry: '화이트 메탈 링',
-    tone: '화이트, 실버, 플래티넘',
-  },
-  water: {
-    meaning: '흐름, 지혜, 관계',
-    gems: ['아쿠아마린', '블루 사파이어', '라피스라줄리', '블루 토파즈'],
-    colors: ['블루', '블랙'],
-    metals: ['화이트골드', '실버'],
-    shapes: ['물방울형'],
-    jewelry: '블루 스톤 네크리스',
-    tone: '블루, 블랙, 화이트 메탈',
-  },
-};
-
 const DAY_MASTER_SCENES: Record<string, { metaphor: string; shadow: string; advice: string }> = {
   '甲': {
     metaphor: '큰 나무가 하늘을 향해 곧게 서듯, 방향이 정해지면 주변을 이끌며 판을 키웁니다.',
@@ -315,7 +260,7 @@ const DAY_MASTER_SCENES: Record<string, { metaphor: string; shadow: string; advi
   '丁': {
     metaphor: '작은 촛불이 어두운 방의 방향을 잡아주듯, 조용하지만 오래 집중하는 힘이 있습니다.',
     shadow: '혼자 속을 태우면 불빛보다 그을음이 먼저 쌓입니다.',
-    advice: '마음에 품은 판단을 글이나 대화로 조금씩 꺼내야 에너지가 맑게 탑니다.',
+    advice: '마음에 품은 판단을 글이나 대화로 조금씩 꺼내야 흐름이 맑게 살아납니다.',
   },
   '戊': {
     metaphor: '산이 계절마다 자리를 지키듯, 흔들리는 상황에서 중심을 세우는 사람입니다.',
@@ -353,7 +298,7 @@ const DAY_MASTER_SCENES: Record<string, { metaphor: string; shadow: string; advi
 const DAY_MASTER_INFO: Record<string, { typeName: string; summary: string }> = {
   '甲': { typeName: '거대한 거목(甲)', summary: '앞장서서 나아가고 뿌리 깊은 자존감을 가진 리더 타입입니다.' },
   '乙': { typeName: '유연한 넝쿨(乙)', summary: '적응력이 뛰어나고 끈질긴 생명력을 가진 현실주의적 소통가입니다.' },
-  '丙': { typeName: '강렬한 태양(丙)', summary: '존재감이 확실하며 솔직하고 열정적으로 에너지를 발산합니다.' },
+  '丙': { typeName: '강렬한 태양(丙)', summary: '존재감이 확실하며 솔직하고 열정적으로 자신을 표현합니다.' },
   '丁': { typeName: '따뜻한 등불(丁)', summary: '내면의 열정이 강하며 세심하게 주변을 챙기는 전략가 스타일입니다.' },
   '戊': { typeName: '단단한 태산(戊)', summary: '묵직한 존재감과 신뢰를 바탕으로 흔들림 없이 자리를 지킵니다.' },
   '己': { typeName: '비옥한 대지(己)', summary: '포용력이 넓고 실속을 챙길 줄 아는 내실 있는 생산자입니다.' },
@@ -378,7 +323,7 @@ const DAY_MASTER_PROFILES: Record<string, DayMasterProfile> = {
   },
   '丙': {
     core: '존재감과 표현력이 강한 발산형 일간',
-    strength: '분위기를 띄우고 빠르게 몰입시키는 에너지',
+    strength: '분위기를 띄우고 빠르게 몰입시키는 힘',
     risk: '감정 온도가 높아질수록 판단이 성급해질 수 있음',
     strategy: '중요한 결정은 하루를 넘겨 확인하면 직관의 정확도가 올라갑니다.',
   },
@@ -397,7 +342,7 @@ const DAY_MASTER_PROFILES: Record<string, DayMasterProfile> = {
   '己': {
     core: '현실을 가꾸고 결과로 만드는 생산형 일간',
     strength: '세부를 챙기고 사람을 품는 실무 감각',
-    risk: '너무 많이 받아주다 자기 에너지가 분산될 수 있음',
+    risk: '너무 많이 받아주다 자기 집중이 분산될 수 있음',
     strategy: '내 몫과 남의 몫을 구분하는 체크리스트가 필요합니다.',
   },
   '庚': {
@@ -594,7 +539,7 @@ function buildCoachingSections(
       ]),
     },
     {
-      title: '강하게 쓰는 에너지',
+      title: '강하게 드러나는 기운',
       content: lineList([
         `당신은 ${dominantName}를 강하게 씁니다.`,
         `생활에서는 ${dominantRelation}로 나타납니다.`,
@@ -722,90 +667,77 @@ function getSupportElement(elementProfile: ElementProfile, distribution: Element
   return elementProfile.missing[0] ?? elementProfile.weak[0] ?? ranked[ranked.length - 1]?.type ?? 'water';
 }
 
-function classifyElementStates(distribution: ElementDistribution) {
-  const total = Object.values(distribution).reduce((sum, count) => sum + count, 0);
-  const lowCut = total >= 8 ? 1 : 0;
-  const highCut = total >= 8 ? 3 : 2;
-
-  return (Object.keys(distribution) as ElementType[]).reduce(
-    (states, type) => {
-      const count = distribution[type];
-      states[type] = count <= lowCut ? '부족' : count >= highCut ? '과다' : '적정';
-      return states;
-    },
-    {} as Record<ElementType, '부족' | '적정' | '과다'>,
-  );
-}
-
 function getAvoidElement(elementProfile: ElementProfile, distribution: ElementDistribution, supportElement: ElementType): ElementType {
   const ranked = getRankedElements(distribution);
   return elementProfile.dominant.find((type) => type !== supportElement) ?? ranked[0]?.type ?? supportElement;
-}
-
-function buildJewelryOptions(supportElement: ElementType, avoidElement: ElementType): JewelryOption[] {
-  const match = JEWELRY_MATCHING[supportElement];
-  const avoidLabel = ELEMENT_LABELS[avoidElement];
-
-  return match.gems.slice(0, 2).map((gemstone, index) => ({
-    gemstone,
-    reason:
-      index === 0
-        ? `${ELEMENT_LABELS[supportElement]}은 ${match.meaning}의 에너지입니다. 현재 구조에서 이 기운을 보완해야 하므로, ${match.colors.join('/')} 계열의 ${gemstone}이 가장 직접적인 상징이 됩니다. 과한 ${avoidLabel} 기운을 더 키우지 않고 필요한 방향만 선명하게 보강합니다.`
-        : `${gemstone}은 같은 ${ELEMENT_LABELS[supportElement]} 계열을 더 일상적으로 쓰기 좋은 대안입니다. 첫 번째 보석보다 부담이 적고, 매일 착용해도 스타일이 과해지지 않아 루틴형 보완에 적합합니다.`,
-    metal: match.metals[index % match.metals.length],
-    shape: match.shapes[0],
-  }));
 }
 
 function buildJewelryPracticalStrategy(supportElement: ElementType) {
   const label = ELEMENT_LABELS[supportElement];
 
   return {
-    love: `${label} 기운을 보완하는 보석은 관계에서 부족한 태도를 의식하게 만드는 장치입니다. 감정 표현이 약하면 목걸이, 결단이 약하면 반지로 시선을 고정하세요.`,
-    money: `${label} 기운은 재물 판단에서 빠진 기준을 보강합니다. 계약·결제·투자처럼 숫자를 다루는 날에는 손에 보이는 반지나 팔찌가 가장 실용적입니다.`,
+    love: `${label}의 상징을 담은 보석은 관계에서 필요한 태도를 떠올리는 스타일링 장치로 활용할 수 있습니다. 부드러운 표현이 필요한 날에는 목걸이, 기준을 세우고 싶은 날에는 반지가 잘 어울립니다.`,
+    money: `${label} 기운은 돈을 다룰 때 빠뜨리기 쉬운 기준을 점검하는 참고점이 될 수 있습니다. 계약·결제·투자처럼 숫자를 다루는 날에는 손에 보이는 반지나 팔찌가 실용적입니다.`,
     business: `사업이나 업무 확장 상황에서는 ${label}의 상징을 작은 포인트로 두는 편이 좋습니다. 과한 장식보다 매일 반복 착용 가능한 디자인이 신뢰감을 만듭니다.`,
-    relationship: `인간관계에서는 부족한 ${label} 기운을 말투보다 분위기로 먼저 보완하세요. 목걸이는 인상을 부드럽게, 팔찌는 행동의 리듬을 안정시킵니다.`,
-  };
-}
-
-function buildJewelryWearingGuide(supportElement: ElementType) {
-  const match = JEWELRY_MATCHING[supportElement];
-  const primaryGem = match.gems[0];
-  const secondaryGem = match.gems[1];
-  const metal = match.metals[0];
-
-  return {
-    ring: `${metal} ${primaryGem} 반지는 결정을 내려야 하는 날에 가장 적합합니다. 손에 보이는 위치라 선택 기준을 계속 상기시킵니다.`,
-    necklace: `${secondaryGem} 목걸이는 대화, 연애, 인간관계처럼 인상이 중요한 상황에 맞습니다. 시선이 얼굴과 목선으로 올라와 부드러운 보완이 됩니다.`,
-    bracelet: `${match.metals[match.metals.length - 1]} 팔찌는 돈, 일정, 업무처럼 반복 관리가 필요한 날에 좋습니다. 과시보다 루틴을 잡는 용도로 쓰세요.`,
+    relationship: `인간관계에서는 상대적으로 적게 드러난 ${label} 흐름을 말투보다 분위기로 먼저 표현해볼 수 있습니다. 목걸이는 인상을 부드럽게, 팔찌는 행동의 리듬을 차분하게 보이게 합니다.`,
   };
 }
 
 function buildJewelryRecommendation(elementProfile: ElementProfile, distribution: ElementDistribution): JewelryRecommendation {
   const supportElement = getSupportElement(elementProfile, distribution);
   const avoidElement = getAvoidElement(elementProfile, distribution, supportElement);
-  const match = JEWELRY_MATCHING[supportElement];
-  const recommendations = buildJewelryOptions(supportElement, avoidElement);
+  const jewelryReport = recommendJewelry(distribution, {
+    supportElement,
+    strongElement: avoidElement,
+  });
+  const supportInfo = jewelryReport.supportElementInfo;
+  const avoidInfo = jewelryReport.strongElementInfo;
+  const recommendations = jewelryReport.summaryGems.map((gem: {
+    name: string;
+    displayElement: string;
+    keywords?: string[];
+    situations?: string[];
+    reason: string;
+    stylingTip?: string;
+    recommendedMetals?: string[];
+    recommendedForms?: string[];
+  }) => {
+    return {
+      gemstone: gem.name,
+      element: gem.displayElement,
+      keywords: gem.keywords ?? [],
+      situations: gem.situations ?? [],
+      reason: gem.reason,
+      metal: jewelryReport.primaryMetal.name,
+      shape: jewelryReport.primaryForm.name,
+      styling_tip: gem.stylingTip,
+    };
+  });
+  const primary = recommendations[0];
   const practicalStrategy = buildJewelryPracticalStrategy(supportElement);
-  const wearingGuide = buildJewelryWearingGuide(supportElement);
+  const wearingGuide = {
+    ring: `${jewelryReport.primaryMetal.name} ${jewelryReport.primaryGem.name} 반지는 중요한 결정을 앞둔 날에 잘 어울립니다. 손에 보이는 위치라 차분하게 기준을 떠올리기 좋습니다.`,
+    necklace: `${recommendations[1]?.gemstone ?? jewelryReport.primaryGem.name} 목걸이는 얼굴 가까이에서 첫인상과 대화의 분위기를 부드럽게 정리해 줍니다.`,
+    bracelet: `${jewelryReport.primaryMetal.name} 팔찌는 일상 속에서 가볍게 분위기를 바꾸고 싶을 때 추천할 수 있습니다.`,
+  };
 
   return {
     support_element: supportElement,
-    element_label: ELEMENT_LABELS[supportElement],
-    gemstone: recommendations.map((item) => item.gemstone).join(' 또는 '),
-    jewelry: match.jewelry,
-    tone: match.tone,
-    reason: `${ELEMENT_LABELS[supportElement]} 기운은 현재 명식에서 보강해야 할 용신 축입니다. ${match.meaning}을 상징하는 색과 형태로 가져가야 해석과 착용 전략이 겹치지 않고 기능적으로 분리됩니다.`,
-    styling_tip: `${recommendations[0].metal} 소재와 ${recommendations[0].shape}를 우선으로 고르세요. 중요한 상황에서는 작은 포인트 하나만 선명하게 쓰는 편이 가장 단정합니다.`,
-    element_states: classifyElementStates(distribution),
+    element_label: supportInfo?.display ?? ELEMENT_LABELS[supportElement],
+    gemstone: recommendations.map((item: JewelryOption) => item.gemstone).join(' 또는 '),
+    jewelry: `${jewelryReport.primaryMetal.name} ${jewelryReport.primaryForm.name}`,
+    tone: jewelryReport.primaryMetal.name,
+    reason: `${supportInfo?.display ?? ELEMENT_LABELS[supportElement]}는 ${supportInfo?.friendlyMeaning ?? '균형을 보완하는 흐름'}과 연결해 해석할 수 있습니다. ${jewelryReport.primaryGem.name}은 이 흐름을 상징적으로 보여주는 보석으로 제안할 수 있습니다.`,
+    styling_tip: primary?.styling_tip ?? `${jewelryReport.primaryMetal.name} ${jewelryReport.primaryGem.name}을 작은 포인트로 쓰면 차분하고 정돈된 인상을 만들기 좋습니다.`,
+    element_states: jewelryReport.elementStates as JewelryRecommendation['element_states'],
     needed_element: supportElement,
     avoid_element: avoidElement,
-    needed_element_label: ELEMENT_LABELS[supportElement],
-    avoid_element_label: ELEMENT_LABELS[avoidElement],
+    needed_element_label: supportInfo?.display ?? ELEMENT_LABELS[supportElement],
+    avoid_element_label: avoidInfo?.display ?? ELEMENT_LABELS[avoidElement],
     recommendations,
     practical_strategy: practicalStrategy,
     wearing_guide: wearingGuide,
-    scenario_summary: `중요한 결정이나 도전 상황에서는 ${recommendations[0].metal} ${recommendations[0].gemstone} 반지를 착용하는 것이 가장 효과적입니다.`,
+    scenario_summary: `중요한 결정을 앞둔 날에는 ${primary?.metal ?? jewelryReport.primaryMetal.name} ${primary?.gemstone ?? jewelryReport.primaryGem.name} 반지나 ${primary?.shape ?? jewelryReport.primaryForm.name}처럼 맑고 절제된 조합이 잘 어울립니다. 나의 흐름을 돌아보는 참고용으로 활용해 보세요.`,
   };
 }
 
@@ -878,14 +810,14 @@ function buildDetailedReading(
     relationship: sentenceList([
       `관계에서는 ${supportMeaning.trait}이 보완 포인트입니다.`,
       matchedRules[0]?.interpretation.relationship_style ?? '가까운 관계일수록 기준과 감정 표현의 균형이 중요합니다.',
-      `부족한 ${ELEMENT_LABELS[support]} 기운은 ${supportMeaning.lowImage}`,
+      `상대적으로 적게 드러난 ${ELEMENT_LABELS[support]} 기운은 ${supportMeaning.lowImage}`,
       '상대가 원하는 답보다 내가 줄 수 있는 답의 범위를 먼저 말하면 관계가 덜 소모됩니다.',
     ]),
     money: sentenceList([
       matchedRules[0]?.interpretation.money_style ?? '돈은 안정성과 실행 속도의 균형이 핵심입니다.',
       `${dominantLabel} 기운이 강해 ${moneyAdvice.strength}이 재물 감각으로 드러납니다.`,
       `다만 ${moneyAdvice.risk}이 약점이 될 수 있으니, ${moneyAdvice.rule}`,
-      `부족한 ${supportLabel} 기운은 돈을 다룰 때 ${supportMoneyAdvice.strength}을 보완해 줍니다.`,
+      `상대적으로 적게 드러난 ${supportLabel} 기운은 돈을 다룰 때 ${supportMoneyAdvice.strength}을 돌아보게 합니다.`,
     ]),
     timing: sentenceList([
       timeKnown
@@ -895,7 +827,7 @@ function buildDetailedReading(
       sewoonText,
       `${dominantLabel} 기운이 앞서는 명식이라 ${timingAdvice.whenFast}은 빠르게 잡아도 힘이 붙습니다.`,
       `반대로 ${timingAdvice.whenSlow}은 서두르면 흐름이 흐트러질 수 있습니다.`,
-      `${timingAdvice.signal} 부족한 ${supportLabel} 기운을 살리려면 ${supportTimingAdvice.whenFast}을 일정 안에 의식적으로 넣어두는 편이 좋습니다. ${luckTiming.precision_note}`,
+      `${timingAdvice.signal} ${supportLabel}의 흐름을 살리려면 ${supportTimingAdvice.whenFast}을 일정 안에 의식적으로 넣어두는 편이 좋습니다. ${luckTiming.precision_note}`,
     ]),
     balance_practice: sentenceList([
       `${dominantLabel} 기운이 강한 날에는 ${dominantMeaning.excess}`,
@@ -1012,7 +944,7 @@ function buildViralCharacterMode(
 
   return {
     character_type: `${dominantLabel} 강한 ${archetype.type}`,
-    character_definition: `${archetype.definition}\n\n강한 ${dominantLabel} 기운 때문에 반응은 분명하고, 부족한 ${supportLabel} 기운 때문에 보완해야 할 빈틈도 선명하다.`,
+    character_definition: `${archetype.definition}\n\n강한 ${dominantLabel} 기운 때문에 반응은 분명하고, ${supportLabel}의 흐름을 보완하면 균형 포인트도 더 선명해진다.`,
     decision_style: ruleHook
       ? `${archetype.decision}\n\n이 명식의 판단 습관은 "${ruleHook}"에 가깝다.`
       : archetype.decision,
@@ -1080,7 +1012,7 @@ export function analyzeSaju(input: SajuInput): SajuAnalysis {
       : "분석을 위해 더 많은 데이터가 필요합니다.",
     relationship_style: primaryRule ? primaryRule.interpretation.relationship_style : "신중하고 논리적인 관계를 지향합니다.",
     money_style: primaryRule ? primaryRule.interpretation.money_style : "안정적인 흐름을 중시합니다.",
-    timing_flow: "현재는 자신의 구조를 이해하고 에너지를 응축해야 하는 시기입니다.",
+    timing_flow: "현재는 자신의 사주 구조를 이해하고 선택 기준을 정리하기 좋은 시기입니다.",
     element_distribution: distribution,
     pillars: pillars,
     day_master: dayMaster,

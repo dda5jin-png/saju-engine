@@ -1,6 +1,7 @@
 'use client';
 
 import { BookOpenCheck, CircleHelp, Compass, Landmark, ListChecks, ShieldCheck, Users } from 'lucide-react';
+import { useState } from 'react';
 import { DetailedReading, SajuAnalysis } from '@/types/saju';
 
 interface Props {
@@ -35,9 +36,11 @@ const sectionItems = [
 ] as const;
 
 export default function DetailedReadingPanel({ analysis }: Props) {
+  const [expanded, setExpanded] = useState(false);
   const reading = analysis.detailed_reading ?? fallbackReading(analysis);
   const coachingSections = reading.coaching_sections;
   const reliabilityNote = '역법 계산과 일간·오행 규칙을 바탕으로 한 참고 리포트입니다.';
+  const visibleCoachingSections = expanded ? coachingSections : coachingSections?.slice(0, 4);
 
   return (
     <section className="rounded-[2rem] border border-white/10 bg-white/[0.035] p-6 md:p-8 space-y-8">
@@ -48,8 +51,8 @@ export default function DetailedReadingPanel({ analysis }: Props) {
           </span>
           <div className="space-y-2">
             <h2 className="text-2xl md:text-3xl font-black text-white">상세 풀이</h2>
-            <p className="text-sm md:text-base leading-relaxed text-white/62">
-              사주 구조를 생활 언어로 바꾸어, 성향과 선택 방식을 바로 확인할 수 있게 정리했습니다.
+            <p className="break-keep text-sm leading-relaxed text-white/62 md:text-base">
+              상단의 보석/주얼리 리포트를 뒷받침하는 사주 구조 해석입니다. 먼저 핵심 성향과 균형 포인트를 확인하고, 필요한 항목은 펼쳐서 볼 수 있습니다.
             </p>
           </div>
         </div>
@@ -68,18 +71,27 @@ export default function DetailedReadingPanel({ analysis }: Props) {
 
       {coachingSections && coachingSections.length > 0 ? (
         <div className="grid gap-4">
-          {coachingSections.map((section, index) => (
+          {visibleCoachingSections?.map((section, index) => (
             <article key={section.title} className="grid gap-3 border-t border-white/10 pt-5 md:grid-cols-[160px_1fr]">
               <div className="flex items-center gap-2 text-sm font-black text-white">
                 <ListChecks size={17} className="text-cyan-300" />
                 <span className="text-cyan-200">{String(index + 1).padStart(2, '0')}</span>
-                {section.title}
+                {section.title.replace('강하게 쓰는 에너지', '강하게 드러나는 기운')}
               </div>
               <p className="whitespace-pre-line text-[15px] leading-7 text-white/72 break-keep">
                 {section.content}
               </p>
             </article>
           ))}
+          {coachingSections.length > 4 && (
+            <button
+              type="button"
+              onClick={() => setExpanded((value) => !value)}
+              className="rounded-2xl border border-white/10 bg-white/[0.05] px-5 py-4 text-sm font-black text-white transition active:scale-95"
+            >
+              {expanded ? '상세 풀이 접기' : '상세 풀이 더 보기'}
+            </button>
+          )}
         </div>
       ) : (
         <div className="grid gap-4">
