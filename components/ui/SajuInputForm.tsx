@@ -114,12 +114,12 @@ export default function SajuInputForm() {
         className="glass p-8 rounded-[2.5rem] space-y-8 border-white/10 shadow-2xl relative overflow-hidden"
       >
         {/* 장식용 빛 효과 */}
-        <div className="absolute -top-24 -right-24 w-48 h-48 bg-indigo-500/20 blur-[60px] rounded-full" />
-        <div className="absolute -bottom-24 -left-24 w-48 h-48 bg-purple-500/20 blur-[60px] rounded-full" />
+        <div className="absolute -top-24 -right-24 w-48 h-48 bg-[#D6B46A]/[0.18] blur-[64px] rounded-full" />
+        <div className="absolute -bottom-24 -left-24 w-48 h-48 bg-[#1F2A44]/10 blur-[64px] rounded-full" />
 
         <div className="space-y-6 relative z-10">
           <div>
-            <label className="block text-xs font-bold text-indigo-300 uppercase tracking-widest mb-3 ml-1">
+            <label className="block text-xs font-bold text-[#9A6D22] uppercase tracking-widest mb-3 ml-1">
               생년월일
             </label>
             <div className="grid grid-cols-[1.4fr_1fr_1fr] gap-3">
@@ -132,7 +132,7 @@ export default function SajuInputForm() {
                 placeholder="YYYY"
                 value={birthDateParts.year}
                 onChange={(e) => updateBirthDatePart('year', e.target.value, 4, monthInputRef)}
-                className="min-w-0 bg-white/5 border border-white/10 rounded-2xl px-4 py-4 text-white focus:ring-2 focus:ring-indigo-500 focus:bg-white/10 outline-none transition-all text-lg"
+                className="min-w-0 bg-white/5 border border-white/10 rounded-2xl px-4 py-4 text-white focus:ring-2 focus:ring-[#D6B46A]/45 focus:border-[#D6B46A]/45 focus:bg-white/10 outline-none transition-all text-lg"
               />
               <input
                 required
@@ -144,7 +144,7 @@ export default function SajuInputForm() {
                 placeholder="MM"
                 value={birthDateParts.month}
                 onChange={(e) => updateBirthDatePart('month', e.target.value, 2, dayInputRef)}
-                className="min-w-0 bg-white/5 border border-white/10 rounded-2xl px-4 py-4 text-white focus:ring-2 focus:ring-indigo-500 focus:bg-white/10 outline-none transition-all text-lg"
+                className="min-w-0 bg-white/5 border border-white/10 rounded-2xl px-4 py-4 text-white focus:ring-2 focus:ring-[#D6B46A]/45 focus:border-[#D6B46A]/45 focus:bg-white/10 outline-none transition-all text-lg"
               />
               <input
                 required
@@ -156,25 +156,25 @@ export default function SajuInputForm() {
                 placeholder="DD"
                 value={birthDateParts.day}
                 onChange={(e) => updateBirthDatePart('day', e.target.value, 2)}
-                className="min-w-0 bg-white/5 border border-white/10 rounded-2xl px-4 py-4 text-white focus:ring-2 focus:ring-indigo-500 focus:bg-white/10 outline-none transition-all text-lg"
+                className="min-w-0 bg-white/5 border border-white/10 rounded-2xl px-4 py-4 text-white focus:ring-2 focus:ring-[#D6B46A]/45 focus:border-[#D6B46A]/45 focus:bg-white/10 outline-none transition-all text-lg"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-indigo-300 uppercase tracking-widest mb-3 ml-1">
+            <label className="block text-xs font-bold text-[#9A6D22] uppercase tracking-widest mb-3 ml-1">
               태어난 시간 (선택)
             </label>
             <input
               type="time"
               value={form.birthTime}
               onChange={(e) => setForm({ ...form, birthTime: e.target.value })}
-              className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white focus:ring-2 focus:ring-indigo-500 focus:bg-white/10 outline-none transition-all text-lg"
+              className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white focus:ring-2 focus:ring-[#D6B46A]/45 focus:border-[#D6B46A]/45 focus:bg-white/10 outline-none transition-all text-lg"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-indigo-300 uppercase tracking-widest mb-3 ml-1">
+            <label className="block text-xs font-bold text-[#9A6D22] uppercase tracking-widest mb-3 ml-1">
               나의 성별
             </label>
             <div className="grid grid-cols-2 gap-3">
@@ -185,8 +185,8 @@ export default function SajuInputForm() {
                   onClick={() => setForm({ ...form, gender: g })}
                   className={`py-4 rounded-2xl border font-bold transition-all ${
                     form.gender === g 
-                      ? 'bg-indigo-600 border-indigo-400 text-[var(--result-accent-contrast)] shadow-lg shadow-indigo-500/30 scale-[1.02]' 
-                      : 'bg-white/5 border-white/10 text-gray-400 hover:bg-white/10'
+                      ? 'bg-[#1F2A44] border-[#D6B46A]/55 text-[var(--result-accent-contrast)] shadow-lg shadow-[#1F2A44]/20 scale-[1.02]' 
+                      : 'bg-white/5 border-white/10 text-gray-400 hover:border-[#D6B46A]/35 hover:bg-[#D6B46A]/10'
                   }`}
                 >
                   {g === 'male' ? '남성' : '여성'}
@@ -201,8 +201,8 @@ export default function SajuInputForm() {
           disabled={status === 'loading' || !form.birthDate}
           className="w-full relative group"
         >
-          <div className="absolute -inset-1 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl blur opacity-30 group-hover:opacity-100 transition duration-1000 group-hover:duration-200" />
-          <div className="relative w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-[var(--result-accent-contrast)] font-black py-5 rounded-2xl shadow-xl flex items-center justify-center gap-3 transition-all active:scale-[0.97]">
+          <div className="absolute -inset-1 bg-[linear-gradient(135deg,rgba(214,180,106,0.42),rgba(31,42,68,0.28))] rounded-2xl blur opacity-45 group-hover:opacity-75 transition duration-700" />
+          <div className="relative w-full bg-[linear-gradient(135deg,#1F2A44_0%,#263554_54%,#A77C2F_100%)] text-[var(--result-accent-contrast)] font-black py-5 rounded-2xl shadow-xl shadow-[#1F2A44]/20 flex items-center justify-center gap-3 transition-all active:scale-[0.97]">
             {status === 'loading' ? (
               <span className="animate-pulse">ORABIT 분석 가동 중...</span>
             ) : (
