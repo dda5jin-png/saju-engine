@@ -1,9 +1,10 @@
 'use client';
 
-import { ReactNode, useState } from 'react';
+import { ReactNode, useSyncExternalStore } from 'react';
 import { Moon, SunMedium } from 'lucide-react';
 
 const STORAGE_KEY = 'orabit:brightness-mode';
+const CHANGE_EVENT = 'orabit:brightness-change';
 
 type BrightnessMode = 'light' | 'dark';
 
@@ -12,24 +13,40 @@ interface Props {
   className?: string;
 }
 
-export default function BrightnessThemeShell({ children, className = '' }: Props) {
-  const [mode, setMode] = useState<BrightnessMode>(() => {
-    if (typeof window === 'undefined') return 'light';
+function getStoredMode(): BrightnessMode {
+  const savedMode = window.localStorage.getItem(STORAGE_KEY);
+  return savedMode === 'dark' ? 'dark' : 'light';
+}
 
-    const savedMode = window.localStorage.getItem(STORAGE_KEY);
-    if (savedMode === 'dark' || savedMode === 'light') {
-      return savedMode;
+function getServerMode(): BrightnessMode {
+  return 'light';
+}
+
+function subscribeToMode(onStoreChange: () => void) {
+  const handleStorage = (event: StorageEvent) => {
+    if (event.key === STORAGE_KEY) {
+      onStoreChange();
     }
+  };
 
-    return 'light';
-  });
+  window.addEventListener('storage', handleStorage);
+  window.addEventListener(CHANGE_EVENT, onStoreChange);
+
+  return () => {
+    window.removeEventListener('storage', handleStorage);
+    window.removeEventListener(CHANGE_EVENT, onStoreChange);
+  };
+}
+
+export default function BrightnessThemeShell({ children, className = '' }: Props) {
+  const mode = useSyncExternalStore(subscribeToMode, getStoredMode, getServerMode);
 
   const darkMode = mode === 'dark';
 
   const toggleMode = () => {
     const nextMode: BrightnessMode = darkMode ? 'light' : 'dark';
-    setMode(nextMode);
     window.localStorage.setItem(STORAGE_KEY, nextMode);
+    window.dispatchEvent(new Event(CHANGE_EVENT));
   };
 
   return (
