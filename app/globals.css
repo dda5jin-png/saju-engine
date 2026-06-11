@@ -125,6 +125,26 @@ h1, h2, h3, h4, h5, h6 {
   outline-offset: 3px;
 }
 
+.saju-gender-option {
+  border-color: var(--result-border);
+  background: var(--result-card);
+  color: var(--result-muted);
+}
+
+.saju-gender-option:hover {
+  border-color: var(--result-gold-border);
+  background: var(--result-gold-soft);
+}
+
+.saju-gender-option[aria-pressed="true"] {
+  border-color: var(--result-gold-border);
+  background: var(--result-gold-soft);
+  color: var(--result-text);
+  box-shadow:
+    inset 0 0 0 1px var(--result-gold-border),
+    0 8px 24px var(--result-accent-glow);
+}
+
 .result-primary-action {
   background: var(--result-action-bg);
   color: var(--result-action-text);
