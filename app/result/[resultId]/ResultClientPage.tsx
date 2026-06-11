@@ -1,8 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { getDb } from '@/lib/firebase';
-import { doc, getDoc } from 'firebase/firestore';
 import { SajuAnalysis } from '@/types/saju';
 import BrightnessThemeShell from '@/components/ui/BrightnessThemeShell';
 import CharacterGuide from '@/components/ui/CharacterGuide';
@@ -15,48 +13,28 @@ import PersonalSummaryPanel from '@/components/ui/PersonalSummaryPanel';
 
 interface Props {
   resultId: string;
+  initialAnalysis: SajuAnalysis | null;
 }
 
-async function getDocWithTimeout(docRef: ReturnType<typeof doc>) {
-  return Promise.race([
-    getDoc(docRef),
-    new Promise<null>((resolve) => {
-      setTimeout(() => resolve(null), 4500);
-    }),
-  ]);
-}
-
-export default function ResultClientPage({ resultId }: Props) {
-  const [analysis, setAnalysis] = useState<SajuAnalysis | null>(null);
-  const [loading, setLoading] = useState(true);
+export default function ResultClientPage({ resultId, initialAnalysis }: Props) {
+  const [analysis, setAnalysis] = useState<SajuAnalysis | null>(initialAnalysis);
+  const [loading, setLoading] = useState(!initialAnalysis);
 
   useEffect(() => {
-    async function fetchData() {
-      if (!resultId) return;
+    async function loadFallbackAnalysis() {
+      if (initialAnalysis || !resultId) return;
 
       const fallback = sessionStorage.getItem(`saju:analysis:${resultId}`);
 
       if (fallback) {
         setAnalysis(JSON.parse(fallback) as SajuAnalysis);
-        setLoading(false);
-        return;
-      }
-
-      try {
-        const docRef = doc(getDb(), 'results', resultId);
-        const docSnap = await getDocWithTimeout(docRef);
-
-        if (docSnap?.exists()) {
-          setAnalysis(docSnap.data() as SajuAnalysis);
-        }
-      } catch (error) {
-        console.error('Failed to load analysis result:', error);
       }
 
       setLoading(false);
     }
-    fetchData();
-  }, [resultId]);
+
+    void loadFallbackAnalysis();
+  }, [initialAnalysis, resultId]);
 
   if (loading) {
     return (
