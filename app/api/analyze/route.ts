@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server';
 import { analyzeSaju } from '@/lib/sajuEngine';
-import { getDb } from '@/lib/firebase';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { getAdminDb, getAdminFieldValue } from '@/lib/firebaseAdmin';
 import { randomUUID } from 'crypto';
 import { SajuAnalysis, SajuInput } from '@/types/saju';
+
+export const runtime = 'nodejs';
 
 function isValidBirthDate(value: string) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
@@ -28,14 +29,21 @@ function isValidInput(body: Partial<SajuInput>): body is SajuInput {
 }
 
 async function persistAnalysis(input: SajuInput, analysis: SajuAnalysis) {
-  let writePromise: Promise<string>;
-
   try {
-    writePromise = addDoc(collection(getDb(), "results"), {
+    const writePromise = getAdminDb().collection('results').add({
       ...analysis,
       input,
-      createdAt: serverTimestamp(),
-    }).then((docRef) => docRef.id);
+      createdAt: getAdminFieldValue().serverTimestamp(),
+    });
+
+    const docRef = await Promise.race([
+      writePromise,
+      new Promise<null>((resolve) => {
+        setTimeout(() => resolve(null), 4500);
+      }),
+    ]);
+
+    return docRef?.id ?? null;
   } catch (error) {
     console.warn(
       'Firestore is unavailable; returning local analysis result:',
@@ -43,17 +51,6 @@ async function persistAnalysis(input: SajuInput, analysis: SajuAnalysis) {
     );
     return null;
   }
-
-  writePromise.catch((error) => {
-    console.error('Firestore write failed:', error);
-  });
-
-  return Promise.race([
-    writePromise,
-    new Promise<null>((resolve) => {
-      setTimeout(() => resolve(null), 4500);
-    }),
-  ]);
 }
 
 export async function POST(request: Request) {
