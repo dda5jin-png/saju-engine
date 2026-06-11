@@ -11,6 +11,14 @@ import ViralCharacterPanel from '@/components/ui/ViralCharacterPanel';
 import DecisionCoachPanel from '@/components/ui/DecisionCoachPanel';
 import PersonalSummaryPanel from '@/components/ui/PersonalSummaryPanel';
 
+const reportSections = [
+  { href: '#element-balance', label: '오행 수치' },
+  { href: '#detailed-reading', label: '상세 풀이' },
+  { href: '#jewelry-guide', label: '주얼리' },
+  { href: '#share-card', label: '공유 카드' },
+  { href: '#decision-coach', label: '선택 가이드' },
+] as const;
+
 interface Props {
   resultId: string;
   initialAnalysis: SajuAnalysis | null;
@@ -63,7 +71,20 @@ export default function ResultClientPage({ resultId, initialAnalysis }: Props) {
     <BrightnessThemeShell className="min-h-screen">
       <main className="min-h-screen p-5 pb-24 pt-24 md:pt-24">
         <div className="result-report-font max-w-2xl mx-auto space-y-8 pb-8">
-          <PersonalSummaryPanel analysis={analysis} resultUrl={resultUrl} />
+          <PersonalSummaryPanel analysis={analysis} />
+
+          <nav aria-label="리포트 목차" className="grid grid-cols-2 gap-2 rounded-[1.5rem] border border-[color:var(--result-border)] bg-[var(--result-surface)] p-3 shadow-lg sm:grid-cols-5">
+            {reportSections.map((section, index) => (
+              <a
+                key={section.href}
+                href={section.href}
+                className="rounded-xl border border-transparent px-3 py-3 text-center text-xs font-black text-[color:var(--result-muted)] transition hover:border-[color:var(--result-border-strong)] hover:bg-[var(--result-soft)] hover:text-[var(--result-text)]"
+              >
+                <span className="block text-[10px] text-[var(--result-gold-text)]">{String(index + 2).padStart(2, '0')}</span>
+                {section.label}
+              </a>
+            ))}
+          </nav>
 
           <ElementBalancePanel
             distribution={analysis.element_distribution}
@@ -98,7 +119,7 @@ export default function ResultClientPage({ resultId, initialAnalysis }: Props) {
           <div className="pt-10 border-t border-[color:var(--result-border)]">
             <button
               onClick={() => window.location.href = '/'}
-              className="group relative inline-flex items-center justify-center px-8 py-4 font-bold text-[var(--result-text)] transition-all duration-200 bg-[var(--result-surface)] border border-[color:var(--result-border)] rounded-2xl hover:brightness-95 active:scale-95"
+              className="result-primary-action group relative inline-flex items-center justify-center rounded-2xl px-8 py-4 font-bold transition-all duration-200 hover:brightness-95 active:scale-95"
             >
               <span className="relative flex items-center gap-2">
                 <svg className="w-4 h-4 transition-transform group-hover:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">

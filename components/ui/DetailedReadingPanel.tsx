@@ -39,20 +39,28 @@ export default function DetailedReadingPanel({ analysis }: Props) {
   const [expanded, setExpanded] = useState(false);
   const reading = analysis.detailed_reading ?? fallbackReading(analysis);
   const coachingSections = reading.coaching_sections;
+  const uniqueCoachingSections = coachingSections?.filter(
+    (section) => ![
+      '한 줄 요약',
+      '강하게 쓰는 에너지',
+      '강하게 드러나는 기운',
+      '보완하면 좋아지는 부분',
+    ].includes(section.title),
+  );
   const reliabilityNote = '역법 계산과 일간·오행 규칙을 바탕으로 한 참고 리포트입니다.';
-  const visibleCoachingSections = expanded ? coachingSections : coachingSections?.slice(0, 4);
+  const visibleCoachingSections = expanded ? uniqueCoachingSections : uniqueCoachingSections?.slice(0, 4);
 
   return (
-    <section className="rounded-[2rem] border border-white/10 bg-white/[0.035] p-6 md:p-8 space-y-8">
+    <section id="detailed-reading" className="scroll-mt-24 space-y-8 rounded-[2rem] border border-[color:var(--result-border-strong)] bg-[var(--result-surface)] p-6 md:p-8">
       <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
         <div className="space-y-3">
-          <span className="inline-flex w-fit items-center gap-2 rounded-full border border-cyan-400/30 bg-cyan-400/10 px-4 py-1.5 text-[11px] font-bold text-cyan-200">
-            DEEP READING
+          <span className="inline-flex w-fit items-center gap-2 rounded-full border border-[color:var(--result-info-border)] bg-[var(--result-info-soft)] px-4 py-1.5 text-[11px] font-bold text-[var(--result-info-text)]">
+            03 · 생활 해석
           </span>
           <div className="space-y-2">
-            <h2 className="text-2xl md:text-3xl font-black text-white">상세 풀이</h2>
-            <p className="break-keep text-sm leading-relaxed text-white/62 md:text-base">
-              상단의 보석/주얼리 리포트를 뒷받침하는 사주 구조 해석입니다. 먼저 핵심 성향과 균형 포인트를 확인하고, 필요한 항목은 펼쳐서 볼 수 있습니다.
+            <h2 className="text-2xl font-black text-[var(--result-text)] md:text-3xl">상세 풀이</h2>
+            <p className="break-keep text-sm leading-relaxed text-[color:var(--result-muted)] md:text-base">
+              기질을 일, 관계, 돈, 타이밍과 생활 습관으로 나누어 해석합니다.
             </p>
           </div>
         </div>
@@ -61,7 +69,7 @@ export default function DetailedReadingPanel({ analysis }: Props) {
           {reading.basis.map((item) => (
             <span
               key={item}
-              className="rounded-xl border border-white/10 bg-black/25 px-3 py-2 text-xs font-semibold text-white/70"
+              className="rounded-xl border border-[color:var(--result-border)] bg-[var(--result-soft)] px-3 py-2 text-xs font-semibold text-[color:var(--result-muted)]"
             >
               {item}
             </span>
@@ -69,25 +77,25 @@ export default function DetailedReadingPanel({ analysis }: Props) {
         </div>
       </div>
 
-      {coachingSections && coachingSections.length > 0 ? (
+      {uniqueCoachingSections && uniqueCoachingSections.length > 0 ? (
         <div className="grid gap-4">
           {visibleCoachingSections?.map((section, index) => (
-            <article key={section.title} className="grid gap-3 border-t border-white/10 pt-5 md:grid-cols-[160px_1fr]">
-              <div className="flex items-center gap-2 text-sm font-black text-white">
-                <ListChecks size={17} className="text-cyan-300" />
-                <span className="text-cyan-200">{String(index + 1).padStart(2, '0')}</span>
+            <article key={section.title} className="grid gap-3 border-t border-[color:var(--result-border)] pt-5 md:grid-cols-[160px_1fr]">
+              <div className="flex items-center gap-2 text-sm font-black text-[var(--result-text)]">
+                <ListChecks size={17} className="text-[var(--result-info-text)]" />
+                <span className="text-[var(--result-info-text)]">{String(index + 1).padStart(2, '0')}</span>
                 {section.title.replace('강하게 쓰는 에너지', '강하게 드러나는 기운')}
               </div>
-              <p className="whitespace-pre-line text-[15px] leading-7 text-white/72 break-keep">
+              <p className="whitespace-pre-line text-[15px] leading-7 text-[color:var(--result-muted)] break-keep">
                 {section.content}
               </p>
             </article>
           ))}
-          {coachingSections.length > 4 && (
+          {uniqueCoachingSections.length > 4 && (
             <button
               type="button"
               onClick={() => setExpanded((value) => !value)}
-              className="rounded-2xl border border-white/10 bg-white/[0.05] px-5 py-4 text-sm font-black text-white transition active:scale-95"
+              className="rounded-2xl border border-[color:var(--result-border-strong)] bg-[var(--result-soft)] px-5 py-4 text-sm font-black text-[var(--result-text)] transition active:scale-95"
             >
               {expanded ? '상세 풀이 접기' : '상세 풀이 더 보기'}
             </button>
@@ -96,12 +104,12 @@ export default function DetailedReadingPanel({ analysis }: Props) {
       ) : (
         <div className="grid gap-4">
           {sectionItems.map(({ key, label, icon: Icon }) => (
-            <article key={key} className="grid gap-3 border-t border-white/10 pt-5 md:grid-cols-[140px_1fr]">
-              <div className="flex items-center gap-2 text-sm font-black text-white">
-                <Icon size={17} className="text-cyan-300" />
+            <article key={key} className="grid gap-3 border-t border-[color:var(--result-border)] pt-5 md:grid-cols-[140px_1fr]">
+              <div className="flex items-center gap-2 text-sm font-black text-[var(--result-text)]">
+                <Icon size={17} className="text-[var(--result-info-text)]" />
                 {label}
               </div>
-              <p className="text-[15px] leading-7 text-white/72 break-keep">
+              <p className="text-[15px] leading-7 text-[color:var(--result-muted)] break-keep">
                 {reading[key]}
               </p>
             </article>
@@ -109,12 +117,12 @@ export default function DetailedReadingPanel({ analysis }: Props) {
         </div>
       )}
 
-      <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-5">
-        <div className="flex items-center gap-2 text-sm font-extrabold text-white/85">
+      <div className="rounded-2xl border border-[color:var(--result-border)] bg-[var(--result-soft)] p-5">
+        <div className="flex items-center gap-2 text-sm font-extrabold text-[var(--result-text)]">
           <ShieldCheck size={17} />
           해석 기준
         </div>
-        <p className="mt-3 text-sm leading-6 text-white/58 break-keep">
+        <p className="mt-3 text-sm leading-6 text-[color:var(--result-muted)] break-keep">
           {reliabilityNote}
         </p>
       </div>

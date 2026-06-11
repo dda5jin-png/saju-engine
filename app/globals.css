@@ -37,20 +37,40 @@ h1, h2, h3, h4, h5, h6 {
 .result-theme {
   --result-bg: #f8f4ea;
   --result-text: #172033;
-  --result-muted: rgba(31, 41, 55, 0.68);
-  --result-faint: rgba(31, 41, 55, 0.46);
-  --result-surface: rgba(255, 255, 255, 0.78);
-  --result-surface-strong: rgba(255, 255, 255, 0.92);
-  --result-card: rgba(255, 255, 255, 0.66);
-  --result-border: rgba(15, 23, 42, 0.12);
-  --result-border-strong: rgba(15, 23, 42, 0.18);
-  --result-gold: #a77c2f;
+  --result-muted: #465166;
+  --result-faint: #667085;
+  --result-surface: rgba(255, 255, 255, 0.86);
+  --result-surface-strong: rgba(255, 255, 255, 0.96);
+  --result-card: rgba(255, 255, 255, 0.78);
+  --result-border: rgba(15, 23, 42, 0.16);
+  --result-border-strong: rgba(15, 23, 42, 0.24);
+  --result-gold: #805b17;
   --result-accent: #1f2a44;
   --result-accent-contrast: #ffffff;
   --result-accent-soft: rgba(31, 42, 68, 0.08);
   --result-accent-glow: rgba(166, 123, 47, 0.2);
-  --result-soft: rgba(15, 23, 42, 0.05);
+  --result-soft: rgba(15, 23, 42, 0.065);
   --result-shadow: 0 24px 80px rgba(15, 23, 42, 0.1);
+  --result-gold-text: #805b17;
+  --result-gold-soft: rgba(167, 124, 47, 0.12);
+  --result-gold-border: rgba(128, 91, 23, 0.32);
+  --result-info-text: #155e75;
+  --result-info-soft: rgba(8, 145, 178, 0.1);
+  --result-info-border: rgba(14, 116, 144, 0.3);
+  --result-support-text: #075985;
+  --result-support-soft: rgba(14, 165, 233, 0.1);
+  --result-support-border: rgba(2, 132, 199, 0.3);
+  --result-strong-text: #92400e;
+  --result-strong-soft: rgba(245, 158, 11, 0.12);
+  --result-strong-border: rgba(217, 119, 6, 0.3);
+  --result-share-text: #86198f;
+  --result-share-soft: rgba(217, 70, 239, 0.09);
+  --result-share-border: rgba(192, 38, 211, 0.28);
+  --result-success-text: #065f46;
+  --result-success-soft: rgba(16, 185, 129, 0.1);
+  --result-success-border: rgba(5, 150, 105, 0.3);
+  --result-action-bg: #1f2a44;
+  --result-action-text: #ffffff;
   background:
     radial-gradient(circle at 18% 4%, rgba(214, 180, 106, 0.24), transparent 28%),
     radial-gradient(circle at 80% 12%, rgba(31, 42, 68, 0.07), transparent 26%),
@@ -62,21 +82,123 @@ h1, h2, h3, h4, h5, h6 {
 .result-theme-dark {
   --result-bg: #030712;
   --result-text: #f8f4ea;
-  --result-muted: rgba(248, 244, 234, 0.62);
-  --result-faint: rgba(248, 244, 234, 0.42);
-  --result-surface: rgba(255, 255, 255, 0.035);
-  --result-surface-strong: rgba(255, 255, 255, 0.07);
-  --result-card: rgba(0, 0, 0, 0.24);
-  --result-border: rgba(255, 255, 255, 0.1);
-  --result-border-strong: rgba(255, 255, 255, 0.16);
+  --result-muted: #d2cec4;
+  --result-faint: #aaa69d;
+  --result-surface: rgba(255, 255, 255, 0.055);
+  --result-surface-strong: rgba(255, 255, 255, 0.09);
+  --result-card: rgba(0, 0, 0, 0.28);
+  --result-border: rgba(255, 255, 255, 0.15);
+  --result-border-strong: rgba(255, 255, 255, 0.24);
   --result-gold: #d6b46a;
   --result-accent: #d6b46a;
-  --result-accent-contrast: #ffffff;
+  --result-accent-contrast: #111827;
   --result-accent-soft: rgba(214, 180, 106, 0.12);
   --result-accent-glow: rgba(214, 180, 106, 0.24);
-  --result-soft: rgba(255, 255, 255, 0.055);
+  --result-soft: rgba(255, 255, 255, 0.075);
   --result-shadow: 0 24px 80px rgba(0, 0, 0, 0.34);
+  --result-gold-text: #f1cf82;
+  --result-gold-soft: rgba(214, 180, 106, 0.14);
+  --result-gold-border: rgba(241, 207, 130, 0.34);
+  --result-info-text: #a5f3fc;
+  --result-info-soft: rgba(34, 211, 238, 0.1);
+  --result-info-border: rgba(103, 232, 249, 0.28);
+  --result-support-text: #bae6fd;
+  --result-support-soft: rgba(56, 189, 248, 0.11);
+  --result-support-border: rgba(125, 211, 252, 0.3);
+  --result-strong-text: #fde68a;
+  --result-strong-soft: rgba(245, 158, 11, 0.12);
+  --result-strong-border: rgba(252, 211, 77, 0.3);
+  --result-share-text: #f5d0fe;
+  --result-share-soft: rgba(232, 121, 249, 0.1);
+  --result-share-border: rgba(240, 171, 252, 0.28);
+  --result-success-text: #a7f3d0;
+  --result-success-soft: rgba(52, 211, 153, 0.1);
+  --result-success-border: rgba(110, 231, 183, 0.3);
+  --result-action-bg: #e4c77f;
+  --result-action-text: #111827;
   background: radial-gradient(circle at top center, #111827 0%, #000000 100%);
+}
+
+.result-theme button:focus-visible,
+.result-theme a:focus-visible {
+  outline: 3px solid var(--result-gold);
+  outline-offset: 3px;
+}
+
+.result-primary-action {
+  background: var(--result-action-bg);
+  color: var(--result-action-text);
+}
+
+.result-section-kicker {
+  border-color: var(--result-border-strong);
+  background: var(--result-soft);
+  color: var(--result-muted);
+}
+
+.result-element {
+  border-color: var(--element-border);
+  background: var(--element-soft);
+  color: var(--element-text);
+}
+
+.result-element-bar {
+  background: var(--element-bar);
+}
+
+.result-element-wood {
+  --element-text: #047857;
+  --element-soft: rgba(16, 185, 129, 0.11);
+  --element-border: rgba(5, 150, 105, 0.3);
+  --element-bar: #10b981;
+}
+
+.result-element-fire {
+  --element-text: #be123c;
+  --element-soft: rgba(244, 63, 94, 0.1);
+  --element-border: rgba(225, 29, 72, 0.28);
+  --element-bar: #fb7185;
+}
+
+.result-element-earth {
+  --element-text: #854d0e;
+  --element-soft: rgba(234, 179, 8, 0.12);
+  --element-border: rgba(202, 138, 4, 0.3);
+  --element-bar: #eab308;
+}
+
+.result-element-metal {
+  --element-text: #0369a1;
+  --element-soft: rgba(14, 165, 233, 0.1);
+  --element-border: rgba(2, 132, 199, 0.3);
+  --element-bar: #38bdf8;
+}
+
+.result-element-water {
+  --element-text: #0e7490;
+  --element-soft: rgba(6, 182, 212, 0.1);
+  --element-border: rgba(8, 145, 178, 0.3);
+  --element-bar: #22d3ee;
+}
+
+.result-theme-dark .result-element-wood {
+  --element-text: #a7f3d0;
+}
+
+.result-theme-dark .result-element-fire {
+  --element-text: #fecdd3;
+}
+
+.result-theme-dark .result-element-earth {
+  --element-text: #fef08a;
+}
+
+.result-theme-dark .result-element-metal {
+  --element-text: #bae6fd;
+}
+
+.result-theme-dark .result-element-water {
+  --element-text: #a5f3fc;
 }
 
 .result-theme-dark input[type="date"]::-webkit-calendar-picker-indicator,

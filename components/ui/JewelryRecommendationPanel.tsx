@@ -103,30 +103,15 @@ function normalizeJewelry(analysis: SajuAnalysis) {
   };
 }
 
-function statusClass(status?: string) {
-  if (status === '부족' || status === '보완 포인트') return 'border-sky-300/35 bg-sky-100/55 text-sky-950';
-  if (status === '과다' || status === '강하게 드러남') return 'border-amber-300/35 bg-amber-100/60 text-amber-950';
-  return 'border-[color:var(--result-border)] bg-[var(--result-card)] text-[color:var(--result-muted)]';
-}
-
-function displayStatus(status?: string) {
-  if (status === '부족') return '보완 포인트';
-  if (status === '과다') return '강하게 드러남';
-  if (status === '적정') return '균형권';
-  return status ?? '균형권';
-}
-
 export default function JewelryRecommendationPanel({ analysis }: Props) {
   const jewelry = normalizeJewelry(analysis);
   const recommendations = jewelry.recommendations ?? [];
-  const supportElement = jewelry.needed_element ?? jewelry.support_element ?? getClientSupportElement(analysis);
-  const supportInfo = fiveElements[supportElement] ?? fiveElements.water;
 
   return (
-    <section className="overflow-hidden rounded-[1.75rem] border border-[color:var(--result-border)] bg-[var(--result-surface)] p-5 shadow-2xl md:p-6">
+    <section id="jewelry-guide" className="scroll-mt-24 overflow-hidden rounded-[1.75rem] border border-[color:var(--result-border-strong)] bg-[var(--result-surface)] p-5 shadow-2xl md:p-6">
       <div className="space-y-6">
         <div className="flex items-start gap-4">
-          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-[#D6B46A]/35 bg-[#D6B46A]/15 text-[#9A6D22]">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-[color:var(--result-gold-border)] bg-[var(--result-gold-soft)] text-[var(--result-gold-text)]">
             <Gem size={23} />
           </div>
 
@@ -134,63 +119,27 @@ export default function JewelryRecommendationPanel({ analysis }: Props) {
             <div className="flex flex-wrap items-center gap-2">
               <span className="inline-flex items-center gap-1 rounded-full border border-[color:var(--result-border)] bg-[var(--result-card)] px-3 py-1 text-[11px] font-black text-[color:var(--result-muted)]">
                 <Sparkles size={13} />
-                JEWELRY DETAIL REPORT
+                04 · 착용 가이드
               </span>
-              <span className="rounded-full bg-[#D6B46A]/15 px-3 py-1 text-[11px] font-extrabold text-[#9A6D22]">
+              <span className="rounded-full border border-[color:var(--result-gold-border)] bg-[var(--result-gold-soft)] px-3 py-1 text-[11px] font-extrabold text-[var(--result-gold-text)]">
                 {jewelry.needed_element_label ?? jewelry.element_label} 보완
               </span>
             </div>
             <h2 className="text-xl font-black leading-tight text-[var(--result-text)] md:text-2xl">
-              보석/주얼리 상세 리포트
+              보석과 주얼리 추천
             </h2>
             <p className="break-keep text-sm leading-6 text-[color:var(--result-muted)]">
-              상대적으로 적게 드러난 오행 흐름을 색, 보석, 금속, 착용 형태로 연결한 주얼리 큐레이션입니다.
+              오행 해석을 실제 보석, 금속, 착용 형태로 연결한 스타일 큐레이션입니다.
             </p>
           </div>
         </div>
 
-        <div className="rounded-3xl border border-[#D6B46A]/30 bg-[#D6B46A]/12 p-5">
-          <p className="text-[11px] font-black tracking-[0.14em] text-[#9A6D22]">BEST 착용 아이템</p>
+        <div className="rounded-3xl border border-[color:var(--result-gold-border)] bg-[var(--result-gold-soft)] p-5">
+          <p className="text-[11px] font-black tracking-[0.14em] text-[var(--result-gold-text)]">BEST 착용 아이템</p>
           <h3 className="mt-2 text-xl font-black text-[var(--result-text)]">{jewelry.jewelry}</h3>
           <p className="mt-4 break-keep text-sm font-bold leading-6 text-[color:var(--result-muted)]">
             {jewelry.styling_tip}
           </p>
-        </div>
-
-        <div className="space-y-3">
-          <h3 className="text-sm font-black text-[var(--result-text)]">오행 분석</h3>
-          <div className="grid grid-cols-5 gap-2">
-            {elementOrder.map((element) => {
-              const status = jewelry.element_states?.[element] ?? '균형권';
-              return (
-                <div key={element} className={`rounded-2xl border px-1.5 py-3 text-center ${statusClass(status)}`}>
-                  <p className="text-[11px] font-black">{fiveElements[element].display}</p>
-                  <p className="mt-1 text-xs font-extrabold">{displayStatus(status)}</p>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        <div className="grid gap-3 sm:grid-cols-2">
-          <div className="rounded-2xl border border-emerald-300/30 bg-emerald-100/45 p-4">
-            <p className="text-[11px] font-black text-emerald-900/60">보완 포인트</p>
-            <p className="mt-2 text-lg font-black text-[var(--result-text)]">
-              {jewelry.needed_element_label ?? jewelry.element_label}
-            </p>
-            <p className="mt-2 text-sm leading-6 text-[color:var(--result-muted)]">
-              {supportInfo.description}
-            </p>
-          </div>
-          <div className="rounded-2xl border border-amber-300/25 bg-amber-100/35 p-4">
-            <p className="text-[11px] font-black text-amber-900/60">강하게 드러남</p>
-            <p className="mt-2 text-lg font-black text-[var(--result-text)]">
-              {jewelry.avoid_element_label ?? '강하게 드러나는 기운'}
-            </p>
-            <p className="mt-2 text-sm leading-6 text-[color:var(--result-muted)]">
-              이미 강하게 드러나므로 과하게 더하지 않는 편이 좋습니다.
-            </p>
-          </div>
         </div>
 
         <div className="space-y-3">
@@ -245,13 +194,6 @@ export default function JewelryRecommendationPanel({ analysis }: Props) {
             </div>
           </div>
         )}
-
-        <div className="rounded-3xl bg-[var(--result-surface-strong)] p-5 text-center text-[var(--result-text)]">
-          <p className="text-[11px] font-black text-[color:var(--result-faint)]">WEARING SCENARIO</p>
-          <p className="mt-2 break-keep text-lg font-black leading-7 text-[var(--result-text)]">
-            {jewelry.scenario_summary ?? jewelry.styling_tip}
-          </p>
-        </div>
 
         <p className="break-keep text-xs font-bold leading-5 text-[color:var(--result-faint)]">
           보석 추천은 명리학적 상징과 스타일 큐레이션을 결합한 참고 정보이며, 의학적·법률적·재정적 효능을 보장하지 않습니다.

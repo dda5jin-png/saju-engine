@@ -41,10 +41,15 @@ export default function DecisionCoachPanel({ resultId }: Props) {
   const [remainingFreeUses, setRemainingFreeUses] = useState<number | null>(null);
 
   useEffect(() => {
-    const unsubscribe = subscribeToAuthChanges((nextUser) => {
-      setUser(nextUser);
-    });
-    return () => unsubscribe();
+    try {
+      const unsubscribe = subscribeToAuthChanges((nextUser) => {
+        setUser(nextUser);
+      });
+      return () => unsubscribe();
+    } catch {
+      console.info('Decision coach auth is unavailable.');
+      return undefined;
+    }
   }, []);
 
   const runDecisionCoach = async () => {
@@ -101,11 +106,11 @@ export default function DecisionCoachPanel({ resultId }: Props) {
   };
 
   return (
-    <section className="space-y-5 rounded-[2rem] border border-[color:var(--result-border)] bg-[var(--result-surface-strong)] p-6 shadow-2xl md:p-8">
+    <section id="decision-coach" className="scroll-mt-24 space-y-5 rounded-[2rem] border border-[color:var(--result-border-strong)] bg-[var(--result-surface-strong)] p-6 shadow-2xl md:p-8">
       <div className="space-y-3">
-        <span className="inline-flex items-center gap-2 rounded-full border border-emerald-300/25 bg-emerald-300/10 px-3 py-1 text-[11px] font-bold text-emerald-700">
+        <span className="inline-flex items-center gap-2 rounded-full border border-[color:var(--result-success-border)] bg-[var(--result-success-soft)] px-3 py-1 text-[11px] font-bold text-[var(--result-success-text)]">
           <BrainCircuit size={14} />
-          TODAY CHOICE GUIDE
+          06 · 선택 도구
         </span>
         <div className="space-y-2">
           <h2 className="text-2xl font-black text-[var(--result-text)]">오늘의 선택 가이드</h2>
@@ -122,7 +127,7 @@ export default function DecisionCoachPanel({ resultId }: Props) {
             onClick={() => setCategory(item.id)}
             className={`rounded-2xl px-3 py-3 text-xs font-extrabold transition ${
               category === item.id
-                ? 'bg-emerald-400 text-black'
+                ? 'result-primary-action'
                 : 'border border-[color:var(--result-border)] bg-[var(--result-soft)] text-[color:var(--result-muted)]'
             }`}
           >
@@ -142,7 +147,7 @@ export default function DecisionCoachPanel({ resultId }: Props) {
       <button
         onClick={runDecisionCoach}
         disabled={loading}
-        className="flex w-full items-center justify-center gap-2 rounded-2xl bg-emerald-400 px-5 py-4 font-black text-black transition active:scale-95 disabled:opacity-50"
+        className="result-primary-action flex w-full items-center justify-center gap-2 rounded-2xl px-5 py-4 font-black transition active:scale-95 disabled:opacity-50"
       >
         {loading ? <Loader2 size={20} className="animate-spin" /> : <ArrowRight size={20} />}
         {loading ? '상황 정리 중...' : '내 고민 정리하기'}

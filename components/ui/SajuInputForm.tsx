@@ -185,7 +185,7 @@ export default function SajuInputForm() {
                   onClick={() => setForm({ ...form, gender: g })}
                   className={`py-4 rounded-2xl border font-bold transition-all ${
                     form.gender === g 
-                      ? 'bg-[#1F2A44] border-[#D6B46A]/55 text-[var(--result-accent-contrast)] shadow-lg shadow-[#1F2A44]/20 scale-[1.02]' 
+                      ? 'bg-[#1F2A44] border-[#D6B46A]/55 text-white shadow-lg shadow-[#1F2A44]/20 scale-[1.02]'
                       : 'bg-white/5 border-white/10 text-gray-400 hover:border-[#D6B46A]/35 hover:bg-[#D6B46A]/10'
                   }`}
                 >
@@ -202,7 +202,7 @@ export default function SajuInputForm() {
           className="w-full relative group"
         >
           <div className="absolute -inset-1 bg-[linear-gradient(135deg,rgba(214,180,106,0.42),rgba(31,42,68,0.28))] rounded-2xl blur opacity-45 group-hover:opacity-75 transition duration-700" />
-          <div className="relative w-full bg-[linear-gradient(135deg,#1F2A44_0%,#263554_54%,#A77C2F_100%)] text-[var(--result-accent-contrast)] font-black py-5 rounded-2xl shadow-xl shadow-[#1F2A44]/20 flex items-center justify-center gap-3 transition-all active:scale-[0.97]">
+          <div className="relative w-full bg-[linear-gradient(135deg,#1F2A44_0%,#263554_54%,#A77C2F_100%)] text-white font-black py-5 rounded-2xl shadow-xl shadow-[#1F2A44]/20 flex items-center justify-center gap-3 transition-all active:scale-[0.97]">
             {status === 'loading' ? (
               <span className="animate-pulse">ORABIT 분석 가동 중...</span>
             ) : (

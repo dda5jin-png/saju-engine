@@ -124,52 +124,35 @@ export default function ViralCharacterPanel({ analysis, resultUrl, resultId }: P
   };
 
   return (
-    <section className="space-y-6" data-share-exclude>
+    <section id="share-card" className="scroll-mt-24 space-y-6" data-share-exclude>
       <div className="rounded-[2rem] border border-[color:var(--result-border)] bg-[var(--result-surface-strong)] p-6 shadow-2xl md:p-8">
         <div className="space-y-3 border-b border-[color:var(--result-border)] pb-6">
-          <span className="inline-flex rounded-full border border-fuchsia-300/25 bg-fuchsia-300/10 px-3 py-1 text-[11px] font-bold text-fuchsia-700">
-            SHARE CHARACTER CARD
+          <span className="inline-flex rounded-full border border-[color:var(--result-share-border)] bg-[var(--result-share-soft)] px-3 py-1 text-[11px] font-bold text-[var(--result-share-text)]">
+            05 · 공유 카드
           </span>
           <div className="space-y-2">
-            <h2 className="text-2xl font-extrabold text-[var(--result-text)]">공유용 캐릭터 카드</h2>
+            <h2 className="text-2xl font-extrabold text-[var(--result-text)]">공유 문구 고르기</h2>
             <p className="text-sm leading-6 text-[color:var(--result-muted)]">
-              사주 용어를 줄이고 친구에게 바로 공유하기 좋은 문장으로 정리했습니다.
+              상세 풀이를 반복하지 않고, 친구에게 보여줄 한 문장만 선택할 수 있습니다.
             </p>
           </div>
         </div>
 
-        <div className="divide-y divide-[color:var(--result-border)]">
-          <ViralBlock title="캐릭터 정의" content={viral.character_definition} />
-          <ViralBlock title="의사결정 방식" content={viral.decision_style} />
-          <ViralBlock title="닮은 캐릭터" content={viral.similar_character} />
-          <article className="py-5">
-            <h3 className="text-sm font-extrabold text-[var(--result-text)]">주변 사람이 보는 너</h3>
-            <div className="mt-3 space-y-2">
-              {viral.outsider_quotes.map((quote) => (
-                <p key={quote} className="rounded-2xl border border-[color:var(--result-border)] bg-[var(--result-soft)] px-4 py-3 text-[15px] leading-6 text-[color:var(--result-muted)]">
-                  &ldquo;{quote}&rdquo;
-                </p>
-              ))}
-            </div>
-          </article>
-          <article className="py-5">
-            <h3 className="text-sm font-extrabold text-[var(--result-text)]">공유용 한줄 문장</h3>
-            <div className="mt-3 grid gap-2">
-              {shareLines.map((line, index) => (
-                <button
-                  key={line}
-                  onClick={() => setSelectedLine(line)}
-                  className={`rounded-2xl border px-4 py-3 text-left text-[15px] font-bold leading-6 transition ${
-                    selectedLine === line
-                      ? 'border-emerald-300/60 bg-emerald-300/12 text-emerald-700'
-                      : 'border-[color:var(--result-border)] bg-[var(--result-soft)] text-[color:var(--result-muted)] hover:brightness-95'
-                  }`}
-                >
-                  {index + 1}) {line}
-                </button>
-              ))}
-            </div>
-          </article>
+        <div className="grid gap-2 pt-5">
+          {shareLines.map((line, index) => (
+            <button
+              key={line}
+              onClick={() => setSelectedLine(line)}
+              aria-pressed={selectedLine === line}
+              className={`rounded-2xl border px-4 py-3 text-left text-[15px] font-bold leading-6 transition ${
+                selectedLine === line
+                  ? 'border-[color:var(--result-success-border)] bg-[var(--result-success-soft)] text-[var(--result-success-text)]'
+                  : 'border-[color:var(--result-border)] bg-[var(--result-soft)] text-[color:var(--result-muted)] hover:brightness-95'
+              }`}
+            >
+              {index + 1}) {line}
+            </button>
+          ))}
         </div>
       </div>
 
@@ -197,7 +180,7 @@ export default function ViralCharacterPanel({ analysis, resultUrl, resultId }: P
         </div>
 
         {notice && (
-          <div role="status" aria-live="polite" className="rounded-2xl border border-emerald-400/30 bg-emerald-400/12 px-5 py-4 text-center text-sm font-extrabold text-emerald-700">
+          <div role="status" aria-live="polite" className="rounded-2xl border border-[color:var(--result-success-border)] bg-[var(--result-success-soft)] px-5 py-4 text-center text-sm font-extrabold text-[var(--result-success-text)]">
             {notice}
           </div>
         )}
@@ -206,7 +189,7 @@ export default function ViralCharacterPanel({ analysis, resultUrl, resultId }: P
           <button
             onClick={saveImage}
             disabled={saving}
-            className="flex min-h-14 flex-col items-center justify-center gap-1 rounded-2xl bg-[var(--result-text)] text-xs font-extrabold text-[var(--result-accent-contrast)] transition active:scale-95 disabled:opacity-50"
+            className="result-primary-action flex min-h-14 flex-col items-center justify-center gap-1 rounded-2xl text-xs font-extrabold transition active:scale-95 disabled:opacity-50"
           >
             {saving ? <Loader2 size={18} className="animate-spin" /> : <Download size={18} />}
             카드 이미지 저장
@@ -228,16 +211,5 @@ export default function ViralCharacterPanel({ analysis, resultUrl, resultId }: P
         </div>
       </div>
     </section>
-  );
-}
-
-function ViralBlock({ title, content }: { title: string; content: string }) {
-  return (
-    <article className="py-5">
-      <h3 className="text-sm font-extrabold text-[var(--result-text)]">{title}</h3>
-      <p className="mt-3 whitespace-pre-line text-[15px] leading-7 text-[color:var(--result-muted)] break-keep">
-        {content}
-      </p>
-    </article>
   );
 }

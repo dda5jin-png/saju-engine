@@ -1,22 +1,13 @@
 'use client';
 
-import { Download, Gem, Link as LinkIcon, RotateCcw, Share2, Sparkles } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { Sparkles } from 'lucide-react';
+import { useMemo } from 'react';
 import { SajuAnalysis, ElementType } from '@/types/saju';
 import { recommendJewelry } from '@/src/utils/recommendJewelry';
 
 interface Props {
   analysis: SajuAnalysis;
-  resultUrl: string;
 }
-
-type SummaryGem = {
-  id: string;
-  name: string;
-  displayElement: string;
-  reason: string;
-  situations: string[];
-};
 
 const dayMasterCopy: Record<string, { display: string; title: string; subtitle: string }> = {
   '甲': {
@@ -77,8 +68,7 @@ function getSupportElement(analysis: SajuAnalysis): ElementType {
   return analysis.element_profile?.missing?.[0] ?? analysis.element_profile?.weak?.[0] ?? weakest;
 }
 
-export default function PersonalSummaryPanel({ analysis, resultUrl }: Props) {
-  const [notice, setNotice] = useState('');
+export default function PersonalSummaryPanel({ analysis }: Props) {
   const supportElement = getSupportElement(analysis);
   const jewelry = useMemo(
     () => recommendJewelry(analysis.element_distribution, { supportElement }),
@@ -89,33 +79,20 @@ export default function PersonalSummaryPanel({ analysis, resultUrl }: Props) {
     title: analysis.summary,
     subtitle: analysis.day_master_profile?.strategy ?? analysis.summary,
   };
-  const strong = jewelry.strongElementInfo;
   const support = jewelry.supportElementInfo;
-  const gems = jewelry.summaryGems.slice(0, 2);
-  const topGemNames = (gems as SummaryGem[]).map((gem) => gem.name).join(', ');
+  const topGemNames = (jewelry.summaryGems as Array<{ name: string }>)
+    .slice(0, 2)
+    .map((gem) => gem.name)
+    .join(', ');
   const keywords = analysis.personality_keywords?.slice(0, 3).join(' / ') || jewelry.strongElementInfo?.keywords?.join(' / ');
 
-  const showNotice = (message: string) => {
-    setNotice(message);
-    setTimeout(() => setNotice(''), 2200);
-  };
-
-  const copyLink = async () => {
-    try {
-      await navigator.clipboard.writeText(resultUrl);
-      showNotice('결과 링크가 복사되었습니다');
-    } catch {
-      showNotice('링크 복사에 실패했습니다');
-    }
-  };
-
   return (
-    <section className="overflow-hidden rounded-[2rem] border border-[#D6B46A]/30 bg-[linear-gradient(145deg,rgba(214,180,106,0.18),rgba(255,255,255,0.045)_42%,rgba(96,165,250,0.08))] p-5 shadow-2xl md:p-7">
+    <section id="result-summary" className="scroll-mt-24 overflow-hidden rounded-[2rem] border border-[color:var(--result-gold-border)] bg-[linear-gradient(145deg,var(--result-gold-soft),var(--result-surface-strong)_44%,var(--result-info-soft))] p-5 shadow-2xl md:p-7">
       <div className="space-y-6">
         <div className="space-y-4 text-center">
-          <span className="inline-flex items-center gap-2 rounded-full border border-[#D6B46A]/35 bg-[#D6B46A]/15 px-4 py-1.5 text-[11px] font-black tracking-[0.14em] text-[#B9892B]">
+          <span className="inline-flex items-center gap-2 rounded-full border border-[color:var(--result-gold-border)] bg-[var(--result-gold-soft)] px-4 py-1.5 text-[11px] font-black tracking-[0.14em] text-[var(--result-gold-text)]">
             <Sparkles size={14} />
-            ORABIT PERSONAL JEWELRY REPORT
+            01 · 핵심 요약
           </span>
           <div className="space-y-3">
             <p className="text-sm font-extrabold text-[color:var(--result-faint)]">{dayMaster.display}</p>
@@ -128,82 +105,15 @@ export default function PersonalSummaryPanel({ analysis, resultUrl }: Props) {
           </div>
         </div>
 
-        <div className="grid gap-3 sm:grid-cols-2">
+        <div className="grid gap-3 sm:grid-cols-3">
           <SummaryItem label="핵심 기질" value={keywords} />
-          <SummaryItem label="강하게 드러나는 기운" value={`${strong?.display ?? '토(土)'}: ${strong?.keywords?.join(', ') ?? '안정, 기준, 현실감'}`} />
-          <SummaryItem label="보완 포인트" value={`${support?.display ?? '수(水)'}: ${support?.keywords?.join(', ') ?? '흐름, 유연함, 감정 조절'}`} />
-          <SummaryItem label="추천 주얼리" value={`${jewelry.primaryMetal.name} ${jewelry.primaryForm.name}`} />
+          <SummaryItem label="보완 방향" value={`${support?.display ?? '수(水)'} · ${support?.keywords?.slice(0, 2).join(', ') ?? '유연함, 감정 조절'}`} />
+          <SummaryItem label="오늘의 주얼리" value={`${jewelry.primaryMetal.name} ${jewelry.primaryForm.name} · ${topGemNames}`} />
         </div>
 
-        <div className="rounded-[1.5rem] border border-[#D6B46A]/30 bg-[#D6B46A]/12 p-5">
-          <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#D6B46A]/20 text-[#A97622]">
-              <Gem size={22} />
-            </div>
-            <div>
-              <p className="text-xs font-black text-[#A97622]">추천 보석</p>
-              <h2 className="mt-1 text-xl font-black text-[var(--result-text)]">{topGemNames}</h2>
-            </div>
-          </div>
-          <div className="mt-4 grid gap-3">
-            {(gems as SummaryGem[]).map((gem, index) => (
-              <article key={gem.id} className="rounded-2xl border border-[color:var(--result-border)] bg-[var(--result-card)] p-4">
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="rounded-full bg-[#D6B46A]/15 px-2.5 py-1 text-[11px] font-black text-[#A97622]">
-                    {index + 1}순위
-                  </span>
-                  <h3 className="font-black text-[var(--result-text)]">{gem.name}</h3>
-                  <span className="text-xs font-bold text-[color:var(--result-faint)]">{gem.displayElement}</span>
-                </div>
-                <p className="mt-3 break-keep text-sm leading-6 text-[color:var(--result-muted)]">{gem.reason}</p>
-                <p className="mt-2 text-xs font-bold leading-5 text-[color:var(--result-faint)]">
-                  어울리는 상황: {gem.situations.slice(0, 4).join(', ')}
-                </p>
-              </article>
-            ))}
-          </div>
-        </div>
-
-        <div className="grid gap-2 sm:grid-cols-3">
-          <button
-            type="button"
-            onClick={() => document.getElementById('share-card-actions')?.scrollIntoView({ behavior: 'smooth', block: 'center' })}
-            className="inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl bg-[var(--result-text)] px-4 text-sm font-black text-[var(--result-accent-contrast)] active:scale-95"
-          >
-            <Download size={17} />
-            내 리포트 저장하기
-          </button>
-          <button
-            type="button"
-            onClick={() => document.getElementById('share-card-actions')?.scrollIntoView({ behavior: 'smooth', block: 'center' })}
-            className="inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl border border-[color:var(--result-border)] bg-[var(--result-surface)] px-4 text-sm font-black text-[var(--result-text)] active:scale-95"
-          >
-            <Share2 size={17} />
-            친구에게 공유하기
-          </button>
-          <button
-            type="button"
-            onClick={() => window.location.href = '/'}
-            className="inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl border border-[color:var(--result-border)] bg-[var(--result-surface)] px-4 text-sm font-black text-[var(--result-text)] active:scale-95"
-          >
-            <RotateCcw size={17} />
-            다시 분석하기
-          </button>
-        </div>
-
-        <button
-          type="button"
-          onClick={copyLink}
-          className="mx-auto flex items-center gap-2 text-xs font-bold text-[color:var(--result-faint)] underline-offset-4 hover:underline"
-        >
-          <LinkIcon size={14} />
-          결과 링크 복사
-        </button>
-        {notice && (
-          <p role="status" className="text-center text-sm font-bold text-emerald-700">
-            {notice}
-          </p>
-        )}
+        <p className="text-center text-xs font-bold leading-5 text-[color:var(--result-faint)]">
+          아래에서 오행 수치, 상세 해석, 실제 착용법을 순서대로 확인할 수 있습니다.
+        </p>
       </div>
     </section>
   );
